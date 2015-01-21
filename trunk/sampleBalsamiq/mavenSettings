@@ -1,0 +1,12 @@
+<profile>
+	<id>profile1</id>
+	<properties> 
+	  <fr.gencodefrombalsamiq.freemarker.catalog.components.dir>c:/temp/balsamiq/assets</fr.gencodefrombalsamiq.freemarker.catalog.components.dir>
+	  <fr.gencodefrombalsamiq.freemarker.template.dir>c:/temp/balsamiq/templates</fr.gencodefrombalsamiq.freemarker.template.dir>
+	  <fr.gencodefrombalsamiq.balsamiq.bmml.dir>c:/temp/balsamiq/sourcesBalsamiq</fr.gencodefrombalsamiq.balsamiq.bmml.dir>
+	  <fr.gencodefrombalsamiq.freemarker.properties.file>C:/Temp/balsamiq/templates/freeMarkerTemplatesHTML.properties</fr.gencodefrombalsamiq.freemarker.properties.file>
+      <fr.gencodefrombalsamiq.messagesFile>c:/temp/balsamiq/sourcesBalsamiq/messages.properties</fr.gencodefrombalsamiq.messagesFile>
+	  <fr.gencodefrombalsamiq.propertiesFile>C:/Temp/balsamiq/sourcesBalsamiq/config.properties</fr.gencodefrombalsamiq.propertiesFile>
+	  <fr.gencodefrombalsamiq.generatedproject.dir>C:/georges/projets/Zk/%project%</fr.gencodefrombalsamiq.generatedproject.dir>
+	  <fr.gencodefrombalsamiq.projectName>projetBalsamiq2</fr.gencodefrombalsamiq.projectName>
+	</properties> 
