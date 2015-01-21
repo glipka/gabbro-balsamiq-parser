@@ -5,11 +5,9 @@ modify setting.xml
 
 
 = Details =
-
-
-  * modify maven setting.xml (detailed in documentation) 
   * uncompress balsamiqSample.zip 
-  * 
+  * modify maven setting.xml (detailed in documentation) 
+  * execute programme : mvn exec:exec -Dexec.executable="java" -e
 
 example of maven setting.xml 
 
