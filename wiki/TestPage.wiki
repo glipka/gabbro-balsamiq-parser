@@ -1,4 +1,4 @@
-#summary How to test Gabbro
+#summary How to execute Gabbro
 = Introduction =
 
 modify setting.xml
