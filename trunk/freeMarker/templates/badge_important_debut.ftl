@@ -1,0 +1,1 @@
+ <span id="badge${internalId}" class="badge badge-important"><#if text??>${text}<#else></#if>  

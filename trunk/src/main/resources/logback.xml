@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds" debug="true">
+	<property name="app-name" value="balsamiqFreeMarkerConverter" />
+	<property name="file-default-path" value="c:/temp/balsamiq/logs" />
+	<property name="pattern-console-message"
+		value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg \\(%file:%line\\)%n" />
+	<property name="pattern-file-message"
+		value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg \\(%file:%line\\)%n" />
+	<property name="file-default-maxsize" value="5MB" />
+	<property name="file-default-maxhistory" value="30" />
+
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${pattern-console-message}</pattern>
+		</encoder>
+	</appender>
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${file-default-path}/${app-name}.log</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>${pattern-file-message}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${file-default-path}/%d{yyyy-MM-dd}/${app-name}-%d{yyyyMMdd}-%i.gz
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches predefined size -->
+				<maxFileSize>${file-default-maxsize}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- keep 1 day' worth of history -->
+			<maxHistory>1</maxHistory>
+		</rollingPolicy>
+	</appender>
+	<appender name="FILE-ERRORS"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<file>${file-default-path}/${app-name}-errors.log</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>${pattern-file-message}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${file-default-path}/%d{yyyy-MM-dd}/${app-name}-%d{yyyyMMdd}-errors-%i.gz
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches predefined size -->
+				<maxFileSize>${file-default-maxsize}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+
+
+	<!-- Project specific loggers -->
+	<logger name="fr.gencodeframbalsamiq" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+
+
+
+	<root level="DEBUG">
+
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

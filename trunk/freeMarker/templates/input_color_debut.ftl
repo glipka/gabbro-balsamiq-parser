@@ -1,0 +1,1 @@
+<input  type="color" class="form-control" id="input${internalId}"    name="input${internalId}" >
