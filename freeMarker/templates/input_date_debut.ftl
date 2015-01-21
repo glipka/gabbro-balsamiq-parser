@@ -1,0 +1,1 @@
+<input  type="date" class="form-control" id="input${internalId}" placeholder="${text}"    name="input${internalId}" >

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="HelloWorldServiceService" targetNamespace="http://webService1.auchan.com/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://webService1.auchan.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://webService1.auchan.com/" version="1.0" xmlns:tns="http://webService1.auchan.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="get" type="tns:get"/>
+<xs:element name="getResponse" type="tns:getResponse"/>
+<xs:element name="sayHi" type="tns:sayHi"/>
+<xs:element name="sayHiResponse" type="tns:sayHiResponse"/>
+<xs:complexType name="sayHi">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="arg1" type="tns:input"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="input">
+<xs:sequence>
+<xs:element minOccurs="0" name="mes1" type="xs:string"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mes2" nillable="true" type="tns:objectComplexe"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="objectComplexe">
+<xs:sequence>
+<xs:element minOccurs="0" name="mes1" type="xs:string"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mes2" nillable="true" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType abstract="true" name="abstractCollection">
+<xs:sequence/>
+</xs:complexType>
+<xs:complexType abstract="true" name="abstractList">
+<xs:complexContent>
+<xs:extension base="tns:abstractCollection">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="arrayList">
+<xs:complexContent>
+<xs:extension base="tns:abstractList">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="sayHiResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:issueResponse"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="issueResponse">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="imbrique" nillable="true" type="tns:imbrique"/>
+<xs:element minOccurs="0" name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="imbrique">
+<xs:sequence>
+<xs:element minOccurs="0" name="subMessage" type="tns:sousImbrique"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="sousImbrique">
+<xs:sequence>
+<xs:element minOccurs="0" name="subMessage" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="get">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:issueResponse"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getResponse">
+    <wsdl:part element="tns:getResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHi">
+    <wsdl:part element="tns:sayHi" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="get">
+    <wsdl:part element="tns:get" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+    <wsdl:part element="tns:sayHiResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HelloWorldService">
+    <wsdl:operation name="sayHi">
+      <wsdl:input message="tns:sayHi" name="sayHi">
+    </wsdl:input>
+      <wsdl:output message="tns:sayHiResponse" name="sayHiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get">
+      <wsdl:input message="tns:get" name="get">
+    </wsdl:input>
+      <wsdl:output message="tns:getResponse" name="getResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloWorldServiceServiceSoapBinding" type="tns:HelloWorldService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHi">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHi">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="get">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloWorldServiceService">
+    <wsdl:port binding="tns:HelloWorldServiceServiceSoapBinding" name="HelloWorldServicePort">
+      <soap:address location="http://localhost:8080/web-services1/services/HelloWorldService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

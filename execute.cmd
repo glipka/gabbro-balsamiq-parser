@@ -1,0 +1,1 @@
+mvn exec:exec -Dexec.executable="java" -e

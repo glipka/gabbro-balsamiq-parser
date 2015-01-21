@@ -1,0 +1,1 @@
+<hr  <#if color??>color="${color}"</#if>>

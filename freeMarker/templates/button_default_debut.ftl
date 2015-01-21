@@ -1,0 +1,1 @@
+ <input  type="submit" class="btn btn-default" id="label${internalId}"<#if text??>value="${text}"<#else>value=""</#if> >

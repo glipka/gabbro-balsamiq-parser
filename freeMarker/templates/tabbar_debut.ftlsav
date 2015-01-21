@@ -1,0 +1,15 @@
+ <ul class="nav nav-tabs  tabs-left" role="tablist" id="tabbar${internalId}"> 
+	<#list tabs as tab>
+			<li><a href="${tab.getBookmark()}" role="tab" data-toggle="tab">${tab.getTab()}</a></li>
+	 </#list> 
+        
+</ul>
+	<div class="tabbable">
+        <div class="tab-content">
+ <#list tabs as tab>
+			 <div class="tab-pane" id="${tab.getTab()}">
+				<p>I'm in Section A.</p>
+			</div>
+</#list>
+		</div>
+	</div>
