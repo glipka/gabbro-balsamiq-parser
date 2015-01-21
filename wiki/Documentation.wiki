@@ -2,7 +2,8 @@
 
 = Introduction =
 
-A general documentation is available here  (in french)
+A general documentation is available here  (in french) :
+https://docs.google.com/document/d/18jevlPr6iy0V4eQ8OYvIq_bCqD5LeNuvTifkIqD8TnM/edit?usp=sharing
 A Guide prototyping will be available soon
 
 
