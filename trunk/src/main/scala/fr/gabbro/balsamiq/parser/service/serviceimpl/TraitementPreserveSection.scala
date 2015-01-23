@@ -34,7 +34,6 @@ import scala.beans.BeanProperty
 import java.nio.file.NoSuchFileException
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
-
 // ----------------------------------------------------------------------------------------
 // Traitement des preserves section
 // chaque section commence par preserve debut 
@@ -52,15 +51,21 @@ class TraitementPreserveSection extends TTraitementCommun {
   // ----------------------------------------------------------------------------------------------------------------------------------
   // **** on récupère le code de la section ****
   // maptemplateByKeyNumber sert à stocker le dernier numero de preserver section utilisé pour ce template
-  //  mapDesPreserveSection contient le code des sections (la clef est le nom du template et le n° de section pour ce template
+  // mapDesPreserveSection contient le code des sections (la clef est le nom du template et le n° de section pour ce template
   // ----------------------------------------------------------------------------------------------------------------------------------
-  def getSectionContent(templateName: String): String = {
+  def getSectionContent(templateName: String, initialContent: String): String = {
     var dernierNumeroClefPourLeTemplate = maptemplateByKeyNumber.getOrElse(templateName, -1) // dernièr n° de clef lu pour le template ?
     dernierNumeroClefPourLeTemplate += 1
     maptemplateByKeyNumber.put(templateName, dernierNumeroClefPourLeTemplate) // on met à jour le n° de la dernière section pour le template
+    // Si le contenu a été modifié on retourne le contenu modifié, sinon on retourne le contenu initial
     val codeDeLaSection = mapDesPreserveSection.getOrElse((dernierNumeroClefPourLeTemplate, templateName), "")
     logBack.debug(utilitaire.getContenuMessage("mes53"), fichierEnCoursDeTraitement, templateName, codeDeLaSection)
-    codeDeLaSection
+    if (codeDeLaSection.trim != "" && codeDeLaSection != initialContent) {
+      codeDeLaSection
+    } else {
+      initialContent
+    }
+
   }
 
   def process(filename: String): TraitementPreserveSection = {
