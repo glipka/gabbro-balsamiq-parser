@@ -27,6 +27,13 @@ import fr.gabbro.balsamiq.parser.modelimpl.ItemVar
 // *** verification de la validité de la position des widgets ***
 // ------------------------------------------------------------------
 class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: TraitementBinding, globalContext: GlobalContext) extends TControleValidite {
+  def process: Boolean = {
+    controle
+    mise_en_table_des_formulaires_pour_templates_et_RetraitementDesBinds(catalog, null)
+    true
+
+  }
+
   // différents controles pour vérifier que les widgets du catalogue sont OK
   def controle: Boolean = {
     var erreur = false
@@ -54,7 +61,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     for (i <- 0 until branche.size) {
       for (j <- i + 1 until branche.size) {
         branche(i).xAbsolute
-        if (intersection(branche(i), branche(j))) { logBack.error(utilitaire.getContenuMessage("mes25"),branche(i).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString())  }
+        if (intersection(branche(i), branche(j))) { logBack.error(utilitaire.getContenuMessage("mes25"), branche(i).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString()) }
       }
       if (branche(i).tableau_des_fils.size > 0) { verification_intersection_entre_widgets_branche(branche(i).tableau_des_fils) }
 
@@ -77,13 +84,13 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
       if (widgetPere.isFormulaireHTML && CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == controle.controlTypeID || x == controle.componentName))) {
         val v1 = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.variableBinding, "").toString()
         val v2 = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.mapBinding, "").toString()
-        if (v1 == "" && v2 == "") { logBack.error(utilitaire.getContenuMessage("mes23"),controle.controlTypeID.split("::").last) }
+        if (v1 == "" && v2 == "") { logBack.error(utilitaire.getContenuMessage("mes23"), controle.controlTypeID.split("::").last) }
       }
       if (controle.isFormulaireHTML) {
         // id formulaire renseigné ? 
-        if (controle.customId == "") { logBack.error(utilitaire.getContenuMessage("mes29"),controle.controlTypeID.split("::").last)  }
+        if (controle.customId == "") { logBack.error(utilitaire.getContenuMessage("mes29"), controle.controlTypeID.split("::").last) }
         // plus de 1 formulaire avec le même Nom ? 
-        else if (CommonObjectForMockupProcess.listeNomdesFormulaires.filter(_ == controle.customId).size > 1) { logBack.error(utilitaire.getContenuMessage("mes30"),controle.controlTypeID.split("::").last) }
+        else if (CommonObjectForMockupProcess.listeNomdesFormulaires.filter(_ == controle.customId).size > 1) { logBack.error(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last) }
       }
       if (controle.tableau_des_fils.size > 0) { verification_binding_variable(controle.tableau_des_fils, controle) }
 
