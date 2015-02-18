@@ -46,10 +46,30 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 // pour chaque widget, on génère la hashMap contenant les paramètres à passer au moteur de templating freemarker
 // -----------------------------------------------------------------------------------------------------------------------
 // engineProperties.freemarkerVariablePrefix
+
+/**
+ * @author Georges Lipka
+ * -----------------------------------------------------------------------------------------------------------------------
+ * <p>Pour chaque widget, on récupère le nom du template à appeler.</p>
+ * <p>Chaque widget pouvant être un container, il y un template pour la phase début et
+ * un template pour la phase fin.</p>
+ * <p>Pour un widget, on peut aussi trouver un fichier js_template.debut et js_template.fin</p>
+ * <p>Si le template js_xxx existe, on l'appelle après l'exécution du template widget
+ * et ceci afin de générer un fichier javascript pour chaque page html. (donc chaque fichier balsamiq)
+ * ainsi qu'un fichier de code (java, scala, ...)</p>
+ * <p>pour chaque widget, on génère la hashMap contenant les paramètres à passer au moteur de templating freemarker</p>
+ *
+ *
+ */
 class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirOut: String, val templateCodeOut: String, sessionBalsamiq: GlobalContext) extends TMoteurTemplatingFreeMarker {
-  // -----------------------------------------------------------------------------------------------
-  // inialisation des propriétés du moteur de templating et chargement de la table des templates
-  // -----------------------------------------------------------------------------------------------
+
+  /**
+   *  -----------------------------------------------------------------------------------------------
+   * inialisation des propriétés du moteur de templating et chargement de la table des templates
+   * -----------------------------------------------------------------------------------------------
+   *
+   * @return
+   */
   def init(): Boolean = {
     try {
       logBack.info(utilitaire.getContenuMessage("mes57"))
@@ -84,9 +104,12 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
 
   }
 
-  // ---------------------------------------------------------------
-  // recupération nom du template
-  // ---------------------------------------------------------------
+  /**
+   * recupération nom du template
+   * @param widget : object widgetDeBase
+   * @param phase : begin or end
+   * @return : name of template
+   */
   def determinationNomDuTemplate(widget: WidgetDeBase, phase: String): (Option[String], Option[String], Option[String]) = {
     val name = widget.getWidgetNameOrComponentName()
     return determinationNomDuTemplate(widget.getWidgetNameOrComponentName(), phase)
@@ -95,6 +118,15 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
   // on récupère le nom du template dans la table des templates
   // puis on génère le nom des fichiers templates pour la partie HTML, javascript et code
   // ------------------------------------------------------------------------------------------
+
+  /**
+   * on récupère le nom du template dans la table des templates
+   * puis on génère le nom des fichiers templates pour la partie HTML, javascript et code
+   *
+   * @param widgetName : widget name
+   * @param phase : begin or end
+   * @return : name of template
+   */
   def determinationNomDuTemplate(widgetName: String, phase: String): (Option[String], Option[String], Option[String]) = {
     val templateName = tableDesTemplates.getOrElse(widgetName, Some(CommonObjectForMockupProcess.constants.templateUndefined))
 
@@ -122,10 +154,13 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     }
 
   }
-  // ----------------------------------------------------------------------------------------------------
-  // *** lecture du fichier properties et chargement dans une map des identifications des templates ***
-  // on verifie que les fichiers template existent physiquement (debut et fin)
-  // ----------------------------------------------------------------------------------------------------
+ 
+  /**
+   * lecture du fichier properties et chargement dans une map des identifications des templates ***
+   * on verifie que les fichiers template existent physiquement (debut et fin)
+   * @param templateDirectory : directory where templates are located
+   * @return (returnCode,Map of templates[String,String])
+   */
   def getAllPropertiesTemplatesHTML(templateDirectory: String): (Boolean, scala.collection.mutable.Map[String, Option[String]]) = {
     val tableDesTemplates = scala.collection.mutable.Map[String, Option[String]]()
     var templateEncours = ""
@@ -163,21 +198,29 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     (ok, tableDesTemplates)
 
   }
-  //new SourceCompactor(source).writeTo(new OutputStreamWriter(System.out));
-  def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
+   
+  /**
+ * @param NomDuFichierSourceJavaOuScala : html fileName to write
+ * @param sourceEcran : buffer to write
+ * @return : true or false
+ */
+def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
     val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
     val source = new Source(sourceEcran);
-    // Utilisation du parser Jerichho pour formater le généré HTML.
+    // Utilisation du parser Jericho pour formater le généré HTML.
     val sourceFormat = new SourceFormatter(source).setIndentString("\t").setTidyTags(true).setCollapseWhiteSpace(true);
     utilitaire.ecrire_fichier(fileName, sourceFormat.toString())
     true
   }
 
-  // --------------------------------------------------------------------------------------------
-  // si le template est dans la liste des templates pour lesquels il n'y a pas de génération
-  // on ne genere pas de code pour les fils (cas de DHTMLxgrid par exemple)
-  // --------------------------------------------------------------------------------------------
-  def templateAGenerer(widget: WidgetDeBase): Boolean = {
+    
+/**
+ * si le template est dans la liste des templates pour lesquels il n'y a pas de génération
+ * on ne genere pas de code pour les fils (cas de DHTMLxgrid par exemple)
+ * @param widget :instance of WidgetDeBase
+ * @return : true or false
+ */
+def templateAGenerer(widget: WidgetDeBase): Boolean = {
     if (widget != null) { !CommonObjectForMockupProcess.engineProperties.bypassGenerationTemplateForChildren.exists(token => (token == widget.controlTypeID || token == widget.componentName)) }
     else { true }
   }
@@ -186,12 +229,33 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
   // *** generation du template ***
   // *** phase : debut ou fin ***
   // --------------------------------------------------
-  def generationDuTemplate(widget: WidgetDeBase, phase: String, widgetPere: WidgetDeBase, params: (String, Object)*): (Boolean, String, String, String) = {
+  
+
+/**
+ * generation du template ***
+ * @param widget : name of widget
+ * @param phase : begin or end 
+ * @param widgetPere : container of widget
+ * @param params : List of parameters (name, content
+ * @return : (true or false, sourceHtml, sourceJavascript, codeJavaOrScalOfWidget)
+ */
+def generationDuTemplate(widget: WidgetDeBase, phase: String, widgetPere: WidgetDeBase, params: (String, Object)*): (Boolean, String, String, String) = {
     return generationDuTemplate(widget.getWidgetNameOrComponentName(), phase, widget, widgetPere, widget.generationTableauDeParametresPourTemplates, params.toList)
   } // fin de generationDuTemplate
 
   import scala.collection.mutable.Map
-  def generationDuTemplate(widgetName: String, phase: String, widget: WidgetDeBase, widgetPere: WidgetDeBase, parametresDuWidget: Map[String, Object], parametresAdditionnels: List[(String, Object)]): (Boolean, String, String, String) = {
+  
+  
+  /**
+ * @param widgetName
+ * @param phase : begin or end
+ * @param widget : object widgetDeBase 
+ * @param widgetPere : container of widget
+ * @param parametresDuWidget :Map of parameters (name, content
+ * @param parametresAdditionnels
+ * @return
+ */
+def generationDuTemplate(widgetName: String, phase: String, widget: WidgetDeBase, widgetPere: WidgetDeBase, parametresDuWidget: Map[String, Object], parametresAdditionnels: List[(String, Object)]): (Boolean, String, String, String) = {
     if (!templateAGenerer(widgetPere)) { (false, "", "", "") } // pas de génération de fils ?
     else {
       var (templateHtml, templateJavascript, templateCode) = determinationNomDuTemplate(widgetName.trim, phase.trim)
@@ -232,7 +296,13 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
       }
     }
   }
-  def processExecuteFreeMarkerTemplate(templateName: String, widgetPere: WidgetDeBase, templateParameter: java.util.Map[String, Object]): (Boolean, String) = {
+  /**
+ * @param templateName : name of template
+ * @param widgetPere : 
+ * @param templateParameter
+ * @return
+ */
+def processExecuteFreeMarkerTemplate(templateName: String, widgetPere: WidgetDeBase, templateParameter: java.util.Map[String, Object]): (Boolean, String) = {
     if (!templateAGenerer(widgetPere)) { (false, "") } // pas de génération de fils ?
     else {
       try {

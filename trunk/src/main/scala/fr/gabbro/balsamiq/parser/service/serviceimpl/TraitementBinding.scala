@@ -26,7 +26,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.modelimpl.FormulaireCode
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.service.TTraitementBinding
- 
+
 // -------------------------------------------------------------------------- 
 // cette classe est instanciée dans le module principal IbalsamiqFreeMarker
 //  la tables des champs tableauDesVariables stockera l'ensemble des champs référencés la méthode bind=
@@ -211,7 +211,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     var codeDeLaClasse = new StringBuilder
     val tabulation = "\t" * niveau
     val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
-    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
+    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
     codeDeLaClasse.append(source1)
     // traitement de chaque champ de la classe      
     classeEnCours.children.foreach(field => {
@@ -220,23 +220,23 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
         else { hierarchiePere + "." + classeEnCours.fieldNameOrClassName }
 
         // on génère la définition de la classe dans le code source
-        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
-        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
         codeDeLaClasse.append(source6 + source7)
-          if (hierarchiePere == "") { generation_code_source_classe(field, niveau + 1, field, classeEnCours.fieldNameOrClassName) }
+        if (hierarchiePere == "") { generation_code_source_classe(field, niveau + 1, field, classeEnCours.fieldNameOrClassName) }
         else { generation_code_source_classe(field, niveau + 1, classeEnCours, hierarchiePere + "." + classeEnCours.fieldNameOrClassName) }
       } else { // c'est un champ 
         val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
 
         val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
         codeDeLaClasse.append(source3 + source4)
 
       }
     })
     // generation fin de classe. 
-    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID),(CommonObjectForMockupProcess.constants.traitementPreserveSection,traitementPreserveSection))
+    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
     codeDeLaClasse.append(source2)
     mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString())
 
@@ -270,17 +270,32 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   // le fichier est écrit dans le répertoire le sous répertoire UC puis dans le sous répertoire form ou DTO en fonction du suffix du fichier.
   //  on rajoute le nom du package en début de classe : Le nom du package est déduit du repertoire DTO
   // ----------------------------------------------------------------------------------------------------------------------------------------- 
+
+  /**
+   * <p>ecriture des sources générés : 1 fichier par classe</p>
+   * <p>le fichier est écrit dans le répertoire le sous répertoire UC puis dans le sous répertoire form ou DTO en fonction du suffix du fichier.</p>
+   * <p>on rajoute le nom du package en début de classe : Le nom du package est déduit du repertoire DTO</p>
+   */
   def generationDuSourceDesClassesEtCreationDuFichier: Unit = {
     generation_code_source_classes(tableauDesVariables)
     mapCodeClasse.foreach(classe => {
       ecriture_fichier(classe._1.fieldNameOrClassName, classe._2)
     })
+    
+    
+    /**
+     * @param repositoryName : name of directory
+     * @return name modified (separator replaced by /)
+     */
     def replaceSystemFileSeparatoirByPoint(repositoryName: String): String = {
       repositoryName.replace("\\", "/").replace("/", ".")
     }
-    // ------------------------------------------------------------------------
 
-    // récupération du code source du nom du package
+    /**
+     * récupération du code source du nom du package
+     * @param className: nom de la classe
+     * @return sources of package
+     */
     def getPackageSources(className: String): String = {
       var packageSourceDebut = ""
       var packageSourceFin = ""
@@ -322,10 +337,13 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       }
       packageSourceDebut + packageSourceFin
     }
-    // *** ecriture du fichier ***
+    /**
+     * @param className : name of java or scala class
+     * @param sourcesDeLaClasse : java or scala source
+     */
     def ecriture_fichier(className: String, sourcesDeLaClasse: String): Unit = {
       var fileWriter: FileWriter = null
-      val classLocation = getClassLocation(className).replace("\\","/").trim
+      val classLocation = getClassLocation(className).replace("\\", "/").trim
       val packageSources = getPackageSources(className)
       // on rajoute le nom du package en début de classe
       val traitementFormatageSourceJava = new TraitementFormatageSourceJava

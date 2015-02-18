@@ -55,7 +55,7 @@ class MockupContext() {
     tableDesCodesDesClassesJavaouScala += (className, subPackageName) -> classCode
   }
   // -------------------------------------------------------------------------------------------
-  // ecriture du coce java ou scala genéré pour la page html en cours
+  // ecriture du code java ou scala genéré pour la page html en cours
   // la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java
   // -------------------------------------------------------------------------------------------
   def ecritureDuCodeJaveOuScala: Boolean = {

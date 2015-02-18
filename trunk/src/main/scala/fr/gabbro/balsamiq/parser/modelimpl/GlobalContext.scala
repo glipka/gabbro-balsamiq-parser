@@ -6,6 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
+import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le ùmenu par exemple.  
@@ -20,11 +21,30 @@ class GlobalContext() {
   var tableauDesMenuItems = ArrayBuffer[MenuItem]() // mis à jour par 
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu
   var moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker = _
-  @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]()
+  @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   @BeanProperty var bindedForms = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
+  // map utilisée spécifiquement pour les fichiers javascript. 
+  // cette map est en global contexte car les traitements preserveSection des fichiers javascript doivent être gardées pendant le traitement de tous les mockups
+  // en effet un fichier javascript est généré par écran principal, mais contient aussi le code des fragements de cet écran principal
+  // le traitement des mockups est aléatoire, il faut donc garder en mémoire les preserveSections.
+  // la clef de cette map est le useCaseName, ainsi que le nom du fichier, le type de preserve, et le sous package 
+  // Pour chaque mockup en cours de traitement on crée une preserve section pour les fichiers html, javascript, et java (dans le sous packages)
+  // les fichiers sources java qui sont bindés au champ sont gérées directement par la classe TraitementBInding.
+  var mapDesTraitementsPreserveSection= Map[(String, String, String, String), TraitementPreserveSection]() // clef= (usecase,nomDuFichierJavascript,type de preserve,sous package) type=javascript,html,code  
+  /**
+   * this method is called by freemarker Templates to get instance of traitementPreserveSection for the current file
+   * @param usecaseName : nom du useCase
+   * @param fileName : nom du fichier
+   * @param typeDePreserve : type de preserve : java, javascript,html, ...
+   * @param subPackage : nom du sous package
+   * @return : objet traitementPreserveSection
+   */
+  def getPreserveSection(usecaseName: String, fileName: String, typeDePreserve: String, subPackage: String): TraitementPreserveSection = {
+    mapDesTraitementsPreserveSection.getOrElse((usecaseName, fileName, typeDePreserve, subPackage), null)
+  }
 
   // ------------------------------------------------------------------------------------------------------
   // le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
@@ -32,9 +52,9 @@ class GlobalContext() {
   // rajout le 16/1/15 de la section de code pour hiérarchiser le code javascript
   // cette procédure est appelée par les templates javascript freemarker
   // ------------------------------------------------------------------------------------------------------
-  def mise_en_cache_code_javascript(fileName: String, codeJavascript: String, isAfragment: String, section: String): Unit = {
+  def cached_javascript_code(fileName: String, codeJavascript: String, isAfragment: String, section: String): Unit = {
     // clef= (usecase,nom de fichier,section)
-     val key =
+    val key =
       if (isAfragment == CommonObjectForMockupProcess.constants.trueString) {
         (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, section)
       } else {
@@ -93,15 +113,14 @@ class GlobalContext() {
 
   def generation_fichiers_javascript: Unit = {
     // regoupement des fichiers usecase  : on ne tient pas compte de la section 
-
     val liste_fichiers_javascript = mapSourcesJavascript.keys.map(key => (key._1, key._2)).toList.distinct
     val utilitaire = new Utilitaire
     val traitementFormatageSourceJava = new TraitementFormatageSourceJava
     liste_fichiers_javascript.foreach(useCasefileName => {
       val useCase = useCasefileName._1
       val fileName = useCasefileName._2
-      val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null,(CommonObjectForMockupProcess.constants.javascriptUseCase,useCase),(CommonObjectForMockupProcess.constants.javascriptFileName,fileName))
-      val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null,(CommonObjectForMockupProcess.constants.javascriptUseCase,useCase),(CommonObjectForMockupProcess.constants.javascriptFileName,fileName))
+      val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
+      val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
       val codeJavaScript = source6 + source7
       ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire, traitementFormatageSourceJava)
 
