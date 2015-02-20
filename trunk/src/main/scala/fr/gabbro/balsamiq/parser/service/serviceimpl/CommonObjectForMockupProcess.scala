@@ -25,8 +25,11 @@ import fr.gabbro.balsamiq.parser.service.GenerationProperties
 import fr.gabbro.balsamiq.parser.service.Constants
 
 
+/**
+ * @author fra9972467
+ *
+ */
 object CommonObjectForMockupProcess {
-
   @BeanProperty val engineProperties = new EngineProperties
   @BeanProperty val generationProperties = new GenerationProperties
   @BeanProperty val templatingProperties = new TemplatingProperties
@@ -40,14 +43,6 @@ object CommonObjectForMockupProcess {
   var generateController = false
   var isAfragment = false
   var subDirectoryName = List[String]()
- // var mapDesTraitementsPreserveSection = Map[(String, String), TraitementPreserveSection]() // clef= (type,sub package) type=javascript,html,code  
-  
-  
-/*   
-def getPreserveSection(typeDePreserve:String, subPackage:String): TraitementPreserveSection = {
-    mapDesTraitementsPreserveSection.getOrElse((typeDePreserve,subPackage), null)
-  }*/
   var listeNomdesFormulaires = new ArrayBuffer[String] // utilisé pour stocker le nom des formulaires 
-  // -------------------------------------------------------------
-
+ 
 }

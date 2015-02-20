@@ -41,13 +41,14 @@ class Utilitaire {
     case ex: Exception => logBack.error("Messages File not found {}", ficPropertyName)
   }
 
-  // -----------------------------------------------------------------------------------
-  // les caractères hexa sont représentés sous forme %xy 
-  // il faut remplacer chaque séquence %xy par son équivalent en format caractère 
-  // exemple : abcd%30efg donne abcd0efg 
-  // il reste à traiter le cas Unicode 
-  // char c = "\uFFFF".toCharArray()[0];
-  // ------------------------------------------------------------------------------------
+  /**
+   * <p>les caractères hexa sont représentés sous forme %xy</p>
+   * <p>il faut remplacer chaque séquence %xy par son équivalent en format caractère</p>
+   * <p>exemple : abcd%30efg donne abcd0ef</p>
+   * <p>char c = "\uFFFF".toCharArray()[0];</p>
+   * @param contenu
+   * @return content modified
+   */
   def remplaceHexa(contenu: String): String = {
     var contenuInitial = contenu.replace("%25", "%");
     var contenuModifie = contenuInitial
@@ -69,17 +70,18 @@ class Utilitaire {
     contenuModifie
   }
 
-  /*  
-    for italic, use _this notation_  OK
-    for a link, use [this notation]
-    for bold, use *this notation* OK
-    for disabled, use -this notation- OK
-    for underlined, use &this notation& OK
-    for strikethrough, use ~this notation~ OK
-    for color, use {color:#FF0000}this notation{color}.
-    for font size, use {size:16}this notation{size}
-*/
-
+  /**
+   * <p>for italic, use _this notation_ </p>
+   * <p>for a link, use [this notation]</p>
+   * <p>for bold, use *this notation* </p>
+   * <p>for disabled, use -this notation- </p>
+   * <p>for underlined, use &this notation&</p>
+   * <p>for strikethrough, use ~this notation~</p>
+   * <p>for color, use {color:#FF0000}this notation{color}.</p>
+   * <p>for font size, use {size:16}this notation{size}</p>
+   * @param text
+   * @return text html formatted
+   */
   def textFormatting(text: String): String = {
     var outputString = remplaceHexa(text)
     outputString = outputString.replace("\\r", "<br>")
@@ -155,14 +157,24 @@ class Utilitaire {
 
     outputStringBulledList
   }
+  /**
+   * @param text
+   * @param subPart
+   * @param htmlDeb
+   * @param htmlFin
+   * @return text replaced
+   */
   private def replaceString(text: String, subPart: String, htmlDeb: String, htmlFin: String): String = {
     var outputString = ""
     if (subPart != "") { outputString = text.replace(subPart, htmlDeb + subPart.substring(1, subPart.size - 1) + htmlFin) }
     outputString
   }
 
-  // [Balsamiq Website](balsamiq.com)
-  //   
+  /**
+   * format du texte : [Balsamiq Website](balsamiq.com)
+   * @param text
+   * @return ListBuffer(true or false, token, urlName, urlLink)
+   */
   private def extractLinkListAvecLien(text: String): ListBuffer[(Boolean, String, String, String)] = {
     // URL renseignee ?? 
     val bufferRetour = new ListBuffer[(Boolean, String, String, String)]()
@@ -193,6 +205,10 @@ class Utilitaire {
     bufferRetour
   }
   // 
+  /**
+   * @param text : string
+   * @return ListBuffer(true, token, urlName, "")
+   */
   private def extractLinkListSansLien(text: String): ListBuffer[(Boolean, String, String, String)] = {
     val regExp1 = "\\[[^\\]]*\\]".r
     val regExp20 = "[^\t\n\\]]*".r
@@ -213,6 +229,11 @@ class Utilitaire {
     bufferRetour
   }
 
+  /**
+   * Extract des fonts
+   * @param text
+   * @return ListBuffer(true, token, fontDecimal, texteDeLaFont)
+   */
   private def extractFontList(text: String): ListBuffer[(Boolean, String, String, String)] = {
     //   val text = " // {color:#ffff} texte de la   couleur {color}"
     val regExp1 = "\\{size:\\d*\\}(.)*\\{size\\}".r
@@ -239,8 +260,12 @@ class Utilitaire {
     })
     bufferRetour
   }
-  // {color:#ffff}xxxxx{color}
-  //  
+  /**
+   * extraction de la couleur
+   * format du texte: {color:#ffff}xxxxx{color}
+   * @param text
+   * @return Listbuffer((true or false, expressionComplete, colorHexa, texteDeLaCouleur))
+   */
   private def extractColorList(text: String): ListBuffer[(Boolean, String, String, String)] = {
     //  val text = " // {color:#ffff} texte de la   couleur {color}"
     //   val regExp1 = "\\{color:#\\w*\\}([a-zA-Z0-9_ ]*)*\\{color\\}".r
@@ -273,8 +298,13 @@ class Utilitaire {
     bufferRetour
   }
 
-  // {color:#ffff}xxxxx{color}
-  //  
+  /**
+   * extraction de la couleur
+   * format du texte: {color:#ffff}xxxxx{color}
+   * @param text
+   * @return (true or false, expressionComplete, colorHexa, texteDeLaCouleur)
+   *
+   */
   private def extractColor(text: String): (Boolean, String, String, String) = {
     //  val text = " // {color:#ffff} texte de la   couleur {color}"
     //   val regExp1 = "\\{color:#\\w*\\}([a-zA-Z0-9_ ]*)*\\{color\\}".r
@@ -299,13 +329,18 @@ class Utilitaire {
 
     }
   }
-  // [Balsamiq Website](balsamiq.com)
-  //   
+  /**
+   * <p>extration du lien dans un texte</p>
+   * <p>format du texte: [[Balsamiq Website](balsamiq.com)</p>
+   * @param text
+   * @return (true, expressionComplete, urlName, urlLink))
+   *
+   */
   private def extractLink(text: String): (Boolean, String, String, String) = {
     // URL renseignee ?? 
     if (text.contains("(") && (text.contains(")"))) {
       //   val text = " // {color:#ffff} texte de la   couleur {color}"
-
+      // [urlName] (urlLink)
       val regExp1 = "\\[(.)*\\](.)*\\((.)*\\)".r
       val regExp2 = "\\[(.)*\\]".r
 
@@ -343,7 +378,11 @@ class Utilitaire {
     }
   }
 
-  // {color:#ffff}xxxxx{color} 
+  /**
+   * format du texte à extraire: {color:#ffff}xxxxx{color}
+   * @param text
+   * @return (true, expressionComplete, fontDecimal, texteDeLaFont)
+   */
   private def extractFont(text: String): (Boolean, String, String, String) = {
     //   val text = " // {color:#ffff} texte de la   couleur {color}"
     val regExp1 = "\\{size:\\d*\\}(.)*\\{size\\}".r
@@ -364,8 +403,15 @@ class Utilitaire {
     }
 
   }
-  // Les hamps sont de type seperateur xxxxxxx separateur
-  // expresssion regulire pour extraire le contenu du champ.
+  /**
+   *
+   * Les champs sont de type seperateur xxxxxxx separateur
+   * expresssion regulière pour extraire le contenu du champ.
+   *
+   * @param text with separator
+   * @param separateur
+   * @return text without separator
+   */
   private def extractSubString(text: String, separateur: Char): List[String] = {
     var sep = separateur.toString
     if (sep == "*") sep = "\\*"
@@ -379,25 +425,31 @@ class Utilitaire {
     })
     list1.toList
   }
-  def link(link1: String): String = {
-    val parts = link1.split("%");
-    return parts(0) + ".xml.html";
 
-  }
-
+  /**
+   * @param s
+   * @return s.toInt
+   */
   def toInt(s: String): Int = {
     var i = if ((s != null) && (s.length() > 0)) { s.toInt }
     else 0;
     return i;
   }
 
+  /**
+   * @param s : String
+   * @return s.toDouble
+   */
   def toDouble(s: String): Double = {
     var d = 1.0D;
     if ((s != null) && (s.length() > 0)) { d = s.toDouble }
     return d;
   }
-  // Recup contenu message erreur
-  // -------------------------------------
+  /**
+   * Recup contenu message erreur
+   * @param mesId
+   * @return content of message
+   */
   def getContenuMessage(mesId: String): String = {
     try {
       val mes = propsMessages.getProperty(mesId);
@@ -407,26 +459,37 @@ class Utilitaire {
 
     }
   }
-  // ---------------------------------------------------------------------------------
-  // *** attention le nom du fichier ne doit pas contenir le nom du répertoire ***
-  // --------------------------------------------------------------------------------
+  /**
+   * <p>*** attention le nom du fichier ne doit pas contenir le nom du répertoire ***</p>
+   * <p>Détermination si le widget est un fragment</p>
+   * <p>récupération du nom du fragment avec son type</p>
+   * <p>Si fragment, récupération nom de l'écran contenant le fragment</p>
+   * <p>Détermination s'il faut générer ou pas le contrôleur</p>
+   *
+   * @param DirectoryfileName
+   * @return  (filename, useCaseName, isAfragment, fragment, generateController, ecranContenantLefragment, typeDeFragment)
+   *
+   */
   def getFileInformation(DirectoryfileName: String): (String, String, Boolean, String, Boolean, String, String) = {
     val filenameCompletSansSuffix = DirectoryfileName.split("\\.").head
     var filename = ""
     var useCaseName = ""
     var generateController = false
-
+    // NomduFIchierEtUseCase
     val val1 = filenameCompletSansSuffix.replace(System.getProperty("file.separator"), "/")
     var fileNameAvecUsecase = if (val1.contains("/")) {
       val1.split("/").last // nom du fichier 
-
     } else val1
-
+    // détermination du file Name et UseCase
     if (!fileNameAvecUsecase.contains(CommonObjectForMockupProcess.engineProperties.usecaseSeparator)) { filename = fileNameAvecUsecase }
     else {
       filename = fileNameAvecUsecase.split(CommonObjectForMockupProcess.engineProperties.usecaseSeparator).last
       useCaseName = fileNameAvecUsecase.split(CommonObjectForMockupProcess.engineProperties.usecaseSeparator).head
     }
+    // <p>détermination si le widget est un fragment</p>
+    // <p>récupération du nom du fragment avec son type</p> 
+    // <p>Si fragment, récupération nom de l'écran contenant le fragment </p>
+    // <p>Détermination s'il faut générer ou pas le contrôleur</p>
     val directoryName = ""
     val isAfragment = if (filename.toLowerCase().startsWith(CommonObjectForMockupProcess.generationProperties.generateControllerForPrefix.toLowerCase()) && filename.contains(CommonObjectForMockupProcess.engineProperties.fragmentSeparator)) true else false
     val fragmentAvecType = if (isAfragment) {
@@ -452,18 +515,24 @@ class Utilitaire {
 
   }
 
-  // Récupération des informations du fichier en cours  : nom du fihcier et nom du repertoire en cours
-  // le nom du fichier est sous la forme usecase-fic-fic2
-  // usecase-fic1$fragment1
+  /**
+   * <p>Récupération des informations du fichier en cours  : nom du fichier et nom du repertoire en cours</p>
+   * <p>le nom du fichier est sous la forme usecase-fic-fic2</p>
+   * @param file
+   * @return (filename, directoryName, useCaseName, filenameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment)
+   * }
+   */
   def getFileInformation(file: File): (String, String, String, String, Boolean, String, Boolean, String, String) = {
     val filenameComplet = file.getName().split("\\.").head
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = getFileInformation(filenameComplet)
     val directoryName = file.getPath().replace(System.getProperty("file.separator"), "/").split("/").init.last // avant dernier 
     (filename, directoryName, useCaseName, filenameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment)
   }
-  // ------------------------------------------------
-  // create de l'aborescence d'un répertoire
-  // ------------------------------------------------
+  /**
+   * <p>creation de l'aborescence d'un répertoire avec appel récursif pour les sous répertoires</p>
+   * <p>Le nom du répertoire est splitté (séparateur). Les répertoires sont créés s'ils n'existent pas.</p>
+   * @param repositoryName
+   */
   def createRepostoriesIfNecessary(repositoryName: String): Unit = {
     var tableauRepository = repositoryName.replace("\\", "/").split("/")
     var repertoireTravail = ""
@@ -481,9 +550,12 @@ class Utilitaire {
     })
 
   }
-  // -------------------------------------------------------------------
-  // fonction commune pour récupérer l'emplacement des fichiers HTMLs 
-  // -------------------------------------------------------------------
+
+  /**
+   * @param fileName  : nom du Mockup ou du fragment
+   * @param directoryName : nom du répertoire
+   * @return emplacement du fichier html
+   */
   def getEmplacementFichierHtml(fileName: String, directoryName: String): String = {
     val sourceHTML = if (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement != "") {
       directoryName + System.getProperty("file.separator") +
@@ -507,15 +579,19 @@ class Utilitaire {
 
   }
 
-  // ---------------------------------------------------------------------------------
-  // récupération nom du répertoire contenant l'ecran principal et ses fragments
-  // ---------------------------------------------------------------------------------
+  /**
+   * @return nom du mainMockup
+   */
   def getRepositoryContainingFragmentAndMainScreen(): String = {
     val repertoireDeLEcranPrincipal = if (!CommonObjectForMockupProcess.isAfragment) CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement else CommonObjectForMockupProcess.ecranContenantLeSegment
     repertoireDeLEcranPrincipal
   }
-
-  // écriture d'un fichier sur disque (ccréation du répertoire s'il n'existe pas).
+  /**
+   * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
+   * @param filename : nom du fichier
+   * @param buffer : buffer à écrire
+   * @return
+   */
   def ecrire_fichier(filename: String, buffer: String): Boolean = {
 
     val rep1 = filename.replace(System.getProperty("file.separator"), "/").split("/").init.mkString(System.getProperty("file.separator"))
@@ -534,11 +610,13 @@ class Utilitaire {
         false
     }
   }
-  // ----------------------------------------------------
-  // remplacement des mots clefs par leur contenu 
-  // mots clefs supportés : %usecase%
-  //                        %ficname%
-  // ----------------------------------------------------
+  /**
+   * <p>remplacement des mots clefs par leur contenu</p>
+   * <p>mots clefs supportés :</p>
+   *  <p>               %usecase% %ficname% %project% %controller% %controller?capitalize% ficname?capitalize%" %customProperty2% %customProperty3% %mainScreen%</p>
+   * @param variable1
+   * @return
+   */
   def substituteKeywords(variable1: String): String = {
     val v1 = variable1.replace("%usecase%", CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)
     val v2 = v1.replace("%ficname%", CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement)

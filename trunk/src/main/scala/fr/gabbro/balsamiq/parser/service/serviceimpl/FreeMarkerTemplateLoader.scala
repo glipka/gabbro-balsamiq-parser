@@ -5,11 +5,19 @@ import freemarker.cache.TemplateLoader
 import java.net.URL
 import java.io.File
 import java.net.URI
-// template loader pour charger 
+
+/**
+ *  template loader pour charger un template
+ * cette permet de rechercher un template dans une arborescence de répertoires
+ * cette fonctionnalité va permettre de structurer l'emplacement des templates
+ *
+ * @author fra9972467
+ *
+ */
 class ClassTemplateLoader extends URLTemplateLoader {
 
   def getURL(templateName: String): URL = {
-    val baseURLDesTemplates =  CommonObjectForMockupProcess .templatingProperties.freemarkerTemplatesDir
+    val baseURLDesTemplates = CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir
     val (ret, url) = rechercheFileInSubDirectories(baseURLDesTemplates, templateName.trim)
     url
   }

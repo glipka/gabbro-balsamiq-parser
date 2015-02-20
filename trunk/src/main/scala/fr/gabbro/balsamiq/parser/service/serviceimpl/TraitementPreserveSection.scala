@@ -34,25 +34,35 @@ import scala.beans.BeanProperty
 import java.nio.file.NoSuchFileException
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
-// ----------------------------------------------------------------------------------------
-// Traitement des preserves section
-// chaque section commence par preserve debut 
-// chaque section se termine par preserve fin
-// on récupére le code dans chaque section que l'on met en table sous forme de tuple
-// ---------------------------------------------------------------------------------------
-
+/**
+ * <p>Traitement des preserves section</p>
+ * <p>chaque section commence par preserve debut et est suivie par le nom du template.</p>
+ * <p>chaque section se termine par preserve fin</p>
+ * <p>on récupére le code dans chaque section que l'on met en table sous forme de tuple</p>
+ * <p>on utilise deux hashMap pour retrouver le contenu des sections </p>
+ * <p>Une première Map dont la clef est le N° de section et le nom du template </p>
+ * <p>Une deuxième Map permet de retrouver le n° de section pour le template en cours. </p>
+ * <p>Pour mémorise les n° de sections extraites par template (grace à la map mapDesPreserveSection)
+ * @author georges Lipka
+ *
+ */
 class TraitementPreserveSection extends TTraitementCommun {
 
   // la map des preservesections
-  private var mapDesPreserveSection = Map[(Int, String), String]()
-  private var maptemplateByKeyNumber = Map[String, Int]() // numero de clef en cours d'utilisation par template
+  private var mapDesPreserveSection = Map[(Int, String), String]() // clef = n° de section et nom de template
+  private var maptemplateByKeyNumber = Map[String, Int]() // clef = templateName valeur=n° de clef
   var fichierEnCoursDeTraitement = ""
   @BeanProperty var fichierPresent = false
-  // ----------------------------------------------------------------------------------------------------------------------------------
-  // **** on récupère le code de la section ****
-  // maptemplateByKeyNumber sert à stocker le dernier numero de preserver section utilisé pour ce template
-  // mapDesPreserveSection contient le code des sections (la clef est le nom du template et le n° de section pour ce template
-  // ----------------------------------------------------------------------------------------------------------------------------------
+
+  /**
+   * <p>Récupération du code de la section, cette procédure est appelée depuis le template freemarker</p>
+   * <p>maptemplateByKeyNumber sert à stocker le dernier numéro de préserve section utilisé pour ce template</p>
+   * <p>mapDesPreserveSection contient le code des sections (la clef est le nom du template et le n° de section pour ce template</p>
+   *
+   * @param templateName
+   * @param initialContent contenu initial qui sera retourné si le contenu de la section n'a pas été modifié.
+   * @return content of section
+   */
   def getSectionContent(templateName: String, initialContent: String): String = {
     var dernierNumeroClefPourLeTemplate = maptemplateByKeyNumber.getOrElse(templateName, -1) // dernièr n° de clef lu pour le template ?
     dernierNumeroClefPourLeTemplate += 1
@@ -68,6 +78,11 @@ class TraitementPreserveSection extends TTraitementCommun {
 
   }
 
+  /**
+   * lecture du fichier pour extraire les preserve sections
+   * @param filename : nom du fichier à traiter
+   * @return traitementPreserveSection
+   */
   def process(filename: String): TraitementPreserveSection = {
     var bufferATraiter = List[String]()
     fichierEnCoursDeTraitement = filename
@@ -102,11 +117,14 @@ class TraitementPreserveSection extends TTraitementCommun {
     }
 
   }
-  // ---------------------------------------------------------------------------------------
-  // on récupère le contenu entre le header debut et le header fin
-  // le nom du template qui a généré la preserve section est juste derrière le header.
-  // que l'on met dans une hashMap
-  // -----------------------------------------------------------------------------------------
+  /**
+   * <p>On récupère le contenu entre le header debut et le header fin</p>
+   * <p>le nom du template qui a généré la preserve section est juste derrière le header.</p>
+   * <p>que l'on met dans une hashMap.</p>
+   * <p>Attention la syntaxe des preserve sections est différente selon le type de fichier (jsp ou java)</p>
+   *
+   * @param bufferATraiter
+   */
   private def traitementPreserve(bufferATraiter: String): Unit = {
     var preserveSectionBegin = ""
     var preserveSectionEnd = ""
@@ -136,10 +154,11 @@ class TraitementPreserveSection extends TTraitementCommun {
     } else { return }
 
   }
-
-  // ---------------------------------------------------------
-  // **** récupération nom du template dans le header ****
-  // ---------------------------------------------------------
+  /**
+   * **** récupération nom du template dans le header ****
+   * @param content
+   * @return (templateName, position fin du template)
+   */
   private def getTemplateName(content: String): (String, Int) = {
     var templateName = ""
     val positionTemplateNameDebut = content.indexOf(CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameBeginInPreserveSection)

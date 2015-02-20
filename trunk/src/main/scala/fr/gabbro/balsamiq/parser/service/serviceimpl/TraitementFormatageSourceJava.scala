@@ -15,14 +15,18 @@ import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.Context
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
-// ----------------------------------------------------------------------------------------
-// Indentation d'un fichier source
-// On utilise la librairie eclipse
-// chaque section se termine par preserve fin
-// on récupére le code dans chaque section que l'on met en table sous forme de tuple
-// ---------------------------------------------------------------------------------------
-
+/**
+ * @author Georges Lipka
+ *
+ */
 class TraitementFormatageSourceJava extends TTraitementCommun {
+
+  /**
+   * On utilise le formatter d'eclipse avec les options par défaut afin de formater le code java
+   * Il faudra modifier cette méthode afin de paramétrer les valeurs des différentes options Eclipse
+   * @param bufferAformater
+   * @return formated buffer
+   */
   def indentSourceCodeJava(bufferAformater: String): String = {
     // take default Eclipse formatting options
     val options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
@@ -50,9 +54,11 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
   }
 
-  // ---------------------------------------------------------
-  // *** parser Rhino pour indenter le code javascript ***
-  // ---------------------------------------------------------
+   /**
+   * @param jsCode
+   * @param indentSize
+   * @return formated buffer
+   */
   def indentSourceCodeJavaScript(jsCode: String, indentSize: Int): String = {
     val BEAUTIFY_JS = System.getProperty("user.dir") + "/" + "beautify.js"
     try {

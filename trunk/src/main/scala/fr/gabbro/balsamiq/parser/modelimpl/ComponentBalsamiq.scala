@@ -25,17 +25,22 @@ import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.TComponentBalsamiq
 
-
 // --------------------------------------------------------------------------------
-// POur un composant Balsamiq, on ne récupère que le nom du composant 
+// Pour un composant Balsamiq, on ne récupère que le nom du composant 
+// --------------------------------------------------------------------------------
 class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
   var controlTypeID: String = elementXML.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
   if (controlTypeID == CommonObjectForMockupProcess.constants.groupConstante) {
     componentName = getComponentName(elementXML)
     if (componentName != "") is_a_group = true
-    element=elementXML // sauvegarde du code XML pour récupération 
+    element = elementXML // sauvegarde du code XML pour récupération 
   }
-  // récupération du nom du composant
+  
+  /**
+   * récupération du nom du composant
+   * @param e : Element
+   * @return name of component
+   */
   private def getComponentName(e: Element): String = {
     var name = ""
     if (e.getChildren().size() != 0) {
@@ -45,7 +50,7 @@ class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           val elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
-          if (elementName == CommonObjectForMockupProcess.constants.controlName) {name = elementValue;}
+          if (elementName == CommonObjectForMockupProcess.constants.controlName) { name = elementValue; }
         }) // fin de cp.foreach
       }
     } // fin de if 
@@ -53,6 +58,4 @@ class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
   } // fin de getCOntrolProperties
 
 }
-
-// les attributs étendus seront enrichis par le traitement des enfants du groupe
-// --------------------------------------------------------------------------------
+ 

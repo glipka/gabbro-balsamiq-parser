@@ -149,6 +149,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>--------------------------------------------------------------------------------------------------------------------------------------------</p>
    * <p><b>processing a mockup</b></p>
    * <p>---------------------------------------------------------------------------------------------------------------------------------------------</p>
+   * <p>le nom des Mockups doit respecter les règles suivantes</p>
+   * <p>pour un Ecran Principal : nom du usecase - nom de l'ecran commençant par ec exemple:useCase2-ectestgl01.bmml</p>
+   * <p>pour un fragment : nom du usecase - nom de l'ecran principal $ nom du fragment § type du fragment  exemple:useCase2-ectestgl01$fragment1§Panel.bmml.old</p>
    * <p>MockupContext est instanciée en début de traitement du mockup et accessible depuis CommonObjectForMockupProcess</p>
    * <p>TraitementBinding est instanciée en début de traitement</p>
    * <p>MockupContext contient l'ensemble des fragments liés au traitement du mockup en cours. Cette classe sert à stocker des</p>
@@ -158,9 +161,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>On déduit aussi si le mockup est moockup est un fragment, s'il faut générer un contôleur, ...</p>
    * <p>si le mockup en cours n'est pas un fragment(donc un mockup principal), on met alors en table l'ensemble des fragments</p>
    * <p>On met en table les preserve Sections à la fois pour :</p>
-   * <p>       Le fichier généré html, le fichier généré javascript (si le mockup n'st pas un fragment etl'ensemble des fichiers java générés par sous package.</p>
+   * <p>       Le fichier généré html, le fichier généré javascript (si le mockup n'est pas un fragment et l'ensemble des fichiers java générés par sous package.</p>
    * <p>       Les preserves sections sont stockées dans une map de GlobalContext, car les fichiers javascript sont enrichis par les fragments, elles ne peuvent donc être locales </p>
-   * <p>       au traitement du mockup.<p>
+   * <p>       au traitement du mockup. Le contenu des preserve section est récupéré depuis les templates freeMarker<p>
    * <p>       Attention : les preserve sections des classes générées par le binding sont gérées directement par la classe TraitementBindinp>
    * <p>--------------------------------------------------------------------------------------------------------------------------------------------------------</p>
    * @param fichierBalsamiq : mockup to process
@@ -197,13 +200,13 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       }
     } // fin de isAFragment
     /**
-     * ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-     *        *** une preserve section pour le fichier code java par sous package***
-     * il faudra remodifier cette liste à chaque ajout de sous package de code java ou scala
-     * principe de la preserve section: on met en table le code lors de la lecture de la preserve section
-     * remarque : le code java est généré depuis freemarker par appel de la methode  MockupCOntext.setCodeClasse(className: String, classCode: String, subPackageName: String)
-     *
-     * ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+     * <p> ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+     * <p>        *** une preserve section pour le fichier code java par sous package***</p>
+     * <p> il faudra remodifier cette liste à chaque ajout de sous package de code java ou scala</p>
+     * <p> principe de la preserve section: on met en table le code lors de la lecture de la preserve section</p>
+     * <p> remarque : le code java est généré depuis freemarker par appel de la methode  MockupCOntext.setCodeClasse(className: String, classCode: String, subPackageName: String)</p>
+     * <p>
+     * <p> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
      */
     val listeDesSubPackageCode = List(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias,
       CommonObjectForMockupProcess.generationProperties.generatedsubPackage1,
@@ -213,9 +216,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     // création d'une preserve section pour le fichier html
     globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.html, "") -> new TraitementPreserveSection().process(utilitaire.getEmplacementFichierHtml(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir))) // on met en table le contenu du fichier javascript pour traitment des preserve section
     /**
-     * ----------------------------------------------------------------------------------
-     * *** on indique la location dans la zone de l'écran pour le moteur de template ***
-     * ----------------------------------------------------------------------------------
+     * ------------------------------------------------------------------------------------------
+     * <p>*** on indique la location dans la zone de l'écran pour le moteur de template ***</p>
+     * ------------------------------------------------------------------------------------------
      */
     val location = globalContext.retrieveLocation(fichierBalsamiq.getName)
     CommonObjectForMockupProcess.mockupContext.location = location
@@ -254,11 +257,11 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       sourceJavascript = sourceJavascript.append(sourceJavascript3)
       codeDesComposants = codeDesComposants.append(code3) // code java ou scala fin du gabarit
       /**
-       * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-       * genération des classes java ou scala
-       * Le source des classes est généré par freemarker méthod MockupContext.setCodeClasse
-       * En fin de traitement du mockup, on génère les des classes java du mockup (sauf les dto et les classes générées par le binding qui sont gérées par la classe traitementBinding
-       * -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+       * <p>-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+       * <p>genération des classes java ou scala</p>
+       * <p>Le source des classes est généré par freemarker méthod MockupContext.setCodeClasse</p>
+       * <p>En fin de traitement du mockup, on génère les des classes java du mockup (sauf les dto et les classes générées par le binding qui sont gérées par la classe traitementBinding</p>
+       * <p>-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
        */
       logBack.info(utilitaire.getContenuMessage("mes45"))
 
@@ -286,15 +289,15 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       logBack.info(utilitaire.getContenuMessage("mes9"), fichierBalsamiq.getName())
       true
     }
-  } // fin de la fonction processFile
+  } // fin de la fonction processFilea
 
   /**
-   * mise à jour table des preserves section pour le fichier de type code
-   * les fichiers codes peuvent être localisés dans les sous-packages suivant:
-   *       GenerationProperties.generatedOtherAlias = "" // alias other
-   *       GenerationProperties.generatedsubPackage1 = "" // sous package1
-   *       GenerationProperties.generatedsubPackage2 = "" // sous package2
-   *      GenerationProperties.generatedsubPackage3 = "" // sous package3
+   * <p>mise à jour table des preserves section pour le fichier de type code</p>
+   * <p>les fichiers codes peuvent être localisés dans les sous-packages suivant:</p>
+   *      <p>GenerationProperties.generatedOtherAlias = "" // alias other</p>
+   *       <p>GenerationProperties.generatedsubPackage1 = "" // sous package1</p>
+   *       <p>GenerationProperties.generatedsubPackage2 = "" // sous package2</p>
+   *      <p>GenerationProperties.generatedsubPackage3 = "" // sous package3</p>
    *
    * @param typeDePreserve : type of preserve : code, javascript, html
    * @param subPackageList : List of subPackages
@@ -307,9 +310,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   }
 
   /**
-   * ----------------------------------------------
+   * -----------------------------------------------------------------------------------------------------------
    * *** appel d'un template local ou global ***
-   * ----------------------------------------------
+   * En fin de traitement, le contenu du fichier est indenté en fonction de son type (java ou javascript)
+   * -----------------------------------------------------------------------------------------------------------
    *
    * @param localExecutionTemplate : name of template
    * @param localExecutionPath : path of template
@@ -334,11 +338,15 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   }
 
   /**
-   * ----------------------------------------------------------------------------------------------------
-   * lecture du fichier properties et des propriétés passées en system properties et mise en table
-   * ----------------------------------------------------------------------------------------------------
+   * <p>----------------------------------------------------------------------------------------------------</p>
+   * <p>lecture du fichier properties et des propriétés passées en system properties et mise en table</p>
+   * <p>Les propriétés sont classées de la façon suivante :</p>
+   * <p> engineProperties     : propriétés d'exécution du moteur Gabbro</p>
+   * <p> generationProperties : propriétés liées à la génération</p>
+   *  <p>templatingProperties : propriétés du moteur de templating freeMarker</p>
+   * <p>----------------------------------------------------------------------------------------------------</p>
    *
-   * @return
+   * @return true or false
    */
   private def initProperties(): Boolean = {
     var ok = true
