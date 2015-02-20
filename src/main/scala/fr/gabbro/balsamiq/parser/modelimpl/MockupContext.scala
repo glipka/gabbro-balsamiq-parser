@@ -16,26 +16,51 @@ package fr.gabbro.balsamiq.parser.modelimpl
 // WITHOUT WARRANTY OF ANY KIND, either express or implied.
 // See the individual licence texts for more details.
 
-
 import scala.beans.BeanProperty
 import scala.collection.JavaConversions._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
-// classe expostion de données au niveau de l'ecran 
-// les widgets enrichissent les données au moment de la mise en table 
-// les données sont alors accessibles pour l'ensemble des traitements 
-// C'est une zone de communication transverse, qui est utilisée par exemple pour récupérer 
-// les liens à inclure dans la page HTML
-// un fragment est une sous partie de l'écran. 
+// -----------------------------------------------
+// fragmentName : nom du fragment 
+// ficName : Nom du fichier 
+// ucName : usecaseName 
+// location: location
+// typeOfFragment: panel, popup, ...
+// -----------------------------------------------
 class Fragment(@BeanProperty var fragmentName: String, @BeanProperty var ficName: String, @BeanProperty var ucName: String, @BeanProperty var location: Location, @BeanProperty var typeOfFragment: String) {
 }
+// ----------------------------------------------
+// classname: nom de la classe 
+// widget: 
+// instanceCode: code instanciation de la classe 
+// isAFormulaire : true or false
+// shortPath : shorPath
+// ----------------------------------------------
 class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var widget: WidgetDeBase, @BeanProperty var instanceCode: String, @BeanProperty var isAFormulaire: Boolean, @BeanProperty var shortPath: String)
+// -----------------------------------------
+// location : 
+// shortPath :
+// restUrl: adresse rest 
+// ------------------------------------------
 class Location(@BeanProperty var location: String, @BeanProperty var shortPath: String, @BeanProperty var restUrl: String) {
   val utilitaire = new Utilitaire
 }
+// ---------------------------------------------------------------
+// content 
+// shortPath
+// ----------------------------------------------------------------
 class ItemVar(@BeanProperty var content: String, @BeanProperty var shortPath: String)
-
+/**
+ * <p>classe expostion de données au niveau de l'ecran</p>
+ * <p>les widgets enrichissent les données au moment de la mise en table</p>
+ * <p>les données sont alors accessibles pour l'ensemble des traitements</p>
+ * <p>C'est une zone de communication transverse, qui est utilisée par exemple pour récupérer</p>
+ * <p>les liens à inclure dans la page HTML</p>
+ * <p>un fragment est une sous partie de l'écran.</p>
+ * @author fra9972467
+ *
+ */
 class MockupContext() {
   var global_max_width: Double = 0
   var global_max_height: Double = 0
@@ -47,17 +72,23 @@ class MockupContext() {
   @BeanProperty var fragments = new java.util.ArrayList[Fragment]() // table des fragments
   @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
   val utilitaire = new Utilitaire
-  // ----------------------------------------------------------------------------------
-  // methode appelée par freeMarker pour retourner le code source des classes java. 
-  // subPackageName est le sous package dans lequel sera générée la classe
-  // ----------------------------------------------------------------------------------
+  /**
+   * <p>methode appelée par freeMarker pour mettre en table le code source des classes java.</p>
+   * <p>subPackageName est le sous package dans lequel sera générée la classe</p>
+   *
+   * @param className
+   * @param classCode
+   * @param subPackageName
+   */
   def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
     tableDesCodesDesClassesJavaouScala += (className, subPackageName) -> classCode
   }
-  // -------------------------------------------------------------------------------------------
-  // ecriture du code java ou scala genéré pour la page html en cours
-  // la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java
-  // -------------------------------------------------------------------------------------------
+  /**
+   * <p>écriture du code java ou scala genéré pour la page html en cours</p>
+   * <p>la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java</p>
+   *
+   * @return
+   */
   def ecritureDuCodeJaveOuScala: Boolean = {
     val keysSet = tableDesCodesDesClassesJavaouScala.keys
     keysSet.foreach(classNameAliasName => {
@@ -66,8 +97,13 @@ class MockupContext() {
     })
     true
   }
-  // récupération des fragments par leur type
-  // cette méthode est appelée depuis les templates freemarker
+  /**
+   * <p>récupération des fragments par leur type</p>
+   * <p>cette méthode est appelée depuis les templates freemarker</p>
+   *
+   * @param typeDeFragment : Panel, Popup, ...
+   * @return ArrayList[Fragment]
+   */
   def getFragmentsByType(typeDeFragment: String): java.util.ArrayList[Fragment] = {
     val listeDesFragments = new java.util.ArrayList[Fragment]
     fragments.foreach(fragment => {

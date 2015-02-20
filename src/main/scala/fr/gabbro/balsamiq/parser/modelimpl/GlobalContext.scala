@@ -9,7 +9,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
-//  va servir pour générer le ùmenu par exemple.  
+//  va servir pour générer le menu par exemple.  
 //  
 //  
 //  
@@ -33,7 +33,7 @@ class GlobalContext() {
   // la clef de cette map est le useCaseName, ainsi que le nom du fichier, le type de preserve, et le sous package 
   // Pour chaque mockup en cours de traitement on crée une preserve section pour les fichiers html, javascript, et java (dans le sous packages)
   // les fichiers sources java qui sont bindés au champ sont gérées directement par la classe TraitementBInding.
-  var mapDesTraitementsPreserveSection= Map[(String, String, String, String), TraitementPreserveSection]() // clef= (usecase,nomDuFichierJavascript,type de preserve,sous package) type=javascript,html,code  
+  var mapDesTraitementsPreserveSection = Map[(String, String, String, String), TraitementPreserveSection]() // clef= (usecase,nomDuFichierJavascript,type de preserve,sous package) type=javascript,html,code  
   /**
    * this method is called by freemarker Templates to get instance of traitementPreserveSection for the current file
    * @param usecaseName : nom du useCase
@@ -46,12 +46,16 @@ class GlobalContext() {
     mapDesTraitementsPreserveSection.getOrElse((usecaseName, fileName, typeDePreserve, subPackage), null)
   }
 
-  // ------------------------------------------------------------------------------------------------------
-  // le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
-  // on met en cache le code javascript : Le code des fragments est cumulé avec le code du fichier
-  // rajout le 16/1/15 de la section de code pour hiérarchiser le code javascript
-  // cette procédure est appelée par les templates javascript freemarker
-  // ------------------------------------------------------------------------------------------------------
+  /**
+   *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
+   * on met en cache le code javascript : Le code des fragments est cumulé avec le code du fichier
+   * rajout le 16/1/15 de la section de code pour hiérarchiser le code javascript
+   * cette procédure est appelée par les templates javascript freemarker
+   * @param fileName
+   * @param codeJavascript
+   * @param isAfragment
+   * @param section
+   */
   def cached_javascript_code(fileName: String, codeJavascript: String, isAfragment: String, section: String): Unit = {
     // clef= (usecase,nom de fichier,section)
     val key =
@@ -66,14 +70,20 @@ class GlobalContext() {
     mapSourcesJavascript.update(key, codeDuFichier)
 
   }
-  // récupération de la section pour le usecase et le fichier
+  /**
+   * récupération de la section pour le usecase et le fichier
+   * @param useCase
+   * @param fileName
+   * @param section
+   * @return code of the section
+   */
   def getJavascriptCodeForTheSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
   }
-  // --------------------------------------------------------
-  // Exposition à freemarker des noms des fichiers javascript générés. 
-  // Exposition à freemarker des informations sur les fichiers javascripts générés. 
-  // ----------------------------------------------------------
+  /**
+   * Exposition à freemarker des noms des fichiers javascript générés. (sans les doublons)
+   * @return  ArrayList[NomDesFichiersJavascript]
+   */
   def getJavascripts(): ArrayList[NomDesFichiersJavascript] = {
     val tableauDesNomsDesFichiersJavascript = new ArrayList[NomDesFichiersJavascript]()
     mapSourcesJavascript.foreach(keyValue => {
@@ -94,8 +104,12 @@ class GlobalContext() {
 
   }
 
-  // ***  nom du fichier javascript *** 
-  // ------------------------------------------------------
+  /**
+   * ***  nom du fichier javascript ***
+   * @param outputFileName
+   * @param useCase
+   * @return name of file
+   */
   def getNomduFichierJavascript(outputFileName: String, useCase: String): String = {
     val ficPropertyName = if (useCase != "") {
       CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDir + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + outputFileName + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript
@@ -104,13 +118,14 @@ class GlobalContext() {
     }
     ficPropertyName
   }
-  // ---------------------------------------------------------------------------------
-  // ecriture du coce javascript: On balaie lahaspMap contenant le nom des fichiers
-  // ainsi que le code javascript
-  // modif le 16/15 : rajout du traitement des sections 
-  // cette procédure est appelée après le traitement de tous les mockups
-  // ---------------------------------------------------------------------------------
 
+  /**
+   * ecriture du coce javascript: On balaie la hashMap contenant le nom des fichiers
+   * ainsi que le code javascript
+   * modif le 16/15 : rajout du traitement des sections
+   * cette procédure est appelée après le traitement de tous les mockups
+   *
+   */
   def generation_fichiers_javascript: Unit = {
     // regoupement des fichiers usecase  : on ne tient pas compte de la section 
     val liste_fichiers_javascript = mapSourcesJavascript.keys.map(key => (key._1, key._2)).toList.distinct
@@ -126,7 +141,15 @@ class GlobalContext() {
 
     })
 
-    // ----------------------------------------------------------------------------
+    /**
+     * écriture du code javascript
+     * @param outputFileName
+     * @param codeJavascript
+     * @param useCase
+     * @param utilitaire
+     * @param traitementFormatageSourceJava
+     * @return true or false
+     */
     def ecritureDuCodeJavascript(outputFileName: String, codeJavascript: String, useCase: String, utilitaire: Utilitaire, traitementFormatageSourceJava: TraitementFormatageSourceJava): Boolean = {
       //  val fileName = outputFileName.trim + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript
       val ficPropertyName = getNomduFichierJavascript(outputFileName, useCase)
@@ -135,11 +158,11 @@ class GlobalContext() {
     }
 
   }
-  // -------------------------------------------------------------------------------
-  // on indique la location dans la zone de l'écran pour le moteur de template
-  //
-  // -------------------------------------------------------------------------------
-
+  /**
+   * on indique la location dans la zone de l'écran pour le moteur de template
+   * @param bookmark
+   * @return Location
+   */
   def retrieveLocation(bookmark: String): Location = {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     val location =
@@ -196,10 +219,13 @@ class GlobalContext() {
       }
     location
   }
-  // ---------------------------------------------------------------------
-  // *** creation d'un fragment ***
-  // le parametre bookmark est sous la forme : usecase-ficname$fragment
-  // ---------------------------------------------------------------------
+
+  /**
+   * *** creation d'un fragment ***
+   * le parametre bookmark est sous la forme : usecase-ficname$fragment
+   * @param bookmark
+   * @return Fragment
+   */
   def createFragment(bookmark: String): Fragment = {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     if (isAfragment) {
@@ -209,9 +235,10 @@ class GlobalContext() {
     } else { null }
   }
 
-  // ----------------------------------------------------------------------------
-  // on génération du Menu de l'application
-  // ----------------------------------------------------------------------------
+  /**
+   * on génération du Menu de l'application
+   * @return source of menu
+   */
   def generation_code_source_menu(): String = {
     globalSourceMenu = new StringBuilder // réinit du source du menu à blanc
     val (_, source1_debut, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("header_menu", "debut", null)
@@ -224,10 +251,14 @@ class GlobalContext() {
     globalSourceMenu.append(source1_fin)
     globalSourceMenu.toString()
   }
-  // -----------------------------------------------------------------------
-  // *** Génération du code source d'une classe ****
-  // -----------------------------------------------------------------------
 
+  /**
+   * @param menuItemEnCours
+   * @param niveau
+   * @param pere
+   * @param hierarchiePere
+   * @return source menu Item
+   */
   private def generation_code_source_menuItem(menuItemEnCours: MenuItem, niveau: Int, pere: MenuItem, hierarchiePere: String): StringBuilder = {
     var codeDuMenu = new StringBuilder
     val tabulation = "\t" * niveau

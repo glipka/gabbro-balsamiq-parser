@@ -23,23 +23,33 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.service.TControleValidite
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.modelimpl.ItemVar
-// ------------------------------------------------------------------
-// *** verification de la validité de la position des widgets ***
-// ------------------------------------------------------------------
+
+/**
+ * *** verification de la validité de la position des widgets ***
+ * @author fra9972467
+ *
+ */
 class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: TraitementBinding, globalContext: GlobalContext) extends TControleValidite {
   def process: Boolean = {
     controle
-    mise_en_table_des_formulaires_pour_templates_et_RetraitementDesBinds(catalog, null)
+    mise_en_table_items_vars(catalog, null)
     true
 
   }
 
-  // différents controles pour vérifier que les widgets du catalogue sont OK
+  /**
+   * <p>le 1ere element du catalogue contient le container principal (mainWIndow par exemple)</p>
+   * <p>s'il y a plus d'une entrée => des widgets sont hors gabarit et ne seront pas traités</p>
+   * <p>on vérifie que les widgets d'un formulaire sont bindés à une variable</p>
+   * <p>détection des widgets d'une même branche ayant une intersection commune</p>
+   * @return true or false
+   */
   def controle: Boolean = {
     var erreur = false
     logBack.info(utilitaire.getContenuMessage("mes24"))
     // le 1ere element du catalogue contient le container principal (mainWIndow par exemple)
     // s'il y a plus d'une entrée => des widgets sont hors gabarit et ne seront pas traités
+
     if (catalog.size > 1) {
       logBack.error(utilitaire.getContenuMessage("mes22"))
       erreur = true
@@ -52,10 +62,11 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
 
     return !erreur
   }
-  // ------------------------------------------------------------------------------
-  // detection des widgets d'une même branche ayant une intersection commune
-  //  
-  // ------------------------------------------------------------------------------
+
+  /**
+   * detection des widgets d'une même branche ayant une intersection commune
+   * @param branche : ArrayBuffer[WidgetDeBase]
+   */
   private def verification_intersection_entre_widgets_branche(branche: ArrayBuffer[WidgetDeBase]) {
 
     for (i <- 0 until branche.size) {
@@ -68,17 +79,29 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     }
 
   }
+
+  /**
+   * intersection of area between 2 widgets.
+   * @param zone1 : widget1
+   * @param zone2 : widget2
+   * @return true or false
+   */
   private def intersection(zone1: WidgetDeBase, zone2: WidgetDeBase): Boolean = {
     val hoverlap = (zone1.xRelative < (zone2.xRelative + zone2.w) && zone2.xRelative < (zone1.xRelative + zone1.w)) // horizontal
     val voverlap = (zone1.yRelative < (zone2.yRelative + zone2.h) && zone2.yRelative < (zone1.yRelative + zone1.h)) // vertical
     return hoverlap && voverlap
   }
-  // ------------------------------------------------------------------------------
-  // on traite branche par branche du catalogue afin de verifier que les widgets d'un container 
-  // sont bindés à une variable
-  // ------------------------------------------------------------------------------
+
+  /**
+   *  on traite branche par branche du catalogue afin de verifier que les widgets d'un container
+   * sont bindés à une variable
+   * Vérification que chaque formulaire a un id déclaré.
+   * On vérifie qu'il n'existe pas plus d'un formulaire avec le même ID
+   *
+   * @param branche : table des widgetDeBase à traiter.
+   * @param widgetPere
+   */
   private def verification_binding_variable(branche: ArrayBuffer[WidgetDeBase], widgetPere: WidgetDeBase) {
-    //   val listeDesengineProperties.widgetsEnablingContainerAsAForm = CommonObjectForMockupProcess .engineProperties.widgetsEnablingContainerAsAForm.split(",").map(_.trim).toList
     branche.foreach(controle => {
       // si le container Pere est un formulaire, on vérifie que chaque widget de type formulaire est bindé à une valeur
       if (widgetPere.isFormulaireHTML && CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == controle.controlTypeID || x == controle.componentName))) {
@@ -97,20 +120,20 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     })
   }
 
-  // ------------------------------------------------------------------------------------------------------
-  // on met en table dans la zone ecran les formulaires. 
-  // on met aussi en table le contenu des variables itemsVar qui sera traite par les templates
-  // on met en table les variables afin de générer les Dtos.
-  // -----------------------------------------------------------------------------------------------------
-  def mise_en_table_des_formulaires_pour_templates_et_RetraitementDesBinds(branche: ArrayBuffer[WidgetDeBase], containerPere: WidgetDeBase) {
+  /**
+   * on met aussi en table (mockupContext et globalContext) le contenu des variables itemsVar qui sera traite par les templates
+   * @param branche
+   * @param containerPere
+   */
+  def mise_en_table_items_vars(branche: ArrayBuffer[WidgetDeBase], containerPere: WidgetDeBase) {
     //   val listeDesengineProperties.widgetsEnablingContainerAsAForm = CommonObjectForMockupProcess .engineProperties.widgetsEnablingContainerAsAForm.split(",").map(_.trim).toList
     branche.foreach(controle => {
       val itemsVar = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.itemsVar, "").toString()
       if (itemsVar != "" && !CommonObjectForMockupProcess.mockupContext.itemsVars.exists { item => item.content == itemsVar }) { CommonObjectForMockupProcess.mockupContext.itemsVars.add(new ItemVar(itemsVar, itemsVar.toUpperCase())) }
       if (itemsVar != "" && !globalContext.itemsVars.exists { item => item.content == itemsVar }) { globalContext.itemsVars.add(new ItemVar(itemsVar, itemsVar.toUpperCase())) }
 
-      // traitement des fils
-      if (controle.tableau_des_fils.size > 0) { mise_en_table_des_formulaires_pour_templates_et_RetraitementDesBinds(controle.tableau_des_fils, controle) }
+      // traitement itératif des fils
+      if (controle.tableau_des_fils.size > 0) { mise_en_table_items_vars(controle.tableau_des_fils, controle) }
     })
   }
 

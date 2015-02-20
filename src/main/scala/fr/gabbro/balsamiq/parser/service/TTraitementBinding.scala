@@ -17,21 +17,29 @@ package fr.gabbro.balsamiq.parser.service
 
 // See the individual licence texts for more details.
 
-
 import scala.collection.mutable.ArrayBuffer
 import org.slf4j.LoggerFactory
 import scala.beans.BeanProperty
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 
-
 trait TTraitementBinding {
   protected val logBack = LoggerFactory.getLogger(this.getClass());
   protected val utilitaire = new Utilitaire
   class StructureMap(@BeanProperty var mapName: String, @BeanProperty var key: String, @BeanProperty var value: String)
- 
-  // le type de champe pe
-  class Field(val fieldNameOrClassName: String,val instanceName:String, val typeDuChamp: String, var children: ArrayBuffer[Field], var controlTypeID:String,var widget:WidgetDeBase)
+
+  /**
+   *
+   * Description de la class Field
+   *    fieldNameOrClassName : nom du champ ou nom de la classe
+   *    typeDuChamp : type au sens java ou scala (il n'y a pas de controle de type).
+   *    children : tableau des fils
+   *     controlTypeID : nom du widget ou du composant
+   *     widget : widget  qui traite le bind
+   * @author fra9972467
+   *
+   */
+  class Field(val fieldNameOrClassName: String, val instanceName: String, val typeDuChamp: String, var children: ArrayBuffer[Field], var controlTypeID: String, var widget: WidgetDeBase)
   protected var tableauDesVariables = ArrayBuffer[Field]()
   protected val point = "."
 

@@ -76,14 +76,14 @@ class CatalogDesComposants {
       mockup = doc.getRootElement();
     } catch {
       case e: Exception =>
-        logBack.info(utilitaire.getContenuMessage("mes61") , e.getMessage());
+        logBack.info(utilitaire.getContenuMessage("mes61"), e.getMessage());
         return (false, null)
     }
 
     var catalog = traitementWidgetCatalogue(mockup.getChild(CommonObjectForMockupProcess.constants.controls))
     catalog.foreach(entry => {
-      logBack.debug("entry={}",entry.componentName)
-      entry.mapExtendedAttribut.foreach(x => logBack.debug("catalog:{} key:{} value:{}",entry.componentName, x._1, x._2))
+      logBack.debug("entry={}", entry.componentName)
+      entry.mapExtendedAttribut.foreach(x => logBack.debug("catalog:{} key:{} value:{}", entry.componentName, x._1, x._2))
     })
     logBack.info(utilitaire.getContenuMessage("mes4"), fichierCatalogDesComposantsBootstrap)
     return (true, catalog)
@@ -121,15 +121,18 @@ class CatalogDesComposants {
     catalog
   }
 
-  // -------------------------------------------------------------------------------------
-  // traitement d'un groupe 
-  // On récupère les enfants du groupe. 
-  // il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe
-  // on cumule les attributs étendus de chaque enfant du groupe
-  // attention aux attributs des enfants ayant le même nom.
-  // --------------------------------------------------------------------------------------
+  /**
+   * traitement d'un groupe
+   * On récupère les enfants du groupe.
+   * il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe
+   * on cumule les attributs étendus de chaque enfant du groupe
+   * attention aux attributs des enfants ayant le même nom.
+   * on met en table le controlId  de l'enfant et L'ID du widget du composant  
+   * @param elementXML : Element
+   * @param groupeEnCours : ComponentBalsamiq
+   * @return ComponentBalsamiq
+   */
   private def traitementGroupeCatalogue(elementXML: Element, groupeEnCours: ComponentBalsamiq): ComponentBalsamiq = {
-
     val groupChildrenDescriptor = elementXML.getChild(CommonObjectForMockupProcess.constants.groupChildrenDescriptors);
     val nombreEnfants = groupChildrenDescriptor.getChildren(CommonObjectForMockupProcess.constants.control).size
     val enfants = groupChildrenDescriptor.getChildren(CommonObjectForMockupProcess.constants.control)
@@ -145,15 +148,18 @@ class CatalogDesComposants {
 
   }
 
-  // -----------------------------------------------------------------------------------------------------------------------------
-  // *** récupération des propriétés du contrôle en cours ***
-  // Principe chaque proprieté est prefixée par le nom du widget
-  // s'il y a plusieurs widgets dans le groupe. Sinon c'est le nom de l'attribut
-  // exemple pour le composant tb_label : button_text
-  // modification 15 janvier : traitement de l'attribut markup d'un élément du composant 
-  // si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup 
-  //  et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré ar le moteur
-  // ---------------------------------------------------------------------------------------------------------------------------
+  /**
+   *  *** récupération des propriétés du contrôle en cours ***
+   * On fait une premire passe pour récupere dans une map l'ensemble des attributs (clef, valeur)
+   * Si l'attribut customId est présent, on modifie la clef de chaque attribut en concaténant le customId avec le nom de l'attribut (capitalized)
+   * modification 15 janvier : traitement de l'attribut markup d'un élément du composant
+   * si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup
+   *  et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré ar le moteur
+   *
+   * @param e : Element
+   * @param controleID : String
+   * @return (map des Attributs, customId)
+   */
   private def recuperationDesAttributsEtendus(e: Element, controleID: String): (scala.collection.mutable.Map[String, String], String) = {
     var mapExtendedAttributDuWidgetDuComposant = scala.collection.mutable.Map[String, String]()
     var customID = ""
@@ -164,7 +170,7 @@ class CatalogDesComposants {
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           val elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
-           // *** le markup n'est pas mis en table ***
+          // *** le markup n'est pas mis en table ***
           if (elementName != CommonObjectForMockupProcess.constants.markup) {
             mapExtendedAttributDuWidgetDuComposant += (elementName -> elementValue)
           }

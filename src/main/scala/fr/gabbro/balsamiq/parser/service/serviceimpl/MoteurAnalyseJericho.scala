@@ -37,17 +37,17 @@ import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
 
-  // ---------------------------------------------------------------------------------------------
-  // Les clefs de traduction sont sauvegardées dans un fichier properties
-  // on recharge les clefs de traduction depuis ce fichier properties dans 2 hashTables :
-  // clef <=> valeur et valeur <=> clef
-  // ======================================================
-  // format de la clef de traduction :
-  // ======================================================
-  // ecran.form1.label1.key.1=valeur1
-  // le 1er champ est le nom de l'écrran, le dernier champ est le compteur unique
-  // les champs intermédiaires sont variables
-  // ----------------------------------------------------------------------------------------------
+  /**
+   * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
+   * <p>on recharge les clefs de traduction depuis ce fichier properties dans 2 hashTables :
+   *  clef <=> valeur et valeur <=> clef</p>
+   *
+   * <p>format de la clef de traduction : <useCase, Ecran, formulaire, htmlTag, internal number</p>
+   * <p>Exemple: useCase2.ectestgl01.ssss.label.1=text1</p>
+   * <p>les champs intermédiaires sont variables</p>
+   *
+   * @return true or false and last key number used</p>
+   */
   def recuperationDesClefsDeTraduction(): (Boolean, Int) = {
     var ok = true
     tableDesClefsValeursDeTraduction.clear
@@ -80,12 +80,12 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     (ok, clefMaxi)
 
   }
-  // ------------------------------------------------------------------------------
-  // ecriture dans le fichier properties des libelles à traduire
-  // On lit l'ensemble des clef que l'on trie par ordre descendant
-  // on récupere la valeur de chaque clef  
-  // puis on écrit le tout dans un buffer.
-  // ------------------------------------------------------------------------------
+  /**
+   * <p> ecriture dans le fichier properties des libelles à traduire</p>
+   * <p>On lit l'ensemble des clefs que l'on trie par ordre descendant</p>
+   * <p>on récupere la valeur de chaque clef</p>
+   * <p>puis on écrit le tout dans un buffer.</p>
+   */
   def sauvegardeDesClefsDeTraduction(): Unit = {
     val msgsEntrySet = tableDesClefsValeursDeTraduction.keys.toList.sortWith((x, y) => x < y)
     var fileWriter: java.io.FileWriter = null
@@ -98,9 +98,13 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     utilitaire.ecrire_fichier(ficPropertyName, sbuf.toString())
 
   }
-  // ------------------------------------------------------------------------
-  // On recopie les nouvelles clefs dans les fichiers pays traduits
-  // ------------------------------------------------------------------------
+
+  /**
+   * <p>La propriété i18nLocales contient la liste des langues à internationaliser.</p>
+   * <p>Pour chaque langue, on prend comme source le fichier des traductions et on rééecrit les clefs</p>
+   * <p>non présentes dans la langue cible à traduire. Ce qui signifie que les clefs existantes ne sont pas écrasées.</p>
+   * <p>@return true or false</p>
+   */
   def traitementDeltaDesFichiersDeTraductionDesDifferentsPays: Boolean = {
     val propsLocal = new Properties();
     val ficPropertyLocal = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
@@ -125,25 +129,30 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     true
 
   }
-  // -------------------------------------------------------------------------------------------------
-  // appel récursif de la liste des elements
-  // si l'element a des fils, traitement récursif des fils
-  // pour chaque élément, on récupère le texte à traduire.
-  // On utilise la hashMap (valeur, clef) pour vérifier si cette valeur est déjà en table
-  // Si oui => on récupère la valeur, sinon, on crée cette valeur dans les 2 hashmap (valeur clef et clef valeur)
-  // la clef de traduction est recupérée par le template Freemarker CommonObjectForMockupProcess.constants.templateClefDeTraduction
-  // puis on un replace du segment à modifier
-  // pour chaque valeur à traduire on détermine la hiérarchie de l'élément.
-  // si l'2lément à traduire est dans un formulaire, on l'indique dans la clef de tradution.
-  // La 1ere valeur de la clef est toujours le nom du fichier en cours de traitement, puis éventuelllement l'ID du fomulaire
-  // contenant l'éelemnt à traduire puis le type d'élement et enfin un compteur unique.
-  // exemple :
-  //           testgl01.header.47=header
-  //           testgl01.i.52=second
-  //           testgl01.ins.53=row
-  //           testgl01.personne.label.56=Adresse
-  //           testgl01.personne.label.57=Personne
-  // --------------------------------------------------------------------------------------------------
+
+  /**
+   *
+   * <p>appel récursif de la liste des elements</p>
+   * <p>si l'element a des fils, traitement récursif des fils</p>
+   * <p>pour chaque élément, on récupère le texte à traduire.</p>
+   * <p>On utilise la hashMap (valeur, clef) pour vérifier si cette valeur est déjà en table</p>
+   * <p>Si oui => on récupère la valeur, sinon, on crée cette valeur dans les 2 hashmap (valeur clef et clef valeur)</p>
+   * <p>la clef de traduction est recupérée par le template Freemarker CommonObjectForMockupProcess.constants.templateClefDeTraduction</p>
+   * <p>puis on un replace du segment à modifier</p>
+   * <p>pour chaque valeur à traduire on détermine la hiérarchie de l'élément.</p>
+   * <p>si l'2lément à traduire est dans un formulaire, on l'indique dans la clef de tradution.</p>
+   * <p>La 1ere valeur de la clef est toujours le nom du fichier en cours de traitement, puis éventuelllement l'ID du fomulaire</p>
+   * <p>contenant l'éelemnt à traduire puis le type d'élement et enfin un compteur unique.</p>
+   * <p>exemple :</p>
+   * <p>          testgl01.header.47=header</p>
+   * <p>          testgl01.i.52=second</p>
+   * <p>          testgl01.ins.53=row</p>
+   * <p>          testgl01.personne.label.56=Adresse</p>
+   * <p>          testgl01.personne.label.57=Personne</p>
+   *
+   * @param elements : List of Element to traduct
+   * @param outputDocument
+   */
   def extractMessages(elements: List[net.htmlparser.jericho.Element], outputDocument: net.htmlparser.jericho.OutputDocument): Unit = {
     elements.foreach(element => {
       // remplacement des attributs
@@ -170,12 +179,16 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       } // if1
     })
   }
-  // ---------------------------------------------------------------------------------------------------------
-  // *** traitement des attributs de l'élément en cours ***
-  // si l'attibut est dans la table des atributs à traduire, on renseigne sa valeur traduite dans une hasMAP
-  // Jericho donne la possibnlité de modifier les attributs d'un segment par la fonction replace
-  // ----------------------------------------------------------------------------------------------------------
+
   import scala.collection.mutable.Map
+  /**
+   * <p>*** traitement des attributs de l'élément en cours ***</p>
+   * <p>si l'attibut est dans la table des atributs à traduire, on renseigne sa valeur traduite dans une hashMAP</p>
+   * <p>Le template templateClefDeTraduction génère le source de traduction du token.</p>
+   * <p> Jericho donne la possibilité de modifier les attributs d'un segment par la fonction replace</p>
+   * @param element
+   * @return Map of Attributes
+   */
   def traitementAttributsElement(element: Element): Map[String, String] = {
     val attributes = if (element.getAttributes != null) element.getAttributes.toList else List[Attribute]()
     val elementName = element.getStartTag.getName
@@ -183,7 +196,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     attributes.foreach(attribute => {
       // le nom de l'attribut est dans la liste des attributs à traduire ? 
       if (List(attribute.getName).intersect(CommonObjectForMockupProcess.generationProperties.attributesToProcessI18n).size > 0) {
-        val key = traduction_valeur(replaceSpecialChar(attribute.getValue), element, attribute.getName)
+        val key = traduction_valeur(replaceSpecialCharKey(attribute.getValue), element, attribute.getName)
         if (key != "") {
           val (_, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
           val (_, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
@@ -196,21 +209,37 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     })
     mapAttributes
   }
-  // ---------------------------------------------------------------------
-  // *** Traduction d'une valeur ***
-  // ---------------------------------------------------------------------
+
+  /**
+   * <p><b>Traduction d'une valeur</b></p>
+   * <p>Si la valeur à traduire est numérique, on ne fait rien</p>
+   * <p>Si la valeur n'est pas déjà traduite pour le useCase et le mockup en cours,</p>
+   *   <p>On récupère la hiérarchie des éléments contenant le tag en cours,</p>
+   *   <p>on filtre cette hiérarchie avec les élements qui sont dans la liste des containers HTML (htmlContainerListForI18nGeneration) et on récupère l'id
+   *    de chaque élément filtré.</p>
+   *   <p>Appel du template BuildTraductionKey afin de générer la clef du fichier properties (usecase,Mockupname,FormName,HtmlTag,Index)</p>
+   *
+   * @param valeur : valeur à traduire
+   * @param element
+   * @param attributeName : nom de l'attribut
+   * @return clef de traduction
+   */
   def traduction_valeur(valeur: String, element: Element, attributeName: String): String = {
     var valeurATraduire = if (valeur != null) { replaceSpecialCharValue(valeur.trim()) } else { "" }
+    // on ne fait pas de traduction pour les valeurs numériques
     if (valeurATraduire.length() > 0 && !valeurATraduire.forall(_.isDigit)) { //if1
+      // valeur non déjà traduite pour le usecase et écran en cours. 
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
         counterClef += 1 // compteur unicité des clefs
-        val table_hierachie = getHierarchie(element);
+        val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
+        // on filtre la table hiérachie par les élements qui sont dans la liste des htmlContainerListForI18nGeneration
         val table_formulaire = table_hierachie.filter(element => {
           val x1 = element.getStartTag.getName
           List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.htmlContainerListForI18nGeneration).size > 0
         })
 
         var container = ""
+        // pour chaque élement de la table des formulaires, on récupère l'attribut id de l'élément.
         table_formulaire.foreach(formulaire => {
           val id = formulaire.getAttributeValue(CommonObjectForMockupProcess.constants.id)
           if (id != null && id != "") { container = container + id + "." }
@@ -221,7 +250,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         var isAttribute = if (attributeName != "") { true } else { false }
         val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
         val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
-        var key = replaceSpecialChar(source6.trim + source7.trim)
+        var key = replaceSpecialCharKey(source6.trim + source7.trim)
         tableDesClefsValeursDeTraduction += (key -> valeurATraduire);
         tableDesValeursClefsDeTraduction += ((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement) -> key)
         return key
@@ -236,7 +265,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
   // --------------------------------------------------------------------------
   // *** remplacement des caractères spéciaux dans les fichiers properties***
   // ---------------------------------------------------------------------------
-  def replaceSpecialChar(valeur: String): String = {
+  def replaceSpecialCharKey(valeur: String): String = {
     //   0X22 = double quote
     valeur.replace("\n", "").replace("\t", "").replace(":", "-").replace("0x22", "")
   }
@@ -247,11 +276,11 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     //   0X22 = double quote
     valeur.replace("\n", "").replace("\t", "").replace("0x22", "").replace(":", "¨")
   }
-  // -------------------------------------------------------
-
-  // --------------------------------------------------------------------------------------------------------
-  // récupération de la hiérarchie de l'element en cours pour retrouver facilement le widget dans la page.
-  // --------------------------------------------------------------------------------------------------------
+  /**
+   *  récupération de la hiérarchie de l'element en cours pour retrouver facilement le widget dans la page.
+   * @param element
+   * @return ArrayBuffer[Element]
+   */
   def getHierarchie(element: Element): ArrayBuffer[Element] = {
     var tableHierarchie = new ArrayBuffer[Element]()
     tableHierarchie += element
@@ -259,15 +288,14 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     tableHierarchie
 
   }
-  // --------------------------------------------------------------------------------------------------------
-  // Lecture du fichier html extraction de l'ensemble des elements de la page.
-  // SI l'element contient du texte à traduire, on vérifie dans la table "valeur clef" si l'élement
-  // est déjà renseigné. Si c'est le cas, on remplace le texte par la valeur de la clef de traduction  (Appel du
-  // template freemarker pour remplacer la clef de traduction).
-  // si l'élement n'est pas présent dans la hashTab, on le rajoute
-  //
-  // ---------------------------------------------------------------------------------------------------------
-
+ 
+  /**
+   * <p>Lecture du fichier html extraction de l'ensemble des elements de la page. (fonction extractMessages)</p>
+   * <p>et réécriture du fichier html.</p>
+   * @param fileName
+   * @param subDirectory
+   * @param templateDirOut
+   */
   def traductHtmlFile(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
     var directoryName = templateDirOut
     val sourceHTML = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
