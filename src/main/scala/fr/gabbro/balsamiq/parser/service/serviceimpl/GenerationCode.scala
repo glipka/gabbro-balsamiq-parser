@@ -16,27 +16,33 @@ package fr.gabbro.balsamiq.parser.service.serviceimpl
 // WITHOUT WARRANTY OF ANY KIND, either express or implied.
 // See the individual licence texts for more details.
 
- 
 import scala.collection.mutable.ArrayBuffer
 import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
- 
 
+ 
+ 
 class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker) extends TTraitementCommun {
 
-  // -----------------------------------------------------------------------------------------------------------
-  // dans le catalogue chaque container est matérialisé par une branche. 
-  // un container peut être lui même contenu dans un container.  
-  // La 1ere branche du catalogue est le gabarit principal qui contient l'ensemble des wigets de l'écran
-  // On extrait dans chaque branche les widgets triés  par n° de ligne et par n° de colonne.
-  // On chaque changement de branche => on appelle la genération du template "Canvas".
-  // A chaque changement de ligne => on appelle le template row 
-  // A chaque changement de colonne => on appelle le template cols, on gère l'offset avec la colonne précédente
-  // Pour chaque widget, il y a 2 phases : la phase début et la phase de fin, un widget pouvant être lui même un conteneur
-  // l'appel aux templates se fait récursivement afin de traiter correctement l'inclusion des widgets.
-  // ----------------------------------------------------------------------------------------------------------
-
+  /**
+   * dans le catalogue chaque container est matérialisé par une branche.
+   * un container peut être lui même contenu dans un container.
+   * La 1ere branche du catalogue est le gabarit principal qui contient l'ensemble des wigets de l'écran
+   * On extrait dans chaque branche les widgets triés  par n° de ligne et par n° de colonne.
+   * On chaque changement de branche => on appelle la genération du template "Canvas".
+   * A chaque changement de ligne => on appelle le template row
+   * A chaque changement de colonne => on appelle le template cols, on gère l'offset avec la colonne précédente
+   * Pour chaque widget, il y a 2 phases : la phase début et la phase de fin, un widget pouvant être lui même un conteneur
+   * l'appel aux templates se fait récursivement afin de traiter correctement l'inclusion des widgets.
+   * @param branche_catalog : ArrayBuffer[WidgetDeBase]
+   * @param rowNumber : Int
+   * @param niveau : Int
+   * @param branche_pere : ArrayBuffer[WidgetDeBase]
+   * @param container : WidgetDeBase
+   * @param forceFormulaire boolean
+   * @return  (sourceHtml, sourceJavascript, sourceJavaOuScala) : (StringBuilder, StringBuilder, StringBuilder)
+   */
   def traitement_widget_par_ligne_colonne(branche_catalog: ArrayBuffer[WidgetDeBase], rowNumber: Int, niveau: Int, branche_pere: ArrayBuffer[WidgetDeBase], container: WidgetDeBase, forceFormulaire: Boolean): (StringBuilder, StringBuilder, StringBuilder) = {
     var sourceHtml: StringBuilder = new StringBuilder()
     var sourceJavascript: StringBuilder = new StringBuilder()
@@ -168,24 +174,31 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
     (sourceHtml, sourceJavascript, sourceJavaOuScala)
   } // fin de la fonction balayage_catalog
 
-  // le calcul de la taile de la cellule se fait par rapport à la taille du conteneur 
-  // la taille de cellule est en pixel
-  // 
+   /**
+   * le calcul de la taile de la cellule se fait par rapport à la taille du conteneur
+   * la taille de cellule est en pixel
+   * @param widget : widgetDeBase
+   * @return : taille cellule en douzieme
+   */
   def calculTailleCelluleEnDouzieme(widget: WidgetDeBase): Int = {
     var tailleCelluleEnDouzieme = if (widget != null) widget.w / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns else (CommonObjectForMockupProcess.mockupContext.global_max_width / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns).toInt
     if (tailleCelluleEnDouzieme < CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) tailleCelluleEnDouzieme = CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns
     tailleCelluleEnDouzieme
   }
-  // ------------------------------------------------------------------------------------------------------------
-  // Terminologie : un colonne = un eensemble de cellules en 12eme bootstrap.
-  // recadrage de la taille pour eviter de ne pas traiter des widgets 
-  // En effet, la taille des cellule en12Eme se fait par arrondi.
-  // 
-  // si la taille de la cellule en 12 =1 => on est certain de ne rien perdre. 
-  // On se positionne sur les différentes cellules comprises entre la la cellule en cours et la cellule en cours+taille de la colonne
-  // S'il y a des widgets inclus dans cet interval, on réactualise le nombre de cellules de la colonne afin de n'y inclure aucun widget.
-  // (on prend la 1er celulle de la colonne ne comprenant pas de widgets.
-  // --------------------------------------------------------------------------------------------------------
+  /**
+   * Terminologie : un colonne = un eensemble de cellules en 12eme bootstrap.
+   * recadrage de la taille pour eviter de ne pas traiter des widgets
+   * En effet, la taille des cellule en12Eme se fait par arrondi.
+   *
+   * si la taille de la cellule en 12 =1 => on est certain de ne rien perdre.
+   * On se positionne sur les différentes cellules comprises entre la la cellule en cours et la cellule en cours+taille de la colonne
+   * S'il y a des widgets inclus dans cet interval, on réactualise le nombre de cellules de la colonne afin de n'y inclure aucun widget.
+   * (on prend la 1er celulle de la colonne ne comprenant pas de widgets.
+   * @param brancheFiltreeParLigne : ArrayBuffer[WidgetDeBase]
+   * @param numeroDeColonne : Int
+   * @param tailleDeLaColonne : Int
+   * @return tailleColonne:Int
+   */
   def ajustementTailleDeLaColonne(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], numeroDeColonne: Int, tailleDeLaColonne: Int): Int = {
     val branche = brancheFiltreeParLigne.filter(widget => widget.positionEnDouzieme == numeroDeColonne + tailleDeLaColonne)
 

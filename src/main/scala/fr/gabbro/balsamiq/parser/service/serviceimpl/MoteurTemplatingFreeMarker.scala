@@ -355,7 +355,6 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
       if (widget.isFormulaireHTML) {
         mapParametre += (CommonObjectForMockupProcess.constants.isForm -> CommonObjectForMockupProcess.constants.trueString)
       }
-
     }
     mapParametre += (CommonObjectForMockupProcess.constants.widgetContainer -> container)
     mapParametre += (CommonObjectForMockupProcess.constants.mockupContext -> CommonObjectForMockupProcess.mockupContext)

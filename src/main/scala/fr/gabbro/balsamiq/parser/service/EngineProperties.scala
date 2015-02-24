@@ -35,7 +35,11 @@ class EngineProperties {
   @BeanProperty var widgetsEnablingContainerAsAForm = List[String]() // liste des composants de type formulaire
   @BeanProperty var widgetsAcceptingIcon = List[String]() // liste des composants de acceptant un widget type icon
   
-  def loadProperties(propsMap: Map[String, String]): Unit = {
+  /**
+   * load engine properties
+ * @param propsMap:Map[String, String]
+ */
+def loadProperties(propsMap: Map[String, String]): Unit = {
     boostrapNumberOfColumns = propsMap.getOrElse("config.engine.boostrapNumberOfColumns", "12").toInt
     widgetsEnablingContainerAsAForm = propsMap.getOrElse("config.engine.widgetsEnablingContainerAsAForm", "").split(",").toList.map(_.trim)
     buttonWidgetsList = propsMap.getOrElse("config.engine.buttonWidgetsList", "tb-btn").split(",").toList.map(_.trim)

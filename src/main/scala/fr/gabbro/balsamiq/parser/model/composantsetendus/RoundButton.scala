@@ -29,7 +29,10 @@ class DirectoryFile(@BeanProperty var directory: String, @BeanProperty var file:
 // on recupere le champ href 
 class RoundButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
-  override def enrichissementParametres(param: String): (String, Object) = {
+  /* (non-Javadoc)
+ * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+ */
+override def enrichissementParametres(param: String): (String, Object) = {
     var tabs = new java.util.ArrayList[Href]()
     // l'adresse doit être sous la forme : http://directory/fichier 
     val href = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.href, "").toString

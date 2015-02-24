@@ -27,10 +27,11 @@ class CheckBoxOrRadioButton(@BeanProperty var text: String, @BeanProperty var st
 
 class CheckBoxRadioButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
-  // -------------------------------------------------------------------
-  // traitement particulier du checkboxGroup
-  // on analyse le champ text qui contient plusieurs checkbox
-  // --------------------------------------------------------------------
+  /* (non-Javadoc)
+ * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+ * traitement particulier du checkboxGroup
+ * on analyse le champ text qui contient plusieurs checkbox
+ */
   override def enrichissementParametres(param1: String): (String, Object) = {
     val checkboxOrRadioButton =
       if (this.controlTypeID == CommonObjectForMockupProcess.constants.checkBoxGroup) { CommonObjectForMockupProcess.constants.checkboxShort }

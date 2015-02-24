@@ -32,7 +32,7 @@ class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
   var controlTypeID: String = elementXML.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
   if (controlTypeID == CommonObjectForMockupProcess.constants.groupConstante) {
     componentName = getComponentName(elementXML)
-    if (componentName != "") is_a_group = true
+    if (componentName != "") {is_a_group = true}
     element = elementXML // sauvegarde du code XML pour récupération 
   }
   

@@ -63,6 +63,10 @@ class GenerationProperties {
   @BeanProperty var srcJavascriptFilesDirWithOutPrefix = "" //répertoire des sources javascripts sans prefix du projet
   @BeanProperty var srcWebFilesDir = "" // repertoire des fichiers html    
   // 
+  /**
+   * load generation properties
+   * @param propsMap
+   */
   def loadProperties(propsMap: Map[String, String]): Unit = {
     concatenateContainerIdToWidgetId = if (propsMap.getOrElse("config.generation.concatenateContainerIdToWidgetId", "true").trim == "true") { true } else { false }
     generatedi18nFileName = propsMap.getOrElse("config.generation.generatedi18nFileName", "dictionnaire_fr.properties")
@@ -77,7 +81,7 @@ class GenerationProperties {
     generatedOtherAlias = propsMap.getOrElse("config.generation.generatedOtherAlias", "").trim
     generatedsubPackage1 = propsMap.getOrElse("config.generation.generatedsubPackage1", "").trim
     generatedsubPackage2 = propsMap.getOrElse("config.generation.generatedsubPackage2", "").trim
-   generatedsubPackage3 = propsMap.getOrElse("config.generation.generatedsubPackage3", "").trim
+    generatedsubPackage3 = propsMap.getOrElse("config.generation.generatedsubPackage3", "").trim
     processI18nInFiles = propsMap.getOrElse("config.generation.processI18nInFiles", "false").trim
     generatedSuffixCodeFileName = propsMap.getOrElse("config.generation.generatedSuffixCodeFileName", "_code").trim
     srcBuildPathDir = propsMap.getOrElse("config.generation.srcBuildPathDir", "").trim.replace("%project%", projectName)

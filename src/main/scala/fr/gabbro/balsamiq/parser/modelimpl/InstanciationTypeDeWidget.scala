@@ -34,7 +34,6 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.BreadCrumbsOrButtonBarE
 import fr.gabbro.balsamiq.parser.model.composantsetendus.Datagrid
 import fr.gabbro.balsamiq.parser.model.composantsetendus.CheckBoxRadioButton
 
-
 // ---------------------------------------------------------------------------------------------------------------
 //  controlID="6" 
 // controlTypeID="com.balsamiq.mockups::Label" 
@@ -55,7 +54,13 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
   var componentName = ""
   //  var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
   val utilitaire = new Utilitaire
-
+  /**
+   * <p>cette classe permet de déterminer le type de widget en cours de traitement</p>
+   * <p>si le widget est un composant et est nommé dhtmlxgrid => instanciation du composant datagrid</p>
+   * <p>Sinon instanciation de l'objet en fonction de son nom.</p>
+   * <p>Remarque pour le moment, il n'y a pas de différenciation en terme d'objet entre un widget et un composant (classe WidgetDeBase)</p>
+   * @return
+   */
   def process(): WidgetDeBase = {
     controlTypeID match {
       // ----------------------------------------------------------------------------------------------------------------
@@ -91,6 +96,10 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
 
   }
 
+  /**
+   * @param e:Element
+   * @return : Map[String, Object] Attributs étendus
+   */
   private def recuperationDesAttributsEtendus(e: Element): scala.collection.mutable.Map[String, Object] = {
     var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
     if (e.getChildren().size() != 0) {

@@ -23,7 +23,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
 
 // --------------------------------------------------------------------------------------------------------
-// Determination des dépendances.  
+// Détermination des dépendances.  
 // on scanne les sous repertoires afin de trouver les fichiers commençant par le nom de l'ecran en cours
 // on met ensuite à jour le tableau des liens de la classe EcranBalsamiq 
 // --------------------------------------------------------------------------------------------------------

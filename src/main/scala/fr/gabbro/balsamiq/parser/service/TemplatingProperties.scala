@@ -43,9 +43,14 @@ class TemplatingProperties {
   @BeanProperty var validationKeywords = List[String]() // mots clefs permis pour la validation des champs
   @BeanProperty var widgetsConsideredAsAForm = List[String]() // liste des widgets composants d'un formulaire
   @BeanProperty var widgetsListProcessedLocally = List[String]() // liste des composants à traiter localement (chaque widget est traité cas par cas)
-  @BeanProperty var preserveCodeIhm=""
-  @BeanProperty var preserveCodeScript=""
-  @BeanProperty var preserveCodeJavaOrScala=""
+  @BeanProperty var preserveCodeIhm = ""
+  @BeanProperty var preserveCodeScript = ""
+  @BeanProperty var preserveCodeJavaOrScala = ""
+
+  /**
+   * load template properties
+   * @param propsMap
+   */
   def loadProperties(propsMap: Map[String, String]): Unit = {
     validationKeywords = propsMap.getOrElse("config.templating.validationKeywords", "required").split(",").toList.map(_.trim)
     freemarkerAutoImportFile = propsMap.getOrElse("config.templating.freemarkerAutoImportFile", "")
@@ -71,10 +76,9 @@ class TemplatingProperties {
     prefix_template_code = propsMap.getOrElse("config.templating.prefixTemplateCode", "code_").trim //prefix des templates code
     suffix_template_code = propsMap.getOrElse("config.templating.suffixTemplateCode", "").trim // suffix des templates code
     separator_template_file = propsMap.getOrElse("config.templating.separatorTemplateFile", "_").trim // separateur dans le nom du fichier template
-    preserveCodeIhm=propsMap.getOrElse("config.templating.preserveCodeIhm", "ihm").trim 
-    preserveCodeScript=propsMap.getOrElse("config.templating.preserveCodeScript", "javascript").trim
-    preserveCodeJavaOrScala=propsMap.getOrElse("config.templating.preserveCodeJavaOrScala", "java").trim
+    preserveCodeIhm = propsMap.getOrElse("config.templating.preserveCodeIhm", "ihm").trim
+    preserveCodeScript = propsMap.getOrElse("config.templating.preserveCodeScript", "javascript").trim
+    preserveCodeJavaOrScala = propsMap.getOrElse("config.templating.preserveCodeJavaOrScala", "java").trim
 
-    
   }
 }

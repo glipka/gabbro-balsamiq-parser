@@ -27,7 +27,10 @@ import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 class ListItem(@BeanProperty var content: String, @BeanProperty var enabled: Boolean)
 class ListHTML(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
-  override def enrichissementParametres(param: String): (String, Object) = {
+  /* (non-Javadoc)
+ * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+ */
+override def enrichissementParametres(param: String): (String, Object) = {
     var items = new java.util.ArrayList[ListItem]()
     val str1 = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\n").toList
     var nbre_lignes = 0

@@ -14,7 +14,7 @@
 </dhtmlx:grid> 
 </#assign>
 
-${globalContext.mise_en_cache_code_javascript(generatedFileName,js1,isAFragment, "sectionDhtmlxgrid")}
+${globalContext.cached_javascript_code(generatedFileName,js1,isAFragment, "sectionDhtmlxgrid")}
  	 
 <#function typeDeWidget type readonly>  
   <#if type == "numeric"><#return "ron"> 
