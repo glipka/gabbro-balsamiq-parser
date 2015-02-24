@@ -29,7 +29,10 @@ import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
  WidgetDeBase(id_interne,groupe_en_cours,elementXML,traitementBinding,catalogDesComposants,isAcomponent) {
 
   
-  override def enrichissementParametres(param1: String): (String, Object) = {
+  /* (non-Javadoc)
+ * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+ */
+override def enrichissementParametres(param1: String): (String, Object) = {
     ("nParam", "noParam")
   }
 }

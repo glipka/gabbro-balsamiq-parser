@@ -38,7 +38,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
   }
 
   /**
-   * <p>le 1ere element du catalogue contient le container principal (mainWIndow par exemple)</p>
+   * <p>le 1er élement du catalogue contient le container principal (mainWIndow par exemple)</p>
    * <p>s'il y a plus d'une entrée => des widgets sont hors gabarit et ne seront pas traités</p>
    * <p>on vérifie que les widgets d'un formulaire sont bindés à une variable</p>
    * <p>détection des widgets d'une même branche ayant une intersection commune</p>
@@ -96,7 +96,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
    *  on traite branche par branche du catalogue afin de verifier que les widgets d'un container
    * sont bindés à une variable
    * Vérification que chaque formulaire a un id déclaré.
-   * On vérifie qu'il n'existe pas plus d'un formulaire avec le même ID
+   * On vérifie qu'il n'existe pas plus d'un formulaire avec le même customId
    *
    * @param branche : table des widgetDeBase à traiter.
    * @param widgetPere

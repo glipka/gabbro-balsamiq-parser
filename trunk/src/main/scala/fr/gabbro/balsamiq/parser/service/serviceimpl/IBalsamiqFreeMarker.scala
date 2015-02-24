@@ -35,7 +35,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
  *   <p>  Le code source étant généré, ecriture des fichiers HTML et code (java, scala).</p>
  *   <p> On génere 2 fichiers HTML, le 2eme contenant les clefs des libelles à traduire.</p>
  *   <p>  Remarque pour chaque template on peut associer un template javascript et un template code</p>
- *   <p> POur un widget donné, les templates sont exécutés automatiquement à chaque instanciation d'un composant.</p>
+ *   <p> Pour un widget donné, les templates sont exécutés automatiquement à chaque instanciation d'un composant.</p>
  *  <p>   Ce mécanisme permet de générer pour un écran à la fois la partie HTML, la partie code java et la partie javascript</p>
  * ==============================================================================================================================</p>
  */
@@ -48,7 +48,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   }
 
   /**
-   * initialiation des properties du programme ***
+   *  initialiation des properties du programme
    *  globalContext un objet scala accessible pendant le traitement de l'ensemble des mockups
    *  MoteurTemplateFreeMarker est instancié une seule fois en début de traitement
    *  MoteurAnalyseJericho est instancié une seule fois en début de traitement.
@@ -106,7 +106,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>le répertoire "assets" contient les fichiers balsamiq communs et ne doit pas être traité</p>
    * <p>En fin de traitement de tous les mockups, exécution des traitements globaux pour générer par exemple les menu</p>
    * <p>En fin de traitement on génère l'ensemble des fichiers javascript (1 par mokcup principal.</p>
-   * <p>POur rappel, le contenu javascript du mockup principal et de ses fragments sont stockés dans le même fichier.</p>
+   * <p>Pour rappel, le contenu javascript du mockup principal et de ses fragments sont stockés dans le même fichier.</p>
    * <p>---------------------------------------------------------------------------------------------------------------------
    *
    * @param url of directory containing mockup to process
@@ -201,7 +201,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     } // fin de isAFragment
     /**
      * <p> ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
-     * <p>        *** une preserve section pour le fichier code java par sous package***</p>
+     * <p> *** une preserve section pour le fichier code java par sous package***</p>
      * <p> il faudra remodifier cette liste à chaque ajout de sous package de code java ou scala</p>
      * <p> principe de la preserve section: on met en table le code lors de la lecture de la preserve section</p>
      * <p> remarque : le code java est généré depuis freemarker par appel de la methode  MockupCOntext.setCodeClasse(className: String, classCode: String, subPackageName: String)</p>

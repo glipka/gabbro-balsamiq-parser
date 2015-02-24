@@ -89,16 +89,15 @@ ${javascript}
  <div id='main'>
  <test>valeur du champ</test>
 <div class="container-fluid"  style="background-color:#eee;border: 1px solid #888;border-radius:3px;">
-${templatingProperties.getPreserveSectionFrontBegin()}${templatingProperties.getDelimiterTemplateNameBeginInPreserveSection()}${templateName}${templatingProperties.getDelimiterTemplateNameEndInPreserveSection()
-}
+
+<#assign initialContent>
+ 	 // content1 ligne1
+	 // content1 ligne1
+</#assign>
+
+${templatingProperties.getPreserveSectionCodeBegin()}${templatingProperties.getDelimiterTemplateNameBeginInPreserveSection()}${templateName}${templatingProperties.getDelimiterTemplateNameEndInPreserveSection()}<#t>
 <#if traitementPreserveSection??>
- ${traitementPreserveSection.getSectionContent(templateName)}
- ${templatingProperties.getPreserveSectionFrontEnd()}
+ ${traitementPreserveSection.getSectionContent(templateName,initialContent)}${templatingProperties.getPreserveSectionCodeEnd()}
  <#else>
- ${commonObject.getPreserveSection(templatingProperties.getPreserveCodeIhm(),"").getSectionContent(templateName)}
- ${templatingProperties.getPreserveSectionFrontEnd()}
-</#if>  
-
-
-
-
+${globalContext.getPreserveSection(usecaseName,generatedFileName,templatingProperties.getPreserveCodeScript(),"").getSectionContent(templateName,initialContent)}${templatingProperties.getPreserveSectionCodeEnd()}</#if>
+  

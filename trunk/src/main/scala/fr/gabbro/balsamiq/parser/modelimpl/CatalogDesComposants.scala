@@ -39,13 +39,16 @@ class CatalogDesComposants {
   var catalogs = Map[String, ArrayBuffer[ComponentBalsamiq]]() // Une clef par nom de catalogue
   val utilitaire = new Utilitaire
 
-  // -----------------------------------------------------------------------------------------------------------------------------
-  // methode appelée dans le module principal afin de charger les différents catalogue de composants
-  // on récupère l'ensemble des fichiers suffixés par .bmml dans le répertoire en cours.
-  // les catalogues sont stockés dans une hashMap, la clef étant le nom du catalogueet la valeur : le catalogue en lui même
-  // cette table sert à récupérer les attributs de base d'un composant utilisé dans une maquette. 
-  // le nom du catalogue, ainsi que le nom du composant sont récupérés dans l'attribut src du widget basé sur ce composant
-  // -----------------------------------------------------------------------------------------------------------------------------
+  /**
+   * <p>methode appelée dans le module principal afin de charger les différents catalogue de composants</p>
+   * <p>on récupère l'ensemble des fichiers suffixés par .bmml dans le répertoire en cours.</p>
+   * <p>les catalogues sont stockés dans une hashMap, la clef étant le nom du catalogueet la valeur : le catalogue en lui même</p>
+   * <p>cette table sert à récupérer les attributs de base d'un composant utilisé dans une maquette.</p>
+   * <p>le nom du catalogue, ainsi que le nom du composant sont récupérés dans l'attribut src du widget basé sur ce composant</p>
+   *
+   * @param repertoireDesComposantsBootstrap
+   * @return true or false
+   */
   def chargementDesCatalogues(repertoireDesComposantsBootstrap: String): Boolean = {
     val catalogues = new File(repertoireDesComposantsBootstrap).listFiles.toList
     catalogues.foreach(fichierCatalog => {
@@ -62,9 +65,11 @@ class CatalogDesComposants {
 
   }
 
-  // ------------------------------------------------------------------------------
-  // traitement du fichier des composants bootstrap bmml 
-  // --------------------------------------------------------------------------------
+  /**
+   *  traitement du fichier des composants bootstrap bmml
+   * @param fichierCatalogDesComposantsBootstrap
+   * @return
+   */
   private def chargementCatalogBootstrap(fichierCatalogDesComposantsBootstrap: String): (Boolean, ArrayBuffer[ComponentBalsamiq]) = {
     var doc: Document = null;
     var mockup: Element = null;
@@ -88,24 +93,29 @@ class CatalogDesComposants {
     logBack.info(utilitaire.getContenuMessage("mes4"), fichierCatalogDesComposantsBootstrap)
     return (true, catalog)
   }
-  // --------------------------------------------------------------------
-  //    <control controlID="302" controlTypeID="__group__" x="0" y="148" w="77" h="24" measuredW="77" measuredH="24" zOrder="3" locked="false" isInGroup="-1">
-  //      <controlProperties>
-  //       <controlName>tb-btn</controlName>
-  //      </controlProperties>
-  //      <groupChildrenDescriptors>
-  //        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="0" w="-1" h="-1" measuredW="77" measuredH="24" zOrder="0" locked="false" isInGroup="302">
-  //          <controlProperties>
-  //            <menuIcon>true</menuIcon>
-  //            <text>Action</text>
-  //          </controlProperties>
-  //        </control>
-  //      </groupChildrenDescriptors>
-  //    </control>
-  // ___________________________________________________________________________________________________
-  // on ne met ici en table que les groupes qui seront réutilisés comme composants dans les maquettes
-  // 
-  // -----------------------------------------------------------------------------------------------------
+  
+  /**
+   * on ne met ici en table que les groupes qui seront réutilisés comme composants dans les maquettes
+   * <p> --------------------------------------------------------------------<p>
+   * <p>   <control controlID="302" controlTypeID="__group__" x="0" y="148" w="77" h="24" measuredW="77" measuredH="24" zOrder="3" locked="false" isInGroup="-1"></p>
+   * <p>     <controlProperties></p>
+   * <p>     <controlName>tb-btn</controlName></p>
+   * <p>     </controlProperties></p>
+   * <p>    <groupChildrenDescriptors></p>
+   * <p>       <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="0" w="-1" h="-1" measuredW="77" measuredH="24" zOrder="0" locked="false" isInGroup="302"></p>
+   *  <p>        <controlProperties></p>
+   * <p>           <menuIcon>true</menuIcon></p>
+   * <p>           <text>Action</text></p>
+   * <p>        </controlProperties></p>
+   * <p>      </control></p>
+   *  <p>    </groupChildrenDescriptors></p>
+   *  <p>  </control></p>
+   * ___________________________________________________________________________________________________
+   *
+   *
+   * @param controlsXML : Element
+   * @return ArrayBuffer[ComponentBalsamiq]  on retourne le catalogue des composants
+   */
   private def traitementWidgetCatalogue(controlsXML: Element): ArrayBuffer[ComponentBalsamiq] = {
     val controlXML = controlsXML.getChildren(CommonObjectForMockupProcess.constants.control).toList
     var traitement_groupe = false
@@ -122,14 +132,14 @@ class CatalogDesComposants {
   }
 
   /**
-   * traitement d'un groupe
-   * On récupère les enfants du groupe.
-   * il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe
-   * on cumule les attributs étendus de chaque enfant du groupe
-   * attention aux attributs des enfants ayant le même nom.
-   * on met en table le controlId  de l'enfant et L'ID du widget du composant  
-   * @param elementXML : Element
-   * @param groupeEnCours : ComponentBalsamiq
+  <p> * traitement d'un groupe</p>
+  <p> * On récupère les enfants du groupe.</p>
+  <p> * il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe</p>
+  <p> * on cumule les attributs étendus de chaque enfant du groupe</p>
+  <p> * attention aux attributs des enfants ayant le même nom.</p>
+  <p> * on met en table le controlId  de l'enfant et L'ID du widget du composant</p>
+    * @param elementXML : Element
+    * @param groupeEnCours : ComponentBalsamiq 
    * @return ComponentBalsamiq
    */
   private def traitementGroupeCatalogue(elementXML: Element, groupeEnCours: ComponentBalsamiq): ComponentBalsamiq = {
@@ -149,13 +159,13 @@ class CatalogDesComposants {
   }
 
   /**
-   *  *** récupération des propriétés du contrôle en cours ***
-   * On fait une premire passe pour récupere dans une map l'ensemble des attributs (clef, valeur)
-   * Si l'attribut customId est présent, on modifie la clef de chaque attribut en concaténant le customId avec le nom de l'attribut (capitalized)
-   * modification 15 janvier : traitement de l'attribut markup d'un élément du composant
-   * si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup
-   *  et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré ar le moteur
-   *
+  <p> *  *** récupération des propriétés du contrôle en cours ***</p>
+  <p> * On fait une premire passe pour récupere dans une map l'ensemble des attributs (clef, valeur)</p>
+  <p> * Si l'attribut customId est présent, on modifie la clef de chaque attribut en concaténant le customId avec le nom de l'attribut (capitalized)</p>
+  <p> * modification 15 janvier : traitement de l'attribut markup d'un élément du composant</p>
+  <p> * si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup</p>
+  <p> * et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré par le moteur</p>
+  <p> *</p>
    * @param e : Element
    * @param controleID : String
    * @return (map des Attributs, customId)

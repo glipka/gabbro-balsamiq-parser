@@ -67,11 +67,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   @BeanProperty var labelFor = "";
   @BeanProperty var labelForWidget: WidgetDeBase = null;
   @BeanProperty var customId: String = "" // id du composant
-  var iconNameList = new java.util.ArrayList[IconInWidget] // sera renseigné dans le traitement du catalogue si un widget de type icon est inclus dans le widget
+  @BeanProperty var iconNameList = new java.util.ArrayList[IconInWidget] // sera renseigné dans le traitement du catalogue si un widget de type icon est inclus dans le widget
   // largeur et hauteur du widget par rapport à la taille de la fenêtre 
   var percentageparRapportHauteurTotale: Double = 0
   var percentageparRapportLargeurTotale: Double = 0
-
   // largeur et hauteur du widget par rapport au parent 
   // le pourcentage haut = ((ordonnée  du composant - ordonnée du pere)/ hauteur du pere )
   // pourcentage bas = ((ordonnée  du composant + hauteur composant - ordonnée du pere + hauteur du pere)/ hauteur du pere ) 
@@ -102,7 +101,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   var pointer_pere = -1;
   var tableau_des_fils = new ArrayBuffer[WidgetDeBase]()
   var indice_des_fils = new ArrayBuffer[Int]()
- 
+
   val utilitaire = new Utilitaire() // classe utilitaire de base
   protected val tableauValidation = new java.util.ArrayList[Token]
   protected var mapIndice = scala.collection.mutable.Map[String, String]()
@@ -115,15 +114,16 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   var projectionH: Int = 0
   @BeanProperty var bind: String = ""
   var itemsVar: String = ""
-  @BeanProperty var variableBinding = ""   // cette variable est enrichie dans le traitement du catalogue
+  @BeanProperty var variableBinding = "" // cette variable est enrichie dans le traitement du catalogue
   @BeanProperty var variableBindingTail = "" // cette variable est enrichie dans le traitement
-  
+
   process;
-  // -----------------------------------------------------------------
-  // traitement du widget 
-  // on récupere les attributs de base 
-  // on récupère les attibuts étendus 
-  // ------------------------------------------------------------------
+  /*
+  * <p>on récupere les attributs de base </p>
+  * <p>on récupère les attibuts étendus </p> 
+  * <p>si le widget est un composant,  on réécrit les attributs en concatenant ID du composant</p>
+ * 
+ */
   def process() {
     if (this.isAComponent) {
       recuperationAttributsDeBase(elementXML)
@@ -139,14 +139,15 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   // cette classe est abstraite et sera surchargée dans chaque composant spécifique
   def enrichissementParametres(param: String): (String, Object)
 
-  // --------------------------------------------------------------------------------------------------
-  // Freemarker communique avec les templates via une hashMap
-  // cette methode est appelée lors de la génération du template pour ce widget. 
-  // on génère la hasMap contenant les attributs étendus en prenant en compte les spécificités 
-  // de certains composants.
-  // les composants spécifiques héritent de la classe AbstratComposant et permettent de gérer
-  // spécifiquement les attributs 
-  // -------------------------------------------------------------------------------------------------
+  /**
+   * <p>Freemarker communique avec les templates via une hashMap</p>
+   * <p>cette methode est appelée lors de la génération du template pour ce widget.</p>
+   * <p>on génère la hasMap contenant les attributs étendus en prenant en compte les spécificités
+   * de certains composants.</p>
+   * <p>les composants spécifiques héritent de la classe AbstratComposant et permettent de gérer
+   * spécifiquement les attributs</p>
+   * @return
+   */
   def generationTableauDeParametresPourTemplates(): java.util.Map[String, Object] = {
     val tableau = scala.collection.mutable.Map[String, Object]()
     tableau += (
@@ -176,7 +177,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
       CommonObjectForMockupProcess.constants.zOrder -> zOrder.toString,
       CommonObjectForMockupProcess.constants.locked -> locked.toString,
       CommonObjectForMockupProcess.constants.isInGroup -> isInGroup.toString,
-      CommonObjectForMockupProcess.constants.positionIn12th-> positionEnDouzieme.toString,
+      CommonObjectForMockupProcess.constants.positionIn12th -> positionEnDouzieme.toString,
       CommonObjectForMockupProcess.constants.rowNumber -> rowNumber.toString,
       CommonObjectForMockupProcess.constants.formularAction -> actionDuFomulaire,
       CommonObjectForMockupProcess.constants.columnNumber -> columnNumber.toString)
@@ -200,11 +201,15 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   }
 
-  // -------------------------------------------------------------------------- 
-  // on teste les 4 points  
-  // la mise en arbre des widgets est basé sur la notion de container
-  // Cette methode est appelée lors de la constitution du catalogue A Plat.
-  // --------------------------------------------------------------------------
+  /**
+   * <p>on teste les 4 points</p>
+   * <p>la mise en arbre des widgets est basé sur la notion de container</p>
+   * <p>Cette methode est appelée lors de la constitution du catalogue A Plat.</p>
+   *
+   *
+   * @param lePlusGrandRectangle
+   * @return
+   */
   def estCompletementInclusDans(lePlusGrandRectangle: WidgetDeBase): Boolean = {
     val x1 = lePlusGrandRectangle.xAbsolute
     val w1 = lePlusGrandRectangle.w
@@ -220,9 +225,6 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   }
   // --------------------------------------------------------------------------------
-  // Récupération des attributs de base d'un widget
-  // attention le controlID n'est unique que dans un groupe 
-  // --------------------------------------------------------------------------------
   //  controlID="6" 
   // controlTypeID="com.balsamiq.mockups::Label" 
   //  x="74" y="15" w="-1" h="-1" 
@@ -232,6 +234,16 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   //          locked="false" 
   //            isInGroup="-1"
   // ------------------------------------------------------------------------------
+  /**
+   * <p>Récupération des attributs de base d'un widget : x,y,w,h, ...</p>
+   * <p>Attention le controlID n'est unique que dans un groupe</p>
+   * <p>Si le widget est dans un groupe, ses coordonnées sont relatives par rapport au groupe</p>
+   * <p>on verifie qu'on est dans le bon groupe</p>
+   *<p>Si le groupe est un composant, on recalcule les coordonnées du widget</p>
+   * <p>     (les parametres en override ont été stockés dans le traitement du composant )</p>
+   *
+   * @param e : Element
+   */
   protected def recuperationAttributsDeBase(e: Element) {
     this.controlTypeID = e.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID) //.substring(22);
     if (this.controlTypeID.contains("::")) {
@@ -278,24 +290,25 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
     }
   }
 
-  // --------------------------------------------------------------------------------------------------------
-  // récupération des attributs étendsu du widget en cours de traitement
-  // Les attributs étendus sont récupérés et stockés sous forme de clef, valeur. 
-  // POur les composants, il y a 
-  // Il y a un traitement particulier pour le binding des données ainsi que pour la validation
-  // Pourle binding on utilise le champ customControlId et pour la validation le champ customControlData
-  // Il y a 2 types de binding possibles :
-  //  Bind = class1.class2.valeur:Int    // on bind le widget avec le champ décrit 
-  //  bind=map(clef1,valeur1)  // on binde le contenu du widget avec un map existante, par exemple en localStorage.
-  // pour la validation : validate=valeur1,valeur2,...
-  // ------------------------------------------------------------------------------------------------------
-  // ******  Exemple de contenu ******
-  // <controlProperties>
-  //      <href>testgl01%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml</href>
-  //      <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22809%2C422%2C956%2C447%22%20href%3D%22testgl01.bmml%22%20alt%3D%22testgl01%22%20id%3D%2268%22/%3E</map>
-  //      <text>search</text>
-  //    </controlProperties>
-  // ---------------------------------------------------------------------------------------------------------------
+  /**
+   *
+   * <p>Les attributs étendus sont récupérés et stockés sous forme de clef, valeur.</p>
+   * <p>POur les composants, il y a</p>
+   *<p> Il y a un traitement particulier pour le binding des données ainsi que pour la validation</p>
+   *<p> Pourle binding on utilise le champ customControlId et pour la validation le champ customControlData</p>
+   *<p> Il y a 2 types de binding possibles :</p>
+   * <p> Bind = class1.class2.valeur:Int    // on bind le widget avec le champ décrit</p>
+   *<p>  bind=map(clef1,valeur1)  // on binde le contenu du widget avec un map existante, par exemple en localStorage.</p>
+   *<p> pour la validation : validate=valeur1,valeur2,...</p>
+   * <p>******  Exemple de contenu ******</p>
+   * <p> <controlProperties></p>
+   * <p>     <href>testgl01%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml</href></p>
+   * <p>     <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22809%2C422%2C956%2C447%22%20href%3D%22testgl01.bmml%22%20alt%3D%22testgl01%22%20id%3D%2268%22/%3E</map></p>
+   * <p>     <text>search</text></p>
+   * <p>   </controlProperties></p>
+   *
+   * @param e:Element
+   */
   private def recuperationDesAttributsEtendus(e: Element): Unit = {
     if (e.getChildren().size() != 0) {
       val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
@@ -319,7 +332,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
           } else if (elementName == CommonObjectForMockupProcess.constants.customData) {
             val tableValue = elementValue.split(";").map(_.trim)
-         
+
             tableValue.foreach(value => {
               // id ne doit être renseigné que pour un container.
               if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(")) {
@@ -331,17 +344,17 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
               // L'attribut customId d'un champ est déduit du binding de champ (on prend le nom du champ
               // Le template freemaker met en oeuvre cette norme. 
               // --------------------------------------------------------------------------------------------
-              else if (value.startsWith(CommonObjectForMockupProcess.constants.bind +"=")) {
+              else if (value.startsWith(CommonObjectForMockupProcess.constants.bind + "=")) {
                 //  val (retCode, variableBinding) = traitementBinding.mise_en_table_classes_binding(value)
-                this.bind = value.substring(CommonObjectForMockupProcess.constants.bind.size+1) // le bind sera retraité après constitution du catalogue pour concatener le bind du pere.    
+                this.bind = value.substring(CommonObjectForMockupProcess.constants.bind.size + 1) // le bind sera retraité après constitution du catalogue pour concatener le bind du pere.    
               } // Traitement de la validation des données
-              else if (value.startsWith((CommonObjectForMockupProcess.constants.itemsVar+"="))) {
+              else if (value.startsWith((CommonObjectForMockupProcess.constants.itemsVar + "="))) {
                 //  val (retCode, variableBinding) = traitementBinding.mise_en_table_classes_binding(value)
-                this.itemsVar = value.substring(CommonObjectForMockupProcess.constants.itemsVar.size+1) // itemsVar sera retraité après constitution du catalogue pour concatener le bind du pere.    
+                this.itemsVar = value.substring(CommonObjectForMockupProcess.constants.itemsVar.size + 1) // itemsVar sera retraité après constitution du catalogue pour concatener le bind du pere.    
                 val tab2 = value.split("=")
                 if (tab2.size > 1) { mapExtendedAttribut += (tab2.head -> tab2.last) }
               } // Traitement de la validation des données
-              else if (value.startsWith(CommonObjectForMockupProcess.constants.validate+"=")) {
+              else if (value.startsWith(CommonObjectForMockupProcess.constants.validate + "=")) {
                 val (retCode, variablesValidate) = mise_en_table_validation_du_champ(value)
                 if (retCode) { mapExtendedAttribut += (CommonObjectForMockupProcess.constants.variablesValidate -> variablesValidate) }
               } // hint a servir à l'infoBulle
@@ -359,21 +372,52 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
     } // fin de if 
   } // fin de getCOntrolProperties
 
-  // ------------------------------------------------------------------------------------------------
-  // *** utilitaireage et enrichissement du texte utilisé directement dans les templates
-  // cette methode est aussi appelée depuis FreeMarker
-  // ------------------------------------------------------------------------------------------------
+  /**
+   * *** utilitaireage et enrichissement du texte utilisé directement dans les templates
+   * cette methode est aussi appelée depuis FreeMarker
+   * @param text
+   * @return
+   */
   def formatText(text: String): String = {
     return utilitaire.textFormatting(text)
   }
 
-  // *** utilitaireage et enrichissement du texte utilisé directement dans les templates
-  // cette methode est aussi appelée depuis FreeMarker
-  // ------------------------------------------------------------------------------------------------
+  /**
+   * ** utilitaireage et enrichissement du texte utilisé directement dans les templates
+   * cette methode est aussi appelée depuis FreeMarker
+   * @param key : String
+   * @return
+   */
   def getExtendedAttributes(key: String): String = {
     return this.mapExtendedAttribut.getOrElse(key, "").toString()
   }
-
+  /**
+   *
+   * <p>Les attributs étendus sont récupérés et stockés sous forme de clef, valeur.</p>
+   * <p>POur les composants,il y a un traitement particulier pour le binding des données ainsi que pour la validation</p>
+   * <p>Pourle binding on utilise le champ customControlId et pour la validation le champ customControlData</p>
+   * <p>Il y a 2 types de binding possibles :</p>
+   * <p> Bind = class1.class2.valeur:Int    // on bind le widget avec le champ décrit</p>
+   * <p> bind=map(clef1,valeur1)  // on binde le contenu du widget avec un map existante, par exemple en localStorage.</p>
+   * <p>pour la validation : validate=valeur1,valeur2,...</p>
+   * <p>On récupère par défaut les attributs du composant dans le catalogue des composants et si
+   * les attributs ne sont surchargés au niveau du widget en cours, ils seronts alors mis en table</p>
+   *
+   * <p>--------------------------------------------------------------------------------------------</p>
+   *       <p>    Cas d'un composant : on récupère les attributs étendus dans la balise override</p> 
+   * <p>--------------------------------------------------------------------------------------------</p>
+   *     <p>    control controlID="24" controlTypeID="com.balsamiq.mockups::Component" x="544" y="389" w="97" h="19" measuredW="97" measuredH="19" zOrder="5" locked="false" isInGroup="-1"></p>
+   *   <p>   <controlProperties></p>
+   *  <p>    <override controlID="0" x="0" y="0" w="97" h="19"></p>
+   *   <p>     <text>Information</text></p>
+   *   <p>  </override></p>
+   *  <p>      <override controlID="-1"/></p>
+   * <p>       <src>./assets/bootstrap.bmml#tb-label-info</src></p>
+   *  <p>     </controlProperties></p>
+   *  <p>    ----------------------------------------------------------------------------------------</p>
+   *
+   * @param e:Element
+   */
   private def recuperationDesAttributsEtendusDuComposant(e: Element): scala.collection.mutable.Map[String, Object] = {
     var mapExtendedAttributDuComposant = scala.collection.mutable.Map[String, Object]()
     if (e.getChildren().size() != 0) {
@@ -460,7 +504,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
       componentName = tab1.last // nom du composant : tb_bagde
       repositoryName = tab1.head.split("/").last.replace(".", ":").split(":").head
 
-      logBack.debug(utilitaire.getContenuMessage("mes5"),Array(componentName, repositoryName))
+      logBack.debug(utilitaire.getContenuMessage("mes5"), Array(componentName, repositoryName))
       // -----------------------------------------------------------------------------------------
       // la liste va contenir le composant, on va alors recupérer les attributs de base 
       // et si les attributs ne sont surchargés au niveau du widget en cours, ils seronts alors mis en table
@@ -488,12 +532,14 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   } // fin de getCOntrolProperties
 
-  // ------------------------------------------------------------------------
-  // traitement de l'attribut href 
-  // On génèr un attribut fragment 
-  // si le fichier n'est pas un fragment, on génère un attribut location
-  // ------------------------------------------------------------------------
   import scala.collection.mutable.Map
+  /**
+   * traitement de l'attribut href
+   * On génère un attribut fragment
+   * si le fichier n'est pas un fragment, on génère un attribut location
+   * @param paramValue : String
+   * @return
+   */
   protected def traitementHref(paramValue: String): Map[String, Object] = {
     val mapFragment = Map[String, Object]()
     val bookmark = paramValue.split("&").head
@@ -506,15 +552,20 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
     }
     return mapFragment
   }
-  // ----------------------------------------
-  // *** nom du widget ou du composant ***
-  // ----------------------------------------
+  /**
+   *  *** nom du widget ou du composant ***
+   * @return name: String
+   */
   def getWidgetNameOrComponentName(): String = {
     val name = if (!isAComponent) controlTypeID
     else componentName
     name
   }
-  // récupération des attributes de la balise override
+  /**
+   *  récupération des attributes de la balise override
+   * @param e
+   * @return  (controlID, overrideX, overrideY, overrideW, overrideH)
+   */
   protected def getOverrideProperties(e: Element): (String, String, String, String, String) = {
     // <override controlID="1" x="96" y="0" w="61" h="27">
     val controlID = e.getAttributeValue(CommonObjectForMockupProcess.constants.controlID)
@@ -527,10 +578,12 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   } // fin de getOverrideProperties
 
-  // --------------------------------------------------------------
-  // on regénère les attributs en remplaceant le controlID du widget dans le composant par le
-  // custom attribut du widget du composant (table mapIndice mise à jour dans le chargement des catalogues de composants)
-  // --------------------------------------------------------------
+  /**
+   * on regénère les attributs en remplaçant le controlID du widget dans le composant par le
+   * custom attribut du widget du composant (table mapIndice mise à jour dans le chargement des catalogues de composants)
+   *
+   * @param e : Element
+   */
   private def remplacementControlIDparCustomIdDuWidgetDuComponent(e: Element): Unit = {
     if (e.getChildren().size() != 0) {
       val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
@@ -560,12 +613,14 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   }
 
-  // -------------------------------------------------------------------------------------------------------
-  // on renseigne les token de validation dans la table tableauValidation
-  // La liste des tokens autorisés est définie dans la table CommonObjectForMockupProcess .templatingProperties.validationKeywords
-  // la syntaxe autorisée est :
-  // validate=token1,token2=valeur2,token3 
-  // -------------------------------------------------------------------------------------------------------
+  /**
+   * on renseigne les token de validation dans la table tableauValidation
+   * La liste des tokens autorisés est définie dans la table CommonObjectForMockupProcess .templatingProperties.validationKeywords
+   * la syntaxe autorisée est :
+   * validate=token1,token2=valeur2,token3
+   * @param input
+   * @return (true or false, Array of Token
+   */
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
     val validate = CommonObjectForMockupProcess.constants.validate + "="
     val value = input.toLowerCase().trim

@@ -16,7 +16,6 @@ package fr.gabbro.balsamiq.parser.model.composantsetendus
 // WITHOUT WARRANTY OF ANY KIND, either express or implied.
 // See the individual licence texts for more details.
 
-
 import org.jdom2.Element
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
@@ -30,11 +29,12 @@ class Adresse(@BeanProperty var href: java.lang.String,
 
 class BreadCrumbsOrButtonBarEnrichissementParametres(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
-  // -------------------------------------------------------------------------------a
-  // l'attribut text contient les libelles des urls séparés par "," 
-  // l'attribut hrefs ccntient les uris séparés par "," 
-  // constitution de la table des urls à l'aide des attributs text et hrefs
-  // --------------------------------------------------------------------------------
+  /* (non-Javadoc)
+   * l'attribut text contient les libelles des urls séparés par "," 
+   * l'attribut hrefs ccntient les uris séparés par "," 
+   * constitution de la table des urls à l'aide des attributs text et hrefs
+   * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+ */
   override def enrichissementParametres(param: String): (String, Object) = {
     val parts: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
     val hrefs: Array[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.hrefs, "").toString().split(",")

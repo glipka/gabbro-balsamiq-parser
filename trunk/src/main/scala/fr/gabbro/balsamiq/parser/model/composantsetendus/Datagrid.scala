@@ -29,18 +29,20 @@ class ColumnDefinition(@BeanProperty var columnName: String, @BeanProperty var s
 
 class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
-  // ---------------------------------------------------------------------------------
-  // Récupération des parametres d'un datatable 
-  // on ne récupère que le nom des colonnes ainsi que leur largeur en % 
-  // on ne se sert pas des données dans le composant pour les types des colonnes
-  // Ces types seront déduits des widgets déposés dans les colonnes.
-  // le contenu du texte du widget est : 
-  // 
-  // Name\r(job title) ^, Age ^v, Nickname, Employee v
-  // \r\r\r\r
-  // {30L, 30R, 35, 25C}
-  // ----------------------------------------------------------------------------------
-
+  /* (non-Javadoc)
+   * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
+   *   Récupération des parametres d'un datatable 
+   * on ne récupère que le nom des colonnes ainsi que leur largeur en % 
+   * on ne se sert pas des données dans le composant pour les types des colonnes
+   * Ces types seront déduits des widgets déposés dans les colonnes.
+   * le contenu du texte du widget est : 
+   * 
+   * Name\r(job title) ^, Age ^v, Nickname, Employee v
+   * \r\r\r\r
+   * {30L, 30R, 35, 25C}
+   * 
+   * 
+  */
   override def enrichissementParametres(param1: String): (String, Object) = {
     val les3lignesDuTableau: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
     val tableauDesNomsDesColonnes = les3lignesDuTableau.head.split(",").map(_.trim)
@@ -92,9 +94,9 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       numeroColonneEnCours += 1
 
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
-      if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"),this.controlTypeID) }
+      if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
       else { largeurTotaleEnpourcentage += width.toInt }
-      if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"),this.controlTypeID) }
+      if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
 
       val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, "", "", null)
       tableauDesColonnes.add(columnDefinition)
@@ -104,18 +106,22 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     (CommonObjectForMockupProcess.constants.columns, enrichissementDuTableau(tableauDesColonnes))
 
   } // fin de la methode 
-  // ------------------------------------------------------------------------------------------------
-  // *** table des colonnes pour un datagrid qui sera utilisée directement dans les templates ***
-  // Exposition de la liste des objets
-  // ------------------------------------------------------------------------------------------------
+  /**
+   * *** table des colonnes pour un datagrid qui sera utilisée directement dans les templates ***
+   * Exposition de la liste des objets
+   * @return
+   */
   def getColumns(): java.util.ArrayList[ColumnDefinition] = {
     val (x, tableau) = this.enrichissementParametres("")
     tableau.asInstanceOf[java.util.ArrayList[ColumnDefinition]]
   }
-  // ----------------------------------------------------------------------------------------------
-  // Récupération tableau des colonnes enrichi par le type de colonnes
-  // on parcourt la liste des widgets fils pour récupérer leur type ainsi que l'attribut readonly
-  // ----------------------------------------------------------------------------------------------
+  /**
+   * Récupération tableau des colonnes enrichi par le type de colonnes
+   * on parcourt la liste des widgets fils pour récupérer leur type ainsi que l'attribut readonly
+   *
+   * @param tableau_des_colonnes
+   * @return
+   */
   private def enrichissementDuTableau(tableau_des_colonnes: java.util.ArrayList[ColumnDefinition]): java.util.ArrayList[ColumnDefinition] = {
     // on récupère le header de chaque colonne
     // var tableau_des_colonnes = getColonneDefinition().toList
@@ -205,7 +211,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
             typeDeColonne = CommonObjectForMockupProcess.constants.img // type=img
           }
 
-          case _ => logBack.info(utilitaire.getContenuMessage("mes18"),widgetFils.controlTypeID)
+          case _ => logBack.info(utilitaire.getContenuMessage("mes18"), widgetFils.controlTypeID)
 
         }
 

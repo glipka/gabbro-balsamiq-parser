@@ -16,13 +16,21 @@ import java.net.URI
  */
 class ClassTemplateLoader extends URLTemplateLoader {
 
-  def getURL(templateName: String): URL = {
+  /* (non-Javadoc)
+ * @see freemarker.cache.URLTemplateLoader#getURL(java.lang.String)
+ */
+def getURL(templateName: String): URL = {
     val baseURLDesTemplates = CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir
     val (ret, url) = rechercheFileInSubDirectories(baseURLDesTemplates, templateName.trim)
     url
   }
-  // on recherche le fichier dnas le repertoire en cours en traitant les sous répertoires
-  def rechercheFileInSubDirectories(directoryName: String, templateName: String): (Boolean, URL) = {
+   /**
+   * on recherche le fichier dnas le repertoire en cours en traitant les sous répertoires
+ * @param directoryName : String
+ * @param templateName : String  
+ * @return (true or false, url:URL)
+ */
+def rechercheFileInSubDirectories(directoryName: String, templateName: String): (Boolean, URL) = {
     val directory = new File(directoryName).listFiles().toList
     directory.foreach(file => {
       if (file.isDirectory()) {
