@@ -1,0 +1,7 @@
+# procedures #
+  * uncompress balsamiqSample.zip in a repository. It contains template samples and parameter properties file.
+  * modify maven setting.xml to add profile (example in sampleBalsamiq Repository)) See documentation for description of parameters
+  * call execute.cmd in source directory of Gabbro
+
+
+
