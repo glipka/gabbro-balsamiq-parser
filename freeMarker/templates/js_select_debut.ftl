@@ -13,5 +13,5 @@ $(\'#select${internalId}\').append(option);
 
 ">
 
-${globalContext.cached_javascript_code(generatedFileName,js1,isAFragment, "section1")}
+${globalContext.cached_javascript_code(js1,isAFragment, "section1")}
  	 
