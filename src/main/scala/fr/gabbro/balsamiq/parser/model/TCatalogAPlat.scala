@@ -15,6 +15,7 @@ package fr.gabbro.balsamiq.parser.model
 // This program is distributed on an "AS IS" basis,
 // WITHOUT WARRANTY OF ANY KIND, either express or implied.
 // See the individual licence texts for more details.
+//
 
  
 import org.jdom2.Element
