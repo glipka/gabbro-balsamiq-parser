@@ -21,7 +21,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
    * <p>lors de cette 1ere phase de chargement, on prend en compte le cas des widgets regoupés, en particulier</p>
    * <p>en recalculant leur abscisse et ordonnée par rapport au début de la page</p>
    * <p>On vérifie qu'il n'y a pas des widgets qui ont la même taille et la même position (car l'algorithme ne peut fonctionner  correctement</p>
-   *<p>On détermine les container pere incluant les widgets et pour chaque container, on met à jour les pointeurs fils (indice du widget).</p>
+   * <p>On détermine les container pere incluant les widgets et pour chaque container, on met à jour les pointeurs fils (indice du widget).</p>
    * @return
    */
   def chargementCatalog(): (Boolean, Int, Int) = {
@@ -30,13 +30,14 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
       doc = builder.build(fichierBalsamiq);
       mockup = doc.getRootElement();
     } catch {
-      case e: Exception =>
+      case e: Exception => {
         logBack.error(e.getMessage())
         return (false, 0, 0)
+      }
 
     }
     traitementDesWidgets(mockup.getChild(CommonObjectForMockupProcess.constants.controls), null) // le groupe en cours est nul 
-    rechercheDesFils(this.catalog) // pour chaque container, on tenseigne les fils
+    rechercheDesFils(this.catalog) // pour chaque container, on renseigne les fils
     if (this.catalog.size > 0) { return (verification_doublon_catalogue, maxWidth(), maxHeight()) }
     else { return (false, 0, 0) } // catalogue vide
 
@@ -54,7 +55,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           (catalog(i).w == catalog(j).w) &&
           (catalog(i).h == catalog(j).h)) {
           logBack.error(utilitaire.getContenuMessage("mes26"), catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(i).xAbsolute.toString(), catalog(i).yAbsolute.toString())
-          return { false }
+          return false
         }
       }
     }
@@ -82,9 +83,9 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
         // l'id interne n'est pas incrémenté après un grpupe car il sert à récuperer les adresses des élements
         else if (controle_en_cours.controlTypeID == groupId) traitementGroupe(elementXML, controle_en_cours)
         else {
-          // si le widget est un element d'un composant traité localement, on rcupere les 
+          // si le widget est un element d'un composant traité localement, on récupère les 
           // attributs en override du groupe.
-          // les attributs en override sont stokces sous la forme "CustomIDuComposantCLef" -> valeur
+          // les attributs en override sont stockés sous la forme "CustomIDuComposantCLef" -> valeur
           if (groupe_en_cours != null && groupe_en_cours.isAComponent) {
             groupe_en_cours.mapExtendedAttribut.foreach(valeur => {
               // la clef commence par le cutomID du widget du commposant ? 
