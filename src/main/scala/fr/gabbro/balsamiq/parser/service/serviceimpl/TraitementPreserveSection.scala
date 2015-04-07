@@ -47,7 +47,7 @@ import fr.gabbro.balsamiq.parser.service.TTraitementCommun
  *
  */
 class TraitementPreserveSection extends TTraitementCommun {
-
+  
   // la map des preservesections
   private var mapDesPreserveSection = Map[(Int, String), String]() // clef = n° de section et nom de template
   private var maptemplateByKeyNumber = Map[String, Int]() // clef = templateName valeur=n° de clef

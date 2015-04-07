@@ -26,6 +26,7 @@ class GenerationProperties {
   @BeanProperty var concatenateContainerIdToWidgetId = true // ajout automatique to nom du formulaire dans le binding
   @BeanProperty var configProperties = "" // localisation du fichier properties
   @BeanProperty var generateControllerForPrefix = "" // prefix des écrans pour lequel il faut générer le controleur
+  @BeanProperty var generatePreserveSection = true // generation des preserves section ?
   @BeanProperty var generateLabelForAttributeForTheseWidgets = List[String]() // liste des widgets pour lesquels on va générer l'attribut labelfor
   @BeanProperty var generatedControllerAlias = "" // alias du controleur
   @BeanProperty var generatedDtoAlias = "" // alias dto

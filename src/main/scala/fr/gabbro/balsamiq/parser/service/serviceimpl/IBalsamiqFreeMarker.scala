@@ -304,6 +304,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    */
   private def setPreserveSection(useCase: String, fileName: String, typeDePreserve: String, subPackageList: List[String]): Unit = {
     subPackageList.foreach(subPackage => {
+      //FIXME passer TraitementPreserveSection en static ?
       globalContext.mapDesTraitementsPreserveSection += ((useCase, fileName, typeDePreserve, subPackage) -> new TraitementPreserveSection().process(utilitaire.getNomDuFichierCodeJavaOuScala(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, subPackage)))
     })
 
