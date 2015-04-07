@@ -4,13 +4,13 @@
 
 
 // section1
- ${globalContext.getJavascriptCodeForTheSection(javascriptUseCase, javascriptFileName, "section1")}
+ ${globalContext.getJavascriptSection(javascriptUseCase, javascriptFileName, "section1")}
   
 // section2 
 
 
 // section Commune
- ${globalContext.getJavascriptCodeForTheSection(javascriptUseCase, javascriptFileName, "commonSection")}
+ ${globalContext.getJavascriptSection(javascriptUseCase, javascriptFileName, "commonSection")}
  
 <#assign initialContent>
 

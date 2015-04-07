@@ -74,6 +74,7 @@ class GenerationProperties {
     languageSource = propsMap.getOrElse("config.generation.languageSource", "scala")
     generatedFrontFilesSuffix = propsMap.getOrElse("config.generation.generatedFrontFilesSuffix", "html")
     generateLabelForAttributeForTheseWidgets = propsMap.getOrElse("config.generation.generateLabelForAttributeForTheseWidgets", "com.balsamiq.mockups::Label").split(",").toList.map(_.trim)
+    generatePreserveSection = if (propsMap.getOrElse("config.generation.generatePreserveSection", "true").trim == "true") { true } else { false }
     htmlContainerListForI18nGeneration = propsMap.getOrElse("config.generation.htmlContainerListForI18nGeneration", "form").split(",").toList.map(_.trim)
     generatedFormAlias = propsMap.getOrElse("config.generation.generatedFormAlias", "").trim
     generatedDtoAlias = propsMap.getOrElse("config.generation.generatedDtoAlias", "").trim
