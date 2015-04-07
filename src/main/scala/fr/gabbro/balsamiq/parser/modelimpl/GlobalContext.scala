@@ -74,7 +74,8 @@ class GlobalContext() {
    * @param isAfragment
    * @param section
    */
-  def cached_javascript_code(fileName: String, codeJavascript: String, isAfragment: String, section: String): Unit = {
+  def registerJavascriptSection(codeJavascript: String, isAfragment: String, section: String): Unit = {
+    //FIXME deduire isAFragment  coté scala ?
     // clef= (usecase,nom de fichier,section)
     val key =
       if (isAfragment == CommonObjectForMockupProcess.constants.trueString) {
@@ -94,8 +95,9 @@ class GlobalContext() {
    * @param fileName
    * @param section
    * @return code of the section
+   * //TODO deduire du code scala ?
    */
-  def getJavascriptCodeForTheSection(useCase: String, fileName: String, section: String): String = {
+  def getJavascriptSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
   }
   /**
