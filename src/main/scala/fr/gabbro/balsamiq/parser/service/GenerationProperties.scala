@@ -31,9 +31,9 @@ class GenerationProperties {
   @BeanProperty var generatedDtoAlias = "" // alias dto
   @BeanProperty var generatedFormAlias = "" // alias du formulaire
   @BeanProperty var generatedOtherAlias = "" // alias other
-  @BeanProperty var generatedsubPackage1 = "" // sous package1 
-  @BeanProperty var generatedsubPackage2 = "" // sous package2
-  @BeanProperty var generatedsubPackage3 = "" // sous package3 
+  @BeanProperty var generatedSubPackage1 = "" // sous package1 
+  @BeanProperty var generatedSubPackage2 = "" // sous package2
+  @BeanProperty var generatedSubPackage3 = "" // sous package3 
   @BeanProperty var generatedProjectDir = "" // répertoire du projet généré
   @BeanProperty var generatedi18nFileName = "" // nom du fichier généré
   @BeanProperty var generatedSuffixCodeFileName = "" // suffix des fichiers generes par les template code
@@ -79,9 +79,9 @@ class GenerationProperties {
     generatedControllerAlias = propsMap.getOrElse("config.generation.generatedControllerAlias", "").trim
     generateControllerForPrefix = propsMap.getOrElse("config.generation.generateControllerForPrefix", "ec").trim
     generatedOtherAlias = propsMap.getOrElse("config.generation.generatedOtherAlias", "").trim
-    generatedsubPackage1 = propsMap.getOrElse("config.generation.generatedsubPackage1", "").trim
-    generatedsubPackage2 = propsMap.getOrElse("config.generation.generatedsubPackage2", "").trim
-    generatedsubPackage3 = propsMap.getOrElse("config.generation.generatedsubPackage3", "").trim
+    generatedSubPackage1 = propsMap.getOrElse("config.generation.generatedsubPackage1", "").trim
+    generatedSubPackage2 = propsMap.getOrElse("config.generation.generatedsubPackage2", "").trim
+    generatedSubPackage3 = propsMap.getOrElse("config.generation.generatedsubPackage3", "").trim
     processI18nInFiles = propsMap.getOrElse("config.generation.processI18nInFiles", "false").trim
     generatedSuffixCodeFileName = propsMap.getOrElse("config.generation.generatedSuffixCodeFileName", "_code").trim
     srcBuildPathDir = propsMap.getOrElse("config.generation.srcBuildPathDir", "").trim.replace("%project%", projectName)

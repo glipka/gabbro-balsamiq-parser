@@ -15,7 +15,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 
 /**
  * <p>==============================================================================================================================   </p>
- *  <p>*** Principe general IbalsamiqFreeMarker *** </p>
+ *  <p>*** Principe général IbalsamiqFreeMarker *** </p>
  *  <p>============================================================================================================================== </p>
  *  <p>Scan du repertoire .asset pour mettre en table les composants Balsamiq partagés entre les différents projets </p>
  *  <p>Scan du repertoire contenant les maquettes de l'application </p>
@@ -26,11 +26,11 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
  *   <p>  le catalogue est un modele 1 n, chaque entrée d'un container pouvant être lui même un container </p>
  *   <p>  Enrichissement de chaque entrée du catalogue : calcul de position dans le container :  </p>
  *   <p>  on détermine à la fois le n° de ligne et le numéro de cellule en 12eme par rapport au container.</p>
- *  <p>Exécution d'un premier traitement de validité des informations dans le catalogue</p>
+ *   <p>Exécution d'un premier traitement de validité des informations dans le catalogue</p>
  *   <p>  Test d'inclusion de l'ensemble des widgets dans un gabarit principal</p>
  *   <p>  Test de chevauchement de contenu dans un container</p>
  *   <p>  Test de duplication de contenu dans le catalogue (2 objets ayant la même position et la même taille</p>
- * <p> Genération de code à partir du catalogue enrichi</p>
+ *   <p> Genération de code à partir du catalogue enrichi</p>
  *   <p>  Pour chaque container, extraction des composants triés par ligne et par colonne.</p>
  *   <p>  Le code source étant généré, ecriture des fichiers HTML et code (java, scala).</p>
  *   <p> On génere 2 fichiers HTML, le 2eme contenant les clefs des libelles à traduire.</p>
@@ -93,7 +93,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       logBack.info(utilitaire.getContenuMessage("mes59"))
       moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
       moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
-      return { true }
+      return   true 
     } else { false }
 
   }
@@ -209,9 +209,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
      * <p> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
      */
     val listeDesSubPackageCode = List(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias,
-      CommonObjectForMockupProcess.generationProperties.generatedsubPackage1,
-      CommonObjectForMockupProcess.generationProperties.generatedsubPackage2,
-      CommonObjectForMockupProcess.generationProperties.generatedsubPackage3)
+      CommonObjectForMockupProcess.generationProperties.generatedSubPackage1,
+      CommonObjectForMockupProcess.generationProperties.generatedSubPackage2,
+      CommonObjectForMockupProcess.generationProperties.generatedSubPackage3)
     setPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.code, listeDesSubPackageCode)
     // création d'une preserve section pour le fichier html
     globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.html, "") -> new TraitementPreserveSection().process(utilitaire.getEmplacementFichierHtml(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir))) // on met en table le contenu du fichier javascript pour traitment des preserve section
