@@ -189,7 +189,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       CommonObjectForMockupProcess.mockupContext.fragments ++= new DetectFragments(utilitaire).processEtMiseEntable() // mise en table des fragments
       // si ce n'est pas un fragment, on génère le traitement preserve section pour le fichier javascript qui sera généré au niveau de l'écran principal
       //     CommonObjectForMockupProcess.traitementPreserveSectionTemplateJavascript = new TraitementPreserveSection().process(globalContext.getNomduFichierJavascript(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) // on met en table le contenu du fichier javascript pour traitment des preserve section
-      globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.javascript, "") -> new TraitementPreserveSection().process(globalContext.getNomduFichierJavascript(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)))
+      globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeScript, "") -> new TraitementPreserveSection().process(globalContext.getNomduFichierJavascript(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)))
 
       // on ne met en table les menus que pour les écrans. 
       // on ne met en table les menus que pour les écrans. 
@@ -212,9 +212,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       CommonObjectForMockupProcess.generationProperties.generatedSubPackage1,
       CommonObjectForMockupProcess.generationProperties.generatedSubPackage2,
       CommonObjectForMockupProcess.generationProperties.generatedSubPackage3)
-    setPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.code, listeDesSubPackageCode)
+    setPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeJavaOrScala, listeDesSubPackageCode)
     // création d'une preserve section pour le fichier html
-    globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.constants.html, "") -> new TraitementPreserveSection().process(utilitaire.getEmplacementFichierHtml(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir))) // on met en table le contenu du fichier javascript pour traitment des preserve section
+    globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeIhm, "") -> new TraitementPreserveSection().process(utilitaire.getEmplacementFichierHtml(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir))) // on met en table le contenu du fichier javascript pour traitment des preserve section
     /**
      * ------------------------------------------------------------------------------------------
      * <p>*** on indique la location dans la zone de l'écran pour le moteur de template ***</p>
