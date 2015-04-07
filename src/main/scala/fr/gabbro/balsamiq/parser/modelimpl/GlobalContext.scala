@@ -46,7 +46,9 @@ class GlobalContext() {
     getPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, typeDePreserve, subPackage)
   }
   /**
-   * rajout le 7/4/15  : our un fragment, on récupère la preserve section de l'ecran contenant le fragment
+   * correction du bug :  le 7/4/15  : pour un fragment, on récupère la preserve section de l'ecran contenant le fragment
+   * En effet, les preserve sections ne sont créées qu'à la lecture du fichier javascript principal. 
+   * Les fragments n'ont pas de fichier javascript, le code javascript du fragment est inclus dans le code javascript du mockup principal.
   * cette procédure est appelée par les templates javascript freemarker
    * @param usecasName
    * @param fileName
