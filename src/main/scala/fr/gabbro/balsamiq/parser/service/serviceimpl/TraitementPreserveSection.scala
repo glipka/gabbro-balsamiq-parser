@@ -33,6 +33,7 @@ import org.mozilla.javascript.BeanProperty
 import scala.beans.BeanProperty
 import java.nio.file.NoSuchFileException
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
+import scala.util.Try
 
 /**
  * <p>Traitement des preserves section</p>
@@ -47,12 +48,14 @@ import fr.gabbro.balsamiq.parser.service.TTraitementCommun
  *
  */
 class TraitementPreserveSection extends TTraitementCommun {
-
+  
   // la map des preservesections
   private var mapDesPreserveSection = Map[(Int, String), String]() // clef = n° de section et nom de template
   private var maptemplateByKeyNumber = Map[String, Int]() // clef = templateName valeur=n° de clef
   var fichierEnCoursDeTraitement = ""
   @BeanProperty var fichierPresent = false
+  
+  private var generatePreserveSection = CommonObjectForMockupProcess.generationProperties.generatePreserveSection
 
   /**
    * <p>Récupération du code de la section, cette procédure est appelée depuis le template freemarker</p>
@@ -84,38 +87,41 @@ class TraitementPreserveSection extends TTraitementCommun {
    * @return traitementPreserveSection
    */
   def process(filename: String): TraitementPreserveSection = {
-    var bufferATraiter = List[String]()
-    fichierEnCoursDeTraitement = filename
-    logBack.debug(utilitaire.getContenuMessage("mes50"), filename.toString)
-    try {
-      // on met en mémoire le fichier à traiter
+    if(generatePreserveSection){
+      var bufferATraiter = List[String]()
+      fichierEnCoursDeTraitement = filename
+      logBack.debug(utilitaire.getContenuMessage("mes50"), filename.toString)
       try {
-        bufferATraiter = Files.readAllLines(Paths.get(filename.trim.replace("\\", "/")), Charset.defaultCharset()).toList
+        // on met en mémoire le fichier à traiter
+        try {
+          bufferATraiter = Files.readAllLines(Paths.get(filename.trim.replace("\\", "/")), Charset.defaultCharset()).toList
+        } catch {
+  
+          case nsfex: NoSuchFileException => return this
+          case ex: Exception =>
+            logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x");
+            return this
+  
+          case ex: Exception =>
+            val exception = ex;
+            logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x"); return this
+  
+        }
+        fichierPresent = true
+        traitementPreserve(bufferATraiter.mkString("\r\n")) // enrichissement de la table mapDesPreserveSection
+        maptemplateByKeyNumber = maptemplateByKeyNumber.empty // table de travail
+        this // on retourne l'instance de l'objet
+  
       } catch {
-
-        case nsfex: NoSuchFileException => return this
-        case ex: Exception =>
-          logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x");
-          return this
-
-        case ex: Exception =>
-          val exception = ex;
-          logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x"); return this
-
+        case ex: Exception => {
+          val exception = ex
+          logBack.error(utilitaire.getContenuMessage("mes38"), filename.toString)
+          null
+        }
       }
-      fichierPresent = true
-      traitementPreserve(bufferATraiter.mkString("\r\n")) // enrichissement de la table mapDesPreserveSection
-      maptemplateByKeyNumber = maptemplateByKeyNumber.empty // table de travail
-      this // on retourne l'instance de l'objet
-
-    } catch {
-      case ex: Exception => {
-        val exception = ex
-        logBack.error(utilitaire.getContenuMessage("mes38"), filename.toString)
-        null
-      }
+    }else{
+      null
     }
-
   }
   /**
    * <p>On récupère le contenu entre le header debut et le header fin</p>
@@ -126,32 +132,34 @@ class TraitementPreserveSection extends TTraitementCommun {
    * @param bufferATraiter
    */
   private def traitementPreserve(bufferATraiter: String): Unit = {
-    var preserveSectionBegin = ""
-    var preserveSectionEnd = ""
-    // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
-    if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
-      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
-      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
-    } else {
-      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
-      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
-    }
-    val positionPreserveDebut = bufferATraiter.indexOf(preserveSectionBegin)
-    val positionPreserveFin = bufferATraiter.indexOf(preserveSectionEnd, 1)
-    if (positionPreserveDebut >= 0) {
-      if (positionPreserveFin > 0 && positionPreserveFin > positionPreserveDebut + preserveSectionBegin.size) {
-        val content = bufferATraiter.substring(positionPreserveDebut + preserveSectionBegin.size, positionPreserveFin)
-        val (templateName, positionFinTemplateName) = getTemplateName(content) // nom du template qui a généré la section
-        if (positionFinTemplateName > 0) { // on ne met en talbe que si on trouve un nom de template
-          val key = maptemplateByKeyNumber.getOrElse(templateName, -1)
-          // la map mapKeyNumberByTemplate sert à stocker les numeros de contenu par template
-          maptemplateByKeyNumber.put(templateName, key + 1)
-          mapDesPreserveSection += ((key + 1, templateName) -> content.substring(positionFinTemplateName))
-        }
-        traitementPreserve(bufferATraiter.substring(positionPreserveFin + preserveSectionEnd.size))
-
+    if(generatePreserveSection){
+      var preserveSectionBegin = ""
+      var preserveSectionEnd = ""
+      // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
+      if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
+        preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
+        preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
+      } else {
+        preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
+        preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
+      }
+      val positionPreserveDebut = bufferATraiter.indexOf(preserveSectionBegin)
+      val positionPreserveFin = bufferATraiter.indexOf(preserveSectionEnd, 1)
+      if (positionPreserveDebut >= 0) {
+        if (positionPreserveFin > 0 && positionPreserveFin > positionPreserveDebut + preserveSectionBegin.size) {
+          val content = bufferATraiter.substring(positionPreserveDebut + preserveSectionBegin.size, positionPreserveFin)
+          val (templateName, positionFinTemplateName) = getTemplateName(content) // nom du template qui a généré la section
+          if (positionFinTemplateName > 0) { // on ne met en talbe que si on trouve un nom de template
+            val key = maptemplateByKeyNumber.getOrElse(templateName, -1)
+            // la map mapKeyNumberByTemplate sert à stocker les numeros de contenu par template
+            maptemplateByKeyNumber.put(templateName, key + 1)
+            mapDesPreserveSection += ((key + 1, templateName) -> content.substring(positionFinTemplateName))
+          }
+          traitementPreserve(bufferATraiter.substring(positionPreserveFin + preserveSectionEnd.size))
+  
+        } else { return }
       } else { return }
-    } else { return }
+    }else { return }
 
   }
   /**

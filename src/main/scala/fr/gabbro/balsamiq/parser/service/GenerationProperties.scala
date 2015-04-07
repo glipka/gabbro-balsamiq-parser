@@ -26,6 +26,7 @@ class GenerationProperties {
   @BeanProperty var concatenateContainerIdToWidgetId = true // ajout automatique to nom du formulaire dans le binding
   @BeanProperty var configProperties = "" // localisation du fichier properties
   @BeanProperty var generateControllerForPrefix = "" // prefix des écrans pour lequel il faut générer le controleur
+  @BeanProperty var generatePreserveSection = true // generation des preserves section ?
   @BeanProperty var generateLabelForAttributeForTheseWidgets = List[String]() // liste des widgets pour lesquels on va générer l'attribut labelfor
   @BeanProperty var generatedControllerAlias = "" // alias du controleur
   @BeanProperty var generatedDtoAlias = "" // alias dto
@@ -73,6 +74,7 @@ class GenerationProperties {
     languageSource = propsMap.getOrElse("config.generation.languageSource", "scala")
     generatedFrontFilesSuffix = propsMap.getOrElse("config.generation.generatedFrontFilesSuffix", "html")
     generateLabelForAttributeForTheseWidgets = propsMap.getOrElse("config.generation.generateLabelForAttributeForTheseWidgets", "com.balsamiq.mockups::Label").split(",").toList.map(_.trim)
+    generatePreserveSection = if (propsMap.getOrElse("config.generation.generatePreserveSection", "true").trim == "true") { true } else { false }
     htmlContainerListForI18nGeneration = propsMap.getOrElse("config.generation.htmlContainerListForI18nGeneration", "form").split(",").toList.map(_.trim)
     generatedFormAlias = propsMap.getOrElse("config.generation.generatedFormAlias", "").trim
     generatedDtoAlias = propsMap.getOrElse("config.generation.generatedDtoAlias", "").trim
