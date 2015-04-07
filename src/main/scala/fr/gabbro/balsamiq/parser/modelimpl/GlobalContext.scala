@@ -42,8 +42,24 @@ class GlobalContext() {
    * @param subPackage : nom du sous package
    * @return : objet traitementPreserveSection
    */
+  def getPreserveSection(typeDePreserve: String, subPackage: String): TraitementPreserveSection = {
+    getPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, typeDePreserve, subPackage)
+  }
+  /**
+   * rajout le 7/4/15  : our un fragment, on récupère la preserve section de l'ecran contenant le fragment
+  * cette procédure est appelée par les templates javascript freemarker
+   * @param usecasName
+   * @param fileName
+   * @param typeDePreserve
+   * @param subPackage
+   */
   def getPreserveSection(usecaseName: String, fileName: String, typeDePreserve: String, subPackage: String): TraitementPreserveSection = {
-    mapDesTraitementsPreserveSection.getOrElse((usecaseName, fileName, typeDePreserve, subPackage), null)
+    // pour un fragment, on récupère la preserve section de l'écran contenant le fragment.
+    if (CommonObjectForMockupProcess.isAfragment) {
+      mapDesTraitementsPreserveSection.getOrElse((usecaseName, CommonObjectForMockupProcess.ecranContenantLeSegment, typeDePreserve, subPackage), null)
+    } else {
+      mapDesTraitementsPreserveSection.getOrElse((usecaseName, fileName, typeDePreserve, subPackage), null)
+    }
   }
 
   /**
