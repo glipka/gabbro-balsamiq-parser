@@ -63,7 +63,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * @return StructureMap(mapName, key1, value1))
    */
   def traitementMap(bind: String): (Boolean, StructureMap) = {
-    val input = bind.substring(5)
+    val input = bind.substring(CommonObjectForMockupProcess.constants.bind.size+1)  // +1 car il faut rajouter le caractere =      bind=
     val regExp1 = "(.)*\\((.)*,(.)*\\)".r
     val regExp10 = "\\((.)*,".r
     val regExp10b = "([^,])*".r // qd le bug sera corrigé : "([^\\(,])*"
@@ -394,11 +394,11 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * @return : bind content
    */
   def getBindContent(widget: WidgetDeBase, container: WidgetDeBase): String = {
-    var bind = ""
+    var bind = widget.bind
     if (widget.isFormulaireHTML) { // pour un formulaire le champ doit se terminer par Form
-      if (CommonObjectForMockupProcess.generationProperties.generatedFormAlias != "" & !widget.bind.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
+      if (CommonObjectForMockupProcess.generationProperties.generatedFormAlias != "" && !widget.bind.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
         bind = widget.bind + CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize
-      }
+      } else {bind=widget.bind}
     } else { // ce n'est pas un formulaire
       // les variables du formulaire sont suffixés par DTO sauf la dernière qui est un champ
       // le container pere est-il un formulaire ?
@@ -426,6 +426,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   /**
    *  Pour un formulaire on force la fin du champ bindé se termine par "Form"
    *  Pour un DTO, on force la fin du champ bindé se termine par "DTO"
+   *  Puis on met en table le contenu des champs.  
+   * 
    * @param widget : WidgetDeBase
    * @param container : WidgetDeBase
    * @return (true of false, bind,variableBinding,variableBindingTail)
