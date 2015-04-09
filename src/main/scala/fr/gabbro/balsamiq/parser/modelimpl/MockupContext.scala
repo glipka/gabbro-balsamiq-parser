@@ -92,7 +92,7 @@ class MockupContext() {
   def ecritureDuCodeJaveOuScala: Boolean = {
     val keysSet = tableDesCodesDesClassesJavaouScala.keys
     keysSet.foreach(classNameAliasName => {
-      val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala(classNameAliasName) // contient le nom dela classe et le nom du sous package
+      val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala(classNameAliasName) // contient le nom dela classe et le nom du sous package sous forme de tuple
       utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
     })
     true
