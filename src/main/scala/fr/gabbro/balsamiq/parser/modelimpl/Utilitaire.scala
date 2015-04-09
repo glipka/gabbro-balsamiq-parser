@@ -586,10 +586,11 @@ class Utilitaire {
    * @return localisation du fichier
    */
   def getRepositoryContainingFragmentAndMainScreen(): String = {
+    val fic=CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement
     val repertoireDeLEcranPrincipal = if (CommonObjectForMockupProcess.isAfragment) {
       // Si le fragment a un type déclaré on récupere le sous repertoire du type
       if (CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement != "") {
-       val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.lookupTableTypeFragment.getOrElse(CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement,"")
+       val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.lookupTableTypeFragment.getOrElse(CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement.toUpperCase(),"")
        if (subDirectoryDuFragment != "") {(CommonObjectForMockupProcess.ecranContenantLeSegment +  System.getProperty("file.separator") + subDirectoryDuFragment)}
        else {CommonObjectForMockupProcess.ecranContenantLeSegment}
       } else { CommonObjectForMockupProcess.ecranContenantLeSegment }

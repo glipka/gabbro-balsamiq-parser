@@ -112,7 +112,7 @@ class GenerationProperties {
     // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"
     lookupTableTypeFragmentList.foreach(typeFragment_subDirectory =>{
      if (typeFragment_subDirectory.contains(":")) {
-       val typeFragment=typeFragment_subDirectory.split(":").head
+       val typeFragment=typeFragment_subDirectory.split(":").head.toUpperCase()
        val subDirectoryDuFragment=typeFragment_subDirectory.split(":").last
        lookupTableTypeFragment+=(typeFragment -> subDirectoryDuFragment)
      }
