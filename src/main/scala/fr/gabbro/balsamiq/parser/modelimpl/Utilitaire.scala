@@ -580,10 +580,21 @@ class Utilitaire {
   }
 
   /**
-   * @return nom du mainMockup
+   * modif le 9 avril 2015 : si le fichier est un fragment et que ce fragment à un type déclaré alors
+   * le fragment sera localisé dans un sous répertoire récupéré de la table CommonObjectForMockupProcess.generationProperties.lookupTableTypeFragment
+   * Pour un fragment: le répertoire est le nom du fichier principal contenant le fragment et le sous répertoire et le type de fragment
+   * @return localisation du fichier
    */
   def getRepositoryContainingFragmentAndMainScreen(): String = {
-    val repertoireDeLEcranPrincipal = if (!CommonObjectForMockupProcess.isAfragment) CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement else CommonObjectForMockupProcess.ecranContenantLeSegment
+    val repertoireDeLEcranPrincipal = if (CommonObjectForMockupProcess.isAfragment) {
+      // Si le fragment a un type déclaré on récupere le sous repertoire du type
+      if (CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement != "") {
+       val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.lookupTableTypeFragment.getOrElse(CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement,"")
+       if (subDirectoryDuFragment != "") {(CommonObjectForMockupProcess.ecranContenantLeSegment +  System.getProperty("file.separator") + subDirectoryDuFragment)}
+       else {CommonObjectForMockupProcess.ecranContenantLeSegment}
+      } else { CommonObjectForMockupProcess.ecranContenantLeSegment }
+    } else {CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement}
+   
     repertoireDeLEcranPrincipal
   }
   /**

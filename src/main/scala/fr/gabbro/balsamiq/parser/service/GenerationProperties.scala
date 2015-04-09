@@ -53,6 +53,7 @@ class GenerationProperties {
   @BeanProperty var localExecutionTemplate1 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var localExecutionTemplate2 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var localExecutionTemplate3 = "" // nom du template a exécuter après le traitement du mockup en cours
+  @BeanProperty var lookupTableTypeFragment = Map[String, String]() // table de lookup des noms des fragments clef=nom du fragment, valeur= sous repertoire du fragment  
   @BeanProperty var processI18nInFiles = "" // internationalisation du fichier html ou jps = true ou false
   @BeanProperty var processI18nInScriptSection = "" // process i18N in script tag of html files
   @BeanProperty var projectName = "" // nom du projet
@@ -106,6 +107,17 @@ class GenerationProperties {
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     processI18nInScriptSection = propsMap.getOrElse("config.generation.processI18nInScriptSection", "false")
+    val lookupTableTypeFragmentList = propsMap.getOrElse("config.generation.lookupTableTypeFragment", "").split(",").toList.map(_.trim)
+    
+    // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"
+    lookupTableTypeFragmentList.foreach(typeFragment_subDirectory =>{
+     if (typeFragment_subDirectory.contains(":")) {
+       val typeFragment=typeFragment_subDirectory.split(":").head
+       val subDirectoryDuFragment=typeFragment_subDirectory.split(":").last
+       lookupTableTypeFragment+=(typeFragment -> subDirectoryDuFragment)
+     }
+   })
+    
     i18nLocales = propsMap.getOrElse("config.generation.i18nLocales", "").split(",").toList.map(_.trim)
     srcDtoFilesFullPath = generatedProjectDir + System.getProperty("file.separator") + srcBuildPathDir + System.getProperty("file.separator") + propsMap.getOrElse("config.generation.srcDtoFilesDir", "").trim.replace("%project%", projectName)
 
