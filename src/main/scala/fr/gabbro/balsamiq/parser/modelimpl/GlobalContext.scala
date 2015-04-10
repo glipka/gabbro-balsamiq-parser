@@ -36,8 +36,6 @@ class GlobalContext() {
   var mapDesTraitementsPreserveSection = Map[(String, String, String, String), TraitementPreserveSection]() // clef= (usecase,nomDuFichierJavascript,type de preserve,sous package) type=javascript,html,code  
   /**
    * this method is called by freemarker Templates to get instance of traitementPreserveSection for the current file
-   * @param usecaseName : nom du useCase
-   * @param fileName : nom du fichier
    * @param typeDePreserve : type de preserve : java, javascript,html, ...
    * @param subPackage : nom du sous package
    * @return : objet traitementPreserveSection
@@ -90,16 +88,17 @@ class GlobalContext() {
 
   }
   /**
-   * récupération de la section pour le usecase et le fichier
+   * Get a javascript section beforehand cached thanks to registerJavascriptSection function
+   * @param section name of cached section
    * @param useCase
    * @param fileName
-   * @param section
    * @return code of the section
    * //TODO deduire du code scala ?
    */
   def getJavascriptSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
   }
+  
   /**
    * Exposition à freemarker des noms des fichiers javascript générés. (sans les doublons)
    * @return  ArrayList[NomDesFichiersJavascript]
