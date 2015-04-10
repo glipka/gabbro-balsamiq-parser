@@ -396,9 +396,11 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   def getBindContent(widget: WidgetDeBase, container: WidgetDeBase): String = {
     var bind = widget.bind
     if (widget.isFormulaireHTML) { // pour un formulaire le champ doit se terminer par Form
+      //init bind name for Object generation
+       bind = widget.bind
       if (CommonObjectForMockupProcess.generationProperties.generatedFormAlias != "" && !widget.bind.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
-        bind = widget.bind + CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize
-      } else {bind=widget.bind}
+        bind += CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize
+      }
     } else { // ce n'est pas un formulaire
       // les variables du formulaire sont suffixés par DTO sauf la dernière qui est un champ
       // le container pere est-il un formulaire ?

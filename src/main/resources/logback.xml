@@ -62,14 +62,14 @@
 
 
 	<!-- Project specific loggers -->
-	<logger name="fr.gencodeframbalsamiq" level="DEBUG" additivity="false">
+	<logger name="fr.gencodeframbalsamiq" level="ERROR" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 
 
 
 
-	<root level="DEBUG">
+	<root level="ERROR">
 
 		<appender-ref ref="STDOUT" />
 	</root>

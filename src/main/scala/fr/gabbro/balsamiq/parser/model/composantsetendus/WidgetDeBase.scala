@@ -247,9 +247,9 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   protected def recuperationAttributsDeBase(e: Element) {
     this.controlTypeID = e.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID) //.substring(22);
     if (this.controlTypeID.contains("::")) {
-      this.shortWidgetName = this.controlTypeID.split("::").last.toLowerCase()
+      this.shortWidgetName = this.controlTypeID.split("::").last
     } else {
-      this.shortWidgetName = this.controlTypeID.toLowerCase()
+      this.shortWidgetName = this.controlTypeID
     }
     //  if (controlTypeID == CommonObjectForMockupProcess .componentBalsamiq) isAComponent = true
     this.w = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.w));
@@ -620,6 +620,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * validate=token1,token2=valeur2,token3
    * @param input
    * @return (true or false, Array of Token
+   * //TODO ajouter parametrage * qui permet n'importe quel saisie
    */
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
     val validate = CommonObjectForMockupProcess.constants.validate + "="
