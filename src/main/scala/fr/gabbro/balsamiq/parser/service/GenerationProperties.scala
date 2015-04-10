@@ -53,7 +53,7 @@ class GenerationProperties {
   @BeanProperty var localExecutionTemplate1 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var localExecutionTemplate2 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var localExecutionTemplate3 = "" // nom du template a exécuter après le traitement du mockup en cours
-  @BeanProperty var lookupTableTypeFragment = Map[String, String]() // table de lookup des noms des fragments clef=nom du fragment, valeur= sous repertoire du fragment  
+  @BeanProperty var fragmentTypesList = Map[String, String]() // table de lookup des noms des fragments clef=nom du fragment, valeur= sous repertoire du fragment  
   @BeanProperty var processI18nInFiles = "" // internationalisation du fichier html ou jps = true ou false
   @BeanProperty var processI18nInScriptSection = "" // process i18N in script tag of html files
   @BeanProperty var projectName = "" // nom du projet
@@ -114,7 +114,7 @@ class GenerationProperties {
      if (typeFragment_subDirectory.contains(":")) {
        val typeFragment=typeFragment_subDirectory.split(":").head.toUpperCase()
        val subDirectoryDuFragment=typeFragment_subDirectory.split(":").last
-       lookupTableTypeFragment+=(typeFragment -> subDirectoryDuFragment)
+       fragmentTypesList+=(typeFragment -> subDirectoryDuFragment)
      }
    })
     

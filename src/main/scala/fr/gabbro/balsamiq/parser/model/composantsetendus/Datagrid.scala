@@ -45,9 +45,11 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
   */
   override def enrichissementParametres(param1: String): (String, Object) = {
     val les3lignesDuTableau: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
+    // on récupère les noms des colonnes (ainsi que leur tri) dans la 1ere ligne.
     val tableauDesNomsDesColonnes = les3lignesDuTableau.head.split(",").map(_.trim)
     // {30L, 30R, 35, 25C}
-    // la ligne commence par { et se termine par } c'est la 3eme ligne du contenu de la table. 
+    // la 3eme ligne (donc la dernière) commence par { et se termine par } c'est la 3eme ligne du contenu de la table. 
+    // on supprime les caractères { et } et on splite pour récupérer en table la largeur de chaque colonne (avec alignement)
     val tableauDesLargeursDesColonnes = if (les3lignesDuTableau.last.startsWith("{") && les3lignesDuTableau.last.endsWith("}"))
       les3lignesDuTableau.last.substring(1, les3lignesDuTableau.last.length - 1).split(",")
     else Array.empty[String]
@@ -55,10 +57,12 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     val tableauDesColonnes = new java.util.ArrayList[ColumnDefinition]
     var largeurTotaleEnpourcentage = 0
 
-    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
     // Name\r(job title) ^, Age ^v, Nickname, Employee v
-    // -----------------------------------------------------------------
-
+    // on parcourt le tableau des noms des colonnes et pour chaque colonne on 
+    // récupère la largeur de la colonne dans la table (
+    // -----------------------------------------------------------------------------------
+ 
     tableauDesNomsDesColonnes.foreach(column => {
       var sort = " "
       var columnName = " "
@@ -80,7 +84,10 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       // le dernier caractere peut inidquer l'alignement dans la cellule
       //{30L, 30R, 35, 25C}
       var largeuretAlignement = if (numeroColonneEnCours < tableauDesLargeursDesColonnes.size) { tableauDesLargeursDesColonnes(numeroColonneEnCours) }
-      else { (100 / tableauDesNomsDesColonnes.size).toString + "C" } // largeur pas renseignée 
+      else { (100 / tableauDesNomsDesColonnes.size).toString + CommonObjectForMockupProcess.constants.center } // largeur pas renseignée 
+      // ------------------------------------------------------------------------------------------------------
+      // *** si la largeur se termine par center, left ou right => on extrait la largeur et l'alignement ***
+      // ------------------------------------------------------------------------------------------------------
       if (largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.center) || // align CommonObjectForMockupProcess.constants.center
         largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.left) || // align CommonObjectForMockupProcess.constants.left
         largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.right) // align Right
@@ -97,7 +104,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
       else { largeurTotaleEnpourcentage += width.toInt }
       if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
-
+      // met en table la colonne 
       val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, "", "", null)
       tableauDesColonnes.add(columnDefinition)
 
@@ -138,7 +145,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
         val widgetFils = tableau_des_widgets_fils(position)
         colonne.widget = widgetFils // on renseigne le widget du composant de la colonne
         val state = widgetFils.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.state, "")
-        // test du type d'objet 
+        // test du type d'objet . ON se 
         widgetFils.controlTypeID match {
           case CommonObjectForMockupProcess.constants.numericStepper => { // NUmerifc 
             if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
