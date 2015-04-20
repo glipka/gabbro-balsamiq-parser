@@ -32,12 +32,13 @@ class Fragment(@BeanProperty var fragmentName: String, @BeanProperty var ficName
 }
 // ----------------------------------------------
 // classname: nom de la classe 
+// instancename : variable pour l'instance générée
 // widget: 
 // instanceCode: code instanciation de la classe 
 // isAFormulaire : true or false
 // shortPath : shorPath
 // ----------------------------------------------
-class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var widget: WidgetDeBase, @BeanProperty var instanceCode: String, @BeanProperty var isAFormulaire: Boolean, @BeanProperty var shortPath: String)
+class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var instanceName: String, @BeanProperty var widget: WidgetDeBase, @BeanProperty var instanceCode: String, @BeanProperty var isAFormulaire: Boolean, @BeanProperty var shortPath: String)
 // -----------------------------------------
 // location : 
 // shortPath :

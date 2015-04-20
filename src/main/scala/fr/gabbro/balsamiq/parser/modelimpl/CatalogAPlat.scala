@@ -75,6 +75,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
     controlXML.foreach(elementXML => {
       val controle_en_cours = new InstanciationTypeDeWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants).process() // traitement du contrôle en cours
       // bypass des widgets ayant l'attribut markup positionné à true
+      //FIXME bug markup - 
       if (controle_en_cours.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.markup, "") != "true") {
         // controle en cours est un composant qui doit être traité localement ?
         if (controle_en_cours.isAComponent && controle_en_cours.componentXML != null && List(controle_en_cours.componentName).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsListProcessedLocally).size > 0) {
@@ -88,14 +89,16 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           // les attributs en override sont stockés sous la forme "CustomIDuComposantCLef" -> valeur
           if (groupe_en_cours != null && groupe_en_cours.isAComponent) {
             groupe_en_cours.mapExtendedAttribut.foreach(valeur => {
-              // la clef commence par le cutomID du widget du commposant ? 
-              if (controle_en_cours.customId != "" && valeur._1.toString().startsWith(controle_en_cours.customId)) {
-                //on recupre le contenu de la clef
-                val clefRecherche = valeur._1.substring(controle_en_cours.customId.size).toLowerCase()
-                controle_en_cours.mapExtendedAttribut.remove(clefRecherche)
-                controle_en_cours.mapExtendedAttribut += (clefRecherche -> valeur._2)
+              if(controle_en_cours.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.markup, "") == "true"){
+              
+                // la clef commence par le cutomID du widget du commposant ? 
+                if (controle_en_cours.customId != "" && valeur._1.toString().startsWith(controle_en_cours.customId)) {
+                  //on recupre le contenu de la clef
+                  val clefRecherche = valeur._1.substring(controle_en_cours.customId.size).toLowerCase()
+                  controle_en_cours.mapExtendedAttribut.remove(clefRecherche)
+                  controle_en_cours.mapExtendedAttribut += (clefRecherche -> valeur._2)
+                }
               }
-
             })
 
           }

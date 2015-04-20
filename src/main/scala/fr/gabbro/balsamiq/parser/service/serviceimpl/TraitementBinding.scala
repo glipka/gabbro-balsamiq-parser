@@ -202,7 +202,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     classes.foreach(classe => {
       // on vérifie si le widget doit être bindé à un tableau
       val (ret8, instanceCodeBegin, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateInstance, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.tabulation, ""), (CommonObjectForMockupProcess.constants.templateInstance, classe.instanceName), (CommonObjectForMockupProcess.constants.hierarchiePere, ""), (CommonObjectForMockupProcess.constants.className, classe.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.widgetName, classe.controlTypeID))
-      val (ret9, instanceCodeEnd, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateInstance, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.tabulation, ""), (CommonObjectForMockupProcess.constants.templateInstance, classe.instanceName), (CommonObjectForMockupProcess.constants.hierarchiePere, ""), ("classnNme", classe.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.widgetName, classe.controlTypeID))
+      val (ret9, instanceCodeEnd, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateInstance, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.tabulation, ""), (CommonObjectForMockupProcess.constants.templateInstance, classe.instanceName), (CommonObjectForMockupProcess.constants.hierarchiePere, ""), (CommonObjectForMockupProcess.constants.className, classe.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.widgetName, classe.controlTypeID))
       val shortPath = if (classe.instanceName.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
         classe.instanceName.substring(0, classe.instanceName.size - CommonObjectForMockupProcess.generationProperties.generatedFormAlias.size).toUpperCase() + "_" + CommonObjectForMockupProcess.generationProperties.generatedFormAlias.toUpperCase()
       } else {
@@ -211,7 +211,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       // mise à jour table des formulaires ou table des objets. 
       // on met à jour les tables dans ecranBalsammiq pour générer l'instance de controleur
       // et les tables dans sessions balsamiq pour génerer l'interface commune à l'ensemble des écrans.
-      val fc = new FormulaireCode(classe.instanceName.capitalize, classe.widget, instanceCodeBegin + instanceCodeEnd, classe.widget.isFormulaireHTML, shortPath);
+      val fc = new FormulaireCode(classe.instanceName.capitalize, classe.instanceName, classe.widget, instanceCodeBegin + instanceCodeEnd, classe.widget.isFormulaireHTML, shortPath);
       if (classe.widget.isFormulaireHTML) {
         CommonObjectForMockupProcess.mockupContext.bindedForms.add(fc);
         sessionBalsamiq.bindedForms.add(fc);
