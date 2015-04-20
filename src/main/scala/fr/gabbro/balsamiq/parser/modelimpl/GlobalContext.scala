@@ -204,7 +204,7 @@ class GlobalContext() {
 
             // 3eme parametre (REST URL)
             useCaseName + "/" +
-              ecranContenantLeFragment + "/" +
+              ecranContenantLeFragment + "/" + typeDeFragment + "/" +
               fragmentName)
 
         } else { // ce n'est pas un fragment
