@@ -186,13 +186,13 @@ class GlobalContext() {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     val location =
       if (useCaseName != "") {
-        if (isAfragment && typeDeFragment != "") {
+        if (isAfragment) {
           new Location((CommonObjectForMockupProcess.generationProperties.srcWebFilesDir +
             // 1er paramétre (location)
             System.getProperty("file.separator") +
             useCaseName +
             System.getProperty("file.separator") +
-            utilitaire.getRepositoryContainingFragmentAndMainScreen() +
+            utilitaire.getRepositoryContainingFragmentAndMainScreen(filename, isAfragment, typeDeFragment, ecranContenantLeFragment) +
             System.getProperty("file.separator") +
             fragmentName + "." +
             CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix).replace("\\", "/"),
@@ -205,29 +205,7 @@ class GlobalContext() {
             // 3eme parametre (REST URL)
 
             useCaseName + "/" +
-              ecranContenantLeFragment + "/" + utilitaire.getRepositoryContainingFragmentAndMainScreen()  + "/" +
-              fragmentName)
-
-        } else if (isAfragment && typeDeFragment == "") {
-          new Location((CommonObjectForMockupProcess.generationProperties.srcWebFilesDir +
-            // 1er paramétre (location)
-            System.getProperty("file.separator") +
-            useCaseName +
-            System.getProperty("file.separator") +
-            utilitaire.getRepositoryContainingFragmentAndMainScreen() +
-            System.getProperty("file.separator") +
-            fragmentName + "." +
-            CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix).replace("\\", "/"),
-
-            // 2eme paramétre (SHORT_PATH)
-            useCaseName.toUpperCase() + "_" +
-              ecranContenantLeFragment.toUpperCase() + "_" +
-              fragmentName.toUpperCase(),
-
-            // 3eme parametre (REST URL)
-
-            useCaseName + "/" +
-              ecranContenantLeFragment + "/" +
+              utilitaire.getRepositoryContainingFragmentAndMainScreen(filename, isAfragment, typeDeFragment, ecranContenantLeFragment) +
               fragmentName)
         } else { // ce n'est pas un fragment
           new Location((
@@ -260,7 +238,6 @@ class GlobalContext() {
       }
     location
   }
-
   /**
    * *** creation d'un fragment ***
    * le parametre bookmark est sous la forme : usecase-ficname$fragment

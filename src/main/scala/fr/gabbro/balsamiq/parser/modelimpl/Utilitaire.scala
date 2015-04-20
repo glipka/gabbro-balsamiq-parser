@@ -560,7 +560,7 @@ class Utilitaire {
     val sourceHTML = if (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement != "") {
       directoryName + System.getProperty("file.separator") +
         CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + System.getProperty("file.separator") +
-        this.getRepositoryContainingFragmentAndMainScreen() + System.getProperty("file.separator") +
+        this.getRepositoryContainingFragmentAndMainScreen(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,CommonObjectForMockupProcess.isAfragment,CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement,CommonObjectForMockupProcess.ecranContenantLeSegment) + System.getProperty("file.separator") +
         fileName + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
     } else {
       directoryName + System.getProperty("file.separator") + fileName + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
@@ -583,21 +583,22 @@ class Utilitaire {
    * modif le 9 avril 2015 : si le fichier est un fragment et que ce fragment à un type déclaré alors
    * le fragment sera localisé dans un sous répertoire récupéré de la table CommonObjectForMockupProcess.generationProperties.lookupTableTypeFragment
    * Pour un fragment: le répertoire est le nom du fichier principal contenant le fragment et le sous répertoire et le type de fragment
+   * Modif le 20 avril 2015 : paramétrage de la fonction pour utilisation avec un ensemble de fragments
    * @return localisation du fichier
    */
-  def getRepositoryContainingFragmentAndMainScreen(): String = {
-    val fic=CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement
-    val repertoireDeLEcranPrincipal = if (CommonObjectForMockupProcess.isAfragment) {
+  def getRepositoryContainingFragmentAndMainScreen(nomDuFichierEnCoursDeTraitement:String,isAfragment:Boolean,typeDuFragment:String,ecranContenantLeFragment:String): String = {
+    val repertoireDeLEcranPrincipal = if (isAfragment) {
       // Si le fragment a un type déclaré on récupere le sous repertoire du type
-      if (CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement != "") {
+      if (typeDuFragment != "") {
        val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.fragmentTypesList.getOrElse(CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement.toUpperCase(),"")
-       if (subDirectoryDuFragment != "") {(CommonObjectForMockupProcess.ecranContenantLeSegment +  System.getProperty("file.separator") + subDirectoryDuFragment)}
-       else {CommonObjectForMockupProcess.ecranContenantLeSegment}
-      } else { CommonObjectForMockupProcess.ecranContenantLeSegment }
-    } else {CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement}
+       if (subDirectoryDuFragment != "") {(ecranContenantLeFragment +  System.getProperty("file.separator") + subDirectoryDuFragment)}
+       else {ecranContenantLeFragment}
+      } else {ecranContenantLeFragment }
+    } else {nomDuFichierEnCoursDeTraitement}
    
     repertoireDeLEcranPrincipal
   }
+  
   /**
    * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
    * @param filename : nom du fichier
