@@ -173,6 +173,7 @@ class CatalogDesComposants {
   private def recuperationDesAttributsEtendus(e: Element, controleID: String): (scala.collection.mutable.Map[String, String], String) = {
     var mapExtendedAttributDuWidgetDuComposant = scala.collection.mutable.Map[String, String]()
     var customID = ""
+    //FIXME ne pas stocker les propriétés des enfants markés en tant que markup
     if (e.getChildren().size() != 0) {
       val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
       if (controlProperties != null) {

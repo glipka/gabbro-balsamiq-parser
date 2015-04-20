@@ -107,10 +107,10 @@ class GenerationProperties {
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     processI18nInScriptSection = propsMap.getOrElse("config.generation.processI18nInScriptSection", "false")
-    val lookupTableTypeFragmentList = propsMap.getOrElse("config.generation.lookupTableTypeFragment", "").split(",").toList.map(_.trim)
+    val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
     
     // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"
-    lookupTableTypeFragmentList.foreach(typeFragment_subDirectory =>{
+    generatedFolderForFragmentType.foreach(typeFragment_subDirectory =>{
      if (typeFragment_subDirectory.contains(":")) {
        val typeFragment=typeFragment_subDirectory.split(":").head.toUpperCase()
        val subDirectoryDuFragment=typeFragment_subDirectory.split(":").last

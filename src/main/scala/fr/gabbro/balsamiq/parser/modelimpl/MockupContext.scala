@@ -32,12 +32,13 @@ class Fragment(@BeanProperty var fragmentName: String, @BeanProperty var ficName
 }
 // ----------------------------------------------
 // classname: nom de la classe 
+// instancename : variable pour l'instance générée
 // widget: 
 // instanceCode: code instanciation de la classe 
 // isAFormulaire : true or false
 // shortPath : shorPath
 // ----------------------------------------------
-class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var widget: WidgetDeBase, @BeanProperty var instanceCode: String, @BeanProperty var isAFormulaire: Boolean, @BeanProperty var shortPath: String)
+class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var instanceName: String, @BeanProperty var widget: WidgetDeBase, @BeanProperty var instanceCode: String, @BeanProperty var isAFormulaire: Boolean, @BeanProperty var shortPath: String)
 // -----------------------------------------
 // location : 
 // shortPath :
@@ -69,7 +70,7 @@ class MockupContext() {
   @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]()
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   @BeanProperty var bindedForms = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les formulaires
-  @BeanProperty var fragments = new java.util.ArrayList[Fragment]() // table des fragments
+  @BeanProperty var fragments= new java.util.ArrayList[Fragment]() // table des fragments
   @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
   val utilitaire = new Utilitaire
   /**

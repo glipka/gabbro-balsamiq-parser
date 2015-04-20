@@ -31,7 +31,7 @@ trait TCatalogAPlat {
   val catalog = new ArrayBuffer[WidgetDeBase]
   val utilitaire = new Utilitaire()
   var id_interne: Int = 0
-  val groupId = "__group__"
+  //val groupId = "__group__"
   var doc: Document = null;
   var mockup: Element = null;
 
