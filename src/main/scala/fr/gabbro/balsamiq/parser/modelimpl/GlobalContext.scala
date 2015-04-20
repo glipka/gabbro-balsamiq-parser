@@ -45,9 +45,9 @@ class GlobalContext() {
   }
   /**
    * correction du bug :  le 7/4/15  : pour un fragment, on récupère la preserve section de l'ecran contenant le fragment
-   * En effet, les preserve sections ne sont créées qu'à la lecture du fichier javascript principal. 
+   * En effet, les preserve sections ne sont créées qu'à la lecture du fichier javascript principal.
    * Les fragments n'ont pas de fichier javascript, le code javascript du fragment est inclus dans le code javascript du mockup principal.
-  * cette procédure est appelée par les templates javascript freemarker
+   * cette procédure est appelée par les templates javascript freemarker
    * @param usecasName
    * @param fileName
    * @param typeDePreserve
@@ -98,7 +98,7 @@ class GlobalContext() {
   def getJavascriptSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
   }
-  
+
   /**
    * Exposition à freemarker des noms des fichiers javascript générés. (sans les doublons)
    * @return  ArrayList[NomDesFichiersJavascript]
@@ -186,7 +186,7 @@ class GlobalContext() {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     val location =
       if (useCaseName != "") {
-        if (isAfragment) {
+        if (isAfragment && typeDeFragment != "") {
           new Location((CommonObjectForMockupProcess.generationProperties.srcWebFilesDir +
             // 1er paramétre (location)
             System.getProperty("file.separator") +
@@ -203,10 +203,32 @@ class GlobalContext() {
               fragmentName.toUpperCase(),
 
             // 3eme parametre (REST URL)
+
             useCaseName + "/" +
               ecranContenantLeFragment + "/" + typeDeFragment + "/" +
               fragmentName)
 
+        } else if (isAfragment && typeDeFragment == "") {
+          new Location((CommonObjectForMockupProcess.generationProperties.srcWebFilesDir +
+            // 1er paramétre (location)
+            System.getProperty("file.separator") +
+            useCaseName +
+            System.getProperty("file.separator") +
+            utilitaire.getRepositoryContainingFragmentAndMainScreen() +
+            System.getProperty("file.separator") +
+            fragmentName + "." +
+            CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix).replace("\\", "/"),
+
+            // 2eme paramétre (SHORT_PATH)
+            useCaseName.toUpperCase() + "_" +
+              ecranContenantLeFragment.toUpperCase() + "_" +
+              fragmentName.toUpperCase(),
+
+            // 3eme parametre (REST URL)
+
+            useCaseName + "/" +
+              ecranContenantLeFragment + "/" +
+              fragmentName)
         } else { // ce n'est pas un fragment
           new Location((
             // 1er paramétre (location)
