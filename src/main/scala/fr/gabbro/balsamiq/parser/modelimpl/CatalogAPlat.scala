@@ -22,7 +22,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
    * <p>en recalculant leur abscisse et ordonnée par rapport au début de la page</p>
    * <p>On vérifie qu'il n'y a pas des widgets qui ont la même taille et la même position (car l'algorithme ne peut fonctionner  correctement</p>
    * <p>On détermine les container pere incluant les widgets et pour chaque container, on met à jour les pointeurs fils (indice du widget).</p>
-   * @return
+   * @return true or false,maxWidth, maxHeight
    */
   def chargementCatalog(): (Boolean, Int, Int) = {
     val builder = new SAXBuilder();
