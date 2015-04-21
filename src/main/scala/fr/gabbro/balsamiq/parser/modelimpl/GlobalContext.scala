@@ -205,8 +205,10 @@ class GlobalContext() {
             // 3eme parametre (REST URL)
 
             useCaseName + "/" +
-              utilitaire.getRepositoryContainingFragmentAndMainScreen(filename, isAfragment, typeDeFragment, ecranContenantLeFragment) +
-              fragmentName)
+            utilitaire.getRepositoryContainingFragmentAndMainScreen(filename, isAfragment, typeDeFragment, ecranContenantLeFragment) +
+            "/" +
+           fragmentName)
+              
         } else { // ce n'est pas un fragment
           new Location((
             // 1er paramétre (location)

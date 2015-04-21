@@ -590,7 +590,7 @@ class Utilitaire {
     val repertoireDeLEcranPrincipal = if (isAfragment) {
       // Si le fragment a un type déclaré on récupere le sous repertoire du type
       if (typeDuFragment != "") {
-       val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.fragmentTypesList.getOrElse(CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement.toUpperCase(),"")
+       val subDirectoryDuFragment= CommonObjectForMockupProcess.generationProperties.fragmentTypesList.getOrElse(typeDuFragment.toUpperCase(),"")
        if (subDirectoryDuFragment != "") {(ecranContenantLeFragment +  System.getProperty("file.separator") + subDirectoryDuFragment)}
        else {ecranContenantLeFragment}
       } else {ecranContenantLeFragment }
