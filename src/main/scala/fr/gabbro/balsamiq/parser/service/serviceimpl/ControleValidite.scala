@@ -130,7 +130,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     branche.foreach(controle => {
       val itemsVar = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.itemsVar, "").toString()
       if (itemsVar != "" && !CommonObjectForMockupProcess.mockupContext.itemsVars.exists { item => item.content == itemsVar }) { CommonObjectForMockupProcess.mockupContext.itemsVars.add(new ItemVar(itemsVar, itemsVar.toUpperCase())) }
-      if (itemsVar != "" && !globalContext.itemsVars.exists { item => item._2.content == itemsVar }) {
+      if (itemsVar != "") {
         val itemVar = new ItemVar(itemsVar, itemsVar.toUpperCase())
         if (CommonObjectForMockupProcess.isAfragment) { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, itemVar.content) -> itemVar }
         else { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", itemVar.content) -> itemVar }
