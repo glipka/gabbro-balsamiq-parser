@@ -63,7 +63,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * @return StructureMap(mapName, key1, value1))
    */
   def traitementMap(bind: String): (Boolean, StructureMap) = {
-    val input = bind.substring(CommonObjectForMockupProcess.constants.bind.size+1)  // +1 car il faut rajouter le caractere =      bind=
+    val input = bind.substring(CommonObjectForMockupProcess.constants.bind.size + 1) // +1 car il faut rajouter le caractere =      bind=
     val regExp1 = "(.)*\\((.)*,(.)*\\)".r
     val regExp10 = "\\((.)*,".r
     val regExp10b = "([^,])*".r // qd le bug sera corrigé : "([^\\(,])*"
@@ -214,7 +214,9 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       val fc = new FormulaireCode(classe.instanceName.capitalize, classe.instanceName, classe.widget, instanceCodeBegin + instanceCodeEnd, classe.widget.isFormulaireHTML, shortPath);
       if (classe.widget.isFormulaireHTML) {
         CommonObjectForMockupProcess.mockupContext.bindedForms.add(fc);
-        sessionBalsamiq.bindedForms.add(fc);
+        if (CommonObjectForMockupProcess.isAfragment) { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement) -> fc }
+        else {sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,"") -> fc }
+
       } else { // la class n'est pas bindée par un formulaire HTML
         sessionBalsamiq.firstLevelObject.add(fc);
         CommonObjectForMockupProcess.mockupContext.firstLevelObject.add(fc);
@@ -397,7 +399,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     var bind = widget.bind
     if (widget.isFormulaireHTML) { // pour un formulaire le champ doit se terminer par Form
       //init bind name for Object generation
-       bind = widget.bind
+      bind = widget.bind
       if (CommonObjectForMockupProcess.generationProperties.generatedFormAlias != "" && !widget.bind.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
         bind += CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize
       }
@@ -428,27 +430,27 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   /**
    *  Pour un formulaire on force la fin du champ bindé se termine par "Form"
    *  Pour un DTO, on force la fin du champ bindé se termine par "DTO"
-   *  Puis on met en table le contenu des champs.  
-   * 
+   *  Puis on met en table le contenu des champs.
+   *
    * @param widget : WidgetDeBase
    * @param container : WidgetDeBase
    * @return (true of false, bind,variableBinding,variableBindingTail)
    */
-  def process(widget: WidgetDeBase, container: WidgetDeBase): (Boolean,String,String,String) = {
-    var bind=""
-    var variableBindingTail=""
-     if (widget.bind.trim.size > 0) {
+  def process(widget: WidgetDeBase, container: WidgetDeBase): (Boolean, String, String, String) = {
+    var bind = ""
+    var variableBindingTail = ""
+    if (widget.bind.trim.size > 0) {
       // vérification de la syntaxe des noms des formulaires et de noms des DTOs.
-       bind = getBindContent(widget, container)
+      bind = getBindContent(widget, container)
       // récupération nom de la variable bindée
       val (retCode, variableBinding) = get_variable_binding(widget.bind, widget)
-//        widget.variableBinding = variableBinding
+      //        widget.variableBinding = variableBinding
       if (variableBinding.contains(".")) { variableBindingTail = variableBinding.split("\\.").tail.mkString(".") }
       else { variableBindingTail = variableBinding }
       // traitement du binding afin de permettre la génération des classes
-      mise_en_table_classes_binding(bind, container, widget) 
-      return(true,bind,variableBinding,variableBindingTail)
-    } else {return (false,"","","")}
+      mise_en_table_classes_binding(bind, container, widget)
+      return (true, bind, variableBinding, variableBindingTail)
+    } else { return (false, "", "", "") }
   }
 
 }  // fin de la classe TraitementBinding
