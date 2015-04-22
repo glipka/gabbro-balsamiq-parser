@@ -90,10 +90,18 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     if (catalogDesComposantsCommuns.chargementDesCatalogues(CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir)) { // chargement du catalog BootStrap  
       logBack.info(utilitaire.getContenuMessage("mes41"))
       traitementDesFichiersDuRepertoireBalsamiq(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir) // traitement ensemble des fichiers
+
+      logBack.info(utilitaire.getContenuMessage("mes42"))
+      // *** templates à exécuter après le traitement de tous les écrans ***
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate1, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath1, traitementFormatageSourceJava)
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate2, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath2, traitementFormatageSourceJava)
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
+      logBack.info(utilitaire.getContenuMessage("mes44"))
+      globalContext.generation_fichiers_javascript
       logBack.info(utilitaire.getContenuMessage("mes59"))
       moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
       moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
-      return   true 
+      return true
     } else { false }
 
   }
@@ -107,6 +115,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>En fin de traitement de tous les mockups, exécution des traitements globaux pour générer par exemple les menu</p>
    * <p>En fin de traitement on génère l'ensemble des fichiers javascript (1 par mokcup principal.</p>
    * <p>Pour rappel, le contenu javascript du mockup principal et de ses fragments sont stockés dans le même fichier.</p>
+   * <p>Modif le 22/4/15 par gl : le traitement des fichiers se fait en 2 passes , d'abord les fragments puis les écrans principaux   *
    * <p>---------------------------------------------------------------------------------------------------------------------
    *
    * @param url of directory containing mockup to process
@@ -115,33 +124,24 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   private def traitementDesFichiersDuRepertoireBalsamiq(directory1: String): Int = {
     var compteur_fichiers_traites = 0
     logBack.info(utilitaire.getContenuMessage("mes60"), directory1)
-    val fichiersBalsamiqAtraiter = new File(directory1).listFiles.toList
-    fichiersBalsamiqAtraiter.foreach(file => {
-      if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { compteur_fichiers_traites += traitementDesFichiersDuRepertoireBalsamiq(file.getPath()) }
-      else {
+    // on traite d'abord les fragments pour mettre en globalSection toutes les références
+    val fragmentsBalsamiq = new File(directory1).listFiles.toList.filter(file => file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
+    val fichiersBalsamiqSansLesFragments = new File(directory1).listFiles.toList.filter(file => !file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
+    traitementDesFichiers(fragmentsBalsamiq)
+    traitementDesFichiers(fichiersBalsamiqSansLesFragments)
+    logBack.info(utilitaire.getContenuMessage("mes14"), directory1, compteur_fichiers_traites)
+
+    def traitementDesFichiers(files: List[File]): Unit = {
+      fragmentsBalsamiq.foreach(file => {
+        //    if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { compteur_fichiers_traites += traitementDesFichiersDuRepertoireBalsamiq(file.getPath()) }
+        //    else {
         if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
           compteur_fichiers_traites += 1;
           traitementFichierBalsamiq(file)
         }
-      }
-    })
-    logBack.info(utilitaire.getContenuMessage("mes42"))
-    // *** templates à exécuter après le traitement de tous les écrans ***
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate1, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath1, traitementFormatageSourceJava)
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate2, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath2, traitementFormatageSourceJava)
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
-    /**
-     * ------------------------------------------------------------
-     * on génère les fichiers javascript
-     * les fichiers javascript sont stockés dans une hashMap
-     * ------------------------------------------------------------
-     *
-     */
-    logBack.info(utilitaire.getContenuMessage("mes44"))
-    globalContext.generation_fichiers_javascript
-    // A modifier dès qu'une solution pou rle menu est trouvée
-    val menu = globalContext.generation_code_source_menu
-    logBack.info(utilitaire.getContenuMessage("mes14"), directory1, compteur_fichiers_traites)
+        //   }
+      })
+    }
     compteur_fichiers_traites
   }
 

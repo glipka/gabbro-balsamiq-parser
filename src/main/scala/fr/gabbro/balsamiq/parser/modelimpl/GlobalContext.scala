@@ -22,13 +22,14 @@ class GlobalContext() {
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu
   var moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker = _
   // modif le 22/4/15 par gl Itemsvars est une Map dont la clef est le usecase,ecran principla, fragmentName, identifiabt unique et la valeur itemsVar
-  var itemsVars = Map[(String,String,String,String),ItemVar]() // pour stocker les itemsvar
+  // cette table va servir à lister des listes des itemsvars pour un ecran principal et pour l'ensemble de ses fragments.
+  var itemsVars = Map[(String, String, String, String), ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   // modif le 22/4/15 par georges 
   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
   // pour un écran principal, le nom du fragment est vide 
   // cette table va servir à lister des listes des formulaires pour un ecran et pour l'ensemble de ses fragments.
-  var bindedForms = Map[(String, String, String,String), FormulaireCode]() // contient les sources pour instancier les formulaires
+  var bindedForms = Map[(String, String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
   // map utilisée spécifiquement pour les fichiers javascript. 
@@ -158,11 +159,11 @@ class GlobalContext() {
     array1
 
   }
-   /**
+  /**
    *  Récupération des formulaires bindés pour un écran principal et l'ensemble de ses fragments
    *  @param useCaseName
    * @param EcranPrincipal name
- 
+   *
    *  @return Array of FormulaireCode
    */
   def getBindedForms(useCaseName: String, ecranPrincipal: String): ArrayList[FormulaireCode] = {
@@ -174,12 +175,12 @@ class GlobalContext() {
     array1
 
   }
-  
-   /**
+
+  /**
    *  Récupération des itemsVars bindés pour un écran principal et l'ensemble de ses fragments
    *  @param useCaseName
    * @param EcranPrincipal name
- 
+   *
    *  @return Array of FormulaireCode
    */
   def getItemsVars(useCaseName: String, ecranPrincipal: String): ArrayList[ItemVar] = {
@@ -191,8 +192,8 @@ class GlobalContext() {
     array1
 
   }
-  
-   /**
+
+  /**
    *  Récupération des itemsVars bindés pour un fragment d'un écran principal
    *  @param useCaseName
    * @param EcranPrincipal name
@@ -208,7 +209,6 @@ class GlobalContext() {
     array1
 
   }
-
 
   /**
    * ecriture du coce javascript: On balaie la hashMap contenant le nom des fichiers
