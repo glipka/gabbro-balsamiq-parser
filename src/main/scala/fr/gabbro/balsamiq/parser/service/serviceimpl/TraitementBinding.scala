@@ -214,8 +214,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       val fc = new FormulaireCode(classe.instanceName.capitalize, classe.instanceName, classe.widget, instanceCodeBegin + instanceCodeEnd, classe.widget.isFormulaireHTML, shortPath);
       if (classe.widget.isFormulaireHTML) {
         CommonObjectForMockupProcess.mockupContext.bindedForms.add(fc);
-        if (CommonObjectForMockupProcess.isAfragment) { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement) -> fc }
-        else {sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,"") -> fc }
+        if (CommonObjectForMockupProcess.isAfragment) { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,fc.classname) -> fc }
+        else {sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,"",fc.classname) -> fc }
 
       } else { // la class n'est pas bindée par un formulaire HTML
         sessionBalsamiq.firstLevelObject.add(fc);

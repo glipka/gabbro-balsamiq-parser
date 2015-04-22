@@ -24,10 +24,10 @@ class GlobalContext() {
   @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   // modif le 22/4/15 par georges 
-  // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment
+  // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment et un identifiant unique
   // pour un écran principal, le nol du fragment est vide 
   // cette table va servir à lister des listes des formulaires pour un ecran et pour l'ensemble de ses fragments.
-  var bindedForms = Map[(String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
+  var bindedForms = Map[(String, String, String,String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
   // map utilisée spécifiquement pour les fichiers javascript. 
