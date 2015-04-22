@@ -243,7 +243,9 @@ class GlobalContext() {
 
             useCaseName + "/" +
               utilitaire.getRepositoryContainingFragmentAndMainScreen(filename, isAfragment, typeDeFragment, ecranContenantLeFragment) +
+
               "/" +
+
               fragmentName)
 
         } else { // ce n'est pas un fragment
