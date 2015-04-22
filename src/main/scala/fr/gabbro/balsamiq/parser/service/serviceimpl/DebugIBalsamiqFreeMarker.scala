@@ -13,34 +13,6 @@ import fr.gabbro.balsamiq.parser.modelimpl.CatalogBalsamiq
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 
-// ==============================================================================================================================  
-// *** Principe general IbalsamiqFreeMarker ***
-// ==============================================================================================================================
-// Scan du repertoire .asset pour mettre en table les composants Balsamiq partagés entre les différents projets
-// Scan du repertoire contenant les maquettes de l'application
-// Pour chaque fichier bmml trouvé :
-//    Mise en table des widgets de l'écran en cours (format xml vers format plat)
-//    A partir du format plat, pour chaque widget, détermination des fils (widgets inclus dans un container)
-//    Puis constitution du catalogue final en respectant la hiérarchie container, fils.
-//    le catalogue est un modele 1 n, chaque entrée d'un container pouvant être lui même un container
-//    Enrichissement de chaque entrée du catalogue : calcul de position dans le container :
-//    on détermine à la fois le n° de ligne et le numéro de cellule en 12eme par rapport au container.
-// Exécution d'un premier traitement de validité des informations dans le catalogue
-//    Test d'inclusion de l'ensemble des widgets dans un gabarit principal
-//    Test de chevauchement de contenu dans un container
-//    Test de duplication de contenu dans le catalogue (2 objets ayant la même position et la même taille
-// Genération de code à partir du catalogue enrichi
-//    Pour chaque container, extraction des composants triés par ligne et par colonne.
-//    A chaque composant, on associe un template et on fait appel au moteur de templating Fréémarker pour exécuter le emaplte.
-//    Le code source étant généré, ecriture des fichiers HTML et code (java, scala).
-//    On génere 2 fichiers HTML, le 2eme contenant les clefs des libelles à traduire.
-//    Remarque pour chaque template on peut associer un template javascript et un template code
-//    POur un widget donné, les templates sont exécutés automatiquement à chaque instanciation d'un composant.
-//    Ce mécanisme permet de générer pour un écran à la fois la partie HTML, la partie code java et la partie javascript
-// ==============================================================================================================================
-object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
- 
-
 /**
  * <p>==============================================================================================================================   </p>
  *  <p>*** Principe général IbalsamiqFreeMarker *** </p>
@@ -67,7 +39,7 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
  *  <p>   Ce mécanisme permet de générer pour un écran à la fois la partie HTML, la partie code java et la partie javascript</p>
  * ==============================================================================================================================</p>
  */
- 
+object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   if (!init()) { System.exit(99) }
   else {
     process() // process du batch
@@ -118,10 +90,18 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     if (catalogDesComposantsCommuns.chargementDesCatalogues(CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir)) { // chargement du catalog BootStrap  
       logBack.info(utilitaire.getContenuMessage("mes41"))
       traitementDesFichiersDuRepertoireBalsamiq(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir) // traitement ensemble des fichiers
+
+      logBack.info(utilitaire.getContenuMessage("mes42"))
+      // *** templates à exécuter après le traitement de tous les écrans ***
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate1, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath1, traitementFormatageSourceJava)
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate2, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath2, traitementFormatageSourceJava)
+      traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
+      logBack.info(utilitaire.getContenuMessage("mes44"))
+      globalContext.generation_fichiers_javascript
       logBack.info(utilitaire.getContenuMessage("mes59"))
       moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
       moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
-      return   true 
+      return true
     } else { false }
 
   }
@@ -135,6 +115,7 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>En fin de traitement de tous les mockups, exécution des traitements globaux pour générer par exemple les menu</p>
    * <p>En fin de traitement on génère l'ensemble des fichiers javascript (1 par mokcup principal.</p>
    * <p>Pour rappel, le contenu javascript du mockup principal et de ses fragments sont stockés dans le même fichier.</p>
+   * <p>Modif le 22/4/15 par gl : le traitement des fichiers se fait en 2 passes , d'abord les fragments puis les écrans principaux   *
    * <p>---------------------------------------------------------------------------------------------------------------------
    *
    * @param url of directory containing mockup to process
@@ -143,33 +124,29 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   private def traitementDesFichiersDuRepertoireBalsamiq(directory1: String): Int = {
     var compteur_fichiers_traites = 0
     logBack.info(utilitaire.getContenuMessage("mes60"), directory1)
-    val fichiersBalsamiqAtraiter = new File(directory1).listFiles.toList
-    fichiersBalsamiqAtraiter.foreach(file => {
-      if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { compteur_fichiers_traites += traitementDesFichiersDuRepertoireBalsamiq(file.getPath()) }
-      else {
-        if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
-          compteur_fichiers_traites += 1;
-          traitementFichierBalsamiq(file)
-        }
-      }
-    })
-    logBack.info(utilitaire.getContenuMessage("mes42"))
-    // *** templates à exécuter après le traitement de tous les écrans ***
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate1, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath1, traitementFormatageSourceJava)
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate2, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath2, traitementFormatageSourceJava)
-    traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
-    /**
-     * ------------------------------------------------------------
-     * on génère les fichiers javascript
-     * les fichiers javascript sont stockés dans une hashMap
-     * ------------------------------------------------------------
-     *
-     */
-    logBack.info(utilitaire.getContenuMessage("mes44"))
-    globalContext.generation_fichiers_javascript
-    // A modifier dès qu'une solution pou rle menu est trouvée
-    val menu = globalContext.generation_code_source_menu
+    // on traite d'abord les fragments pour mettre en globalSection toutes les références
+    val fragmentsBalsamiq = new File(directory1).listFiles.toList.filter(file => file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
+    val fichiersBalsamiqSansLesFragments = new File(directory1).listFiles.toList.filter(file => !file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
+    fragmentsBalsamiq.foreach { file => println(file.getName) }
+    println("** pas les fragments ***")
+    fichiersBalsamiqSansLesFragments.foreach { file => println(file.getName) }
+    
+    traitementDesFichiers(fragmentsBalsamiq)
+    traitementDesFichiers(fichiersBalsamiqSansLesFragments)
     logBack.info(utilitaire.getContenuMessage("mes14"), directory1, compteur_fichiers_traites)
+    
+
+    def traitementDesFichiers(files: List[File]): Unit = {
+      fragmentsBalsamiq.foreach(file => {
+        if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { compteur_fichiers_traites += traitementDesFichiersDuRepertoireBalsamiq(file.getPath()) }
+        else {
+          if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
+            compteur_fichiers_traites += 1;
+            traitementFichierBalsamiq(file)
+          }
+        }
+      })
+    }
     compteur_fichiers_traites
   }
 
@@ -377,12 +354,7 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    *
    * @return true or false
    */
-  
-
-
-
-
-    // lecture du fichier properties et des propriétés passées en system properties et mise en table
+      // lecture du fichier properties et des propriétés passées en system properties et mise en table
    def initProperties(): Boolean = {
     var ok = true
     //     CommonObjectForMockupProcess .generationProperties.projectName = System.getProperty("gencodefrombalsamiq.projectName").trim
@@ -419,6 +391,5 @@ object DebugIBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     }
     ok
   }
-
 } // fin de la classe FileConvert
 
