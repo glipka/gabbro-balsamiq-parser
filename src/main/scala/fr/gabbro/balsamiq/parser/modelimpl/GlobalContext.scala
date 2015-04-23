@@ -144,6 +144,18 @@ class GlobalContext() {
     ficPropertyName
   }
   /**
+   *  Récupération des tous les formulaires bindés
+   *  @return Array of FormulaireCode
+   */
+  def getBindedForms(): ArrayList[FormulaireCode] = {
+    val array1 = new ArrayList[FormulaireCode]()
+   bindedForms.foreach(keyValue => { array1.add(keyValue._2) })
+    //FIXME do bindedForms.values.toList ?
+   array1
+
+  }
+  
+  /**
    *  Récupération des formulaires bindés pour un fragment d'un écran principal
    *  @param useCaseName
    * @param EcranPrincipal name
@@ -175,8 +187,20 @@ class GlobalContext() {
     array1
 
   }
-
-  /**
+  
+    /**
+   *  Récupération de tous les itemsVars bindés
+ 
+   *  @return Array of ItemVar
+   */
+  def getItemsVars(): ArrayList[ItemVar] = {
+      val array1 = new ArrayList[ItemVar]()
+   itemsVars.foreach(keyValue => { array1.add(keyValue._2) })
+    //FIXME do bindedForms.values.toList ?
+   array1
+  }
+  
+   /**
    *  Récupération des itemsVars bindés pour un écran principal et l'ensemble de ses fragments
    *  @param useCaseName
    * @param EcranPrincipal name
