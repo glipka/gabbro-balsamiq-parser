@@ -57,14 +57,6 @@ class TraitementPreserveSection extends TTraitementCommun {
   @BeanProperty var fichierPresent = false
   var preserveSectionBegin = ""
   var preserveSectionEnd = ""
-  // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
-  if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
-    preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
-    preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
-  } else {
-    preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
-    preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
-  }
 
   /**
    * lecture du fichier pour extraire les preserve sections
@@ -74,6 +66,15 @@ class TraitementPreserveSection extends TTraitementCommun {
   def process(filename: String): TraitementPreserveSection = {
     var bufferATraiter = List[String]()
     fichierEnCoursDeTraitement = filename
+    // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
+    if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
+      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
+      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
+      println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
+    } else {
+      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
+      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
+    }
     logBack.debug(utilitaire.getContenuMessage("mes50"), filename.toString)
     try {
       // on met en mémoire le fichier à traiter
@@ -129,9 +130,9 @@ class TraitementPreserveSection extends TTraitementCommun {
   /**
    * <p> *** Remplacement du contenu de la preserve section ***
    * <p> Lecture de la map mapDesPreserveSection par n° croissant de clef et récupération du contenu de la preserve section à remplacer.
-   * <p> Positionnement sur la preserve section et remplacement du contenu précédemment lu.  
+   * <p> Positionnement sur la preserve section et remplacement du contenu précédemment lu.
    * <p>
-   * 
+   *
    * <p>
    *
    * @param bufferATraiter

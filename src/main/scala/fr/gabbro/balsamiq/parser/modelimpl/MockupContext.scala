@@ -96,17 +96,9 @@ class MockupContext() {
     keysSet.foreach(classNameAliasName => {
       val className = classNameAliasName._1
       val subPackage = classNameAliasName._2
-      // modif le 28/4/15 on récupère la préserve section du fichier javascript et on remplace le contenu des preserve
-      //   val preserveJava = CommonObjectForMockupProcess.globalContext.getPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, className, CommonObjectForMockupProcess.templatingProperties.getPreserveCodeJavaOrScala(), subPackage)
-      // récupération du contenu des preserves section avant d'écrire le fichier. 
       val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala(classNameAliasName) // contient le nom dela classe et le nom du sous package sous forme de tuple
-      val traitementPreserveSection = new TraitementPreserveSection().process(ficJavaName) // utilisé pour récupérer le contenu des preserves section
+      utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
 
-      if (traitementPreserveSection!= null) {
-        utilitaire.ecrire_fichier(ficJavaName, traitementPreserveSection.replacePreserveSection(CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, "")))
-      } else {
-        utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
-      }
     })
     true
   }

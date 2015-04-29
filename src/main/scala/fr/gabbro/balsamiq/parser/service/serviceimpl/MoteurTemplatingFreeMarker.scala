@@ -190,9 +190,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    */
   def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
     val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
-    val preserveHtml =  new TraitementPreserveSection().process(fileName)
-    val sourcesAvecPreserve = if (preserveHtml != null) {preserveHtml.replacePreserveSection(sourceEcran)} else {sourceEcran}
-    val source = new Source(sourcesAvecPreserve);
+    val source = new Source(sourceEcran);
     // Utilisation du parser Jericho pour formater le généré HTML.
     val sourceFormat = new SourceFormatter(source).setIndentString("\t").setTidyTags(true).setCollapseWhiteSpace(true);
     utilitaire.ecrire_fichier(fileName, sourceFormat.toString())

@@ -30,6 +30,8 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.io.BufferedWriter
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
+import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
+import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 
 class Utilitaire {
   val logBack = LoggerFactory.getLogger(this.getClass());
@@ -606,15 +608,25 @@ class Utilitaire {
    * @return
    */
   def ecrire_fichier(filename: String, buffer: String): Boolean = {
-
     val rep1 = filename.replace(System.getProperty("file.separator"), "/").split("/").init.mkString(System.getProperty("file.separator"))
     createRepostoriesIfNecessary(rep1)
     logBack.debug(getContenuMessage("mes48"), filename.toString)
-
+    val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
+    val preserveSection = new TraitementPreserveSection().process(filename)
+    var bufferFormate = buffer
+    if (preserveSection != null) { 
+      // on fait un replace des preserve section
+      val codeAvecSection = preserveSection.replacePreserveSection(buffer)
+      if (filename.endsWith(CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript)) { // se termine par .js ??
+        bufferFormate = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeAvecSection, 5)
+      } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.languageSource)) {
+        bufferFormate = traitementFormatageSourceJava.indentSourceCodeJava(codeAvecSection)
+      } else bufferFormate=codeAvecSection
+    }
     try {
       val fileWriter =
         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename.replace("\\", "/").trim), CommonObjectForMockupProcess.constants.utf8));
-      fileWriter.write(buffer)
+      fileWriter.write(bufferFormate)
       fileWriter.close
       true
     } catch {

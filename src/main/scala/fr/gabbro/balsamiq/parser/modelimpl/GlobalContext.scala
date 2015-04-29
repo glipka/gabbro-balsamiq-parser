@@ -32,7 +32,7 @@ class GlobalContext() {
   var bindedForms = Map[(String, String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
-   /**
+  /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
    * on met en cache le code javascript : Le code des fragments est cumulé avec le code du fichier
    * rajout le 16/1/15 de la section de code pour hiérarchiser le code javascript
@@ -121,18 +121,6 @@ class GlobalContext() {
   }
 
   /**
-   *  Récupération des tous les formulaires bindés
-   *  @return Array of FormulaireCode
-   */
-  def getBindedForms(): ArrayList[FormulaireCode] = {
-    val array1 = new ArrayList[FormulaireCode]()
-   bindedForms.foreach(keyValue => { array1.add(keyValue._2) })
-    //FIXME do bindedForms.values.toList ?
-   array1
-
-  }
-  
-  /**
    *  Récupération des formulaires bindés pour un fragment d'un écran principal
    *  @param useCaseName
    * @param EcranPrincipal name
@@ -176,20 +164,8 @@ class GlobalContext() {
     //FIXME do bindedForms.values.toList ?
     array1
   }
-  
-    /**
-   *  Récupération de tous les itemsVars bindés
- 
-   *  @return Array of ItemVar
-   */
-  def getItemsVars(): ArrayList[ItemVar] = {
-      val array1 = new ArrayList[ItemVar]()
-   itemsVars.foreach(keyValue => { array1.add(keyValue._2) })
-    //FIXME do bindedForms.values.toList ?
-   array1
-  }
-  
-   /**
+
+  /**
    *  Récupération des itemsVars bindés pour un écran principal et l'ensemble de ses fragments
    *  @param useCaseName
    * @param EcranPrincipal name
@@ -256,16 +232,7 @@ class GlobalContext() {
      */
     def ecritureDuCodeJavascript(outputFileName: String, codeJavaScript: String, useCase: String, utilitaire: Utilitaire, traitementFormatageSourceJava: TraitementFormatageSourceJava): Boolean = {
       val ficPropertyName = getNomduFichierJavascript(outputFileName, useCase)
-      val preserveJavaScript = new TraitementPreserveSection().process(ficPropertyName)
-      if (preserveJavaScript != null) {
-        val codeJavaScriptAvecSection = preserveJavaScript.replacePreserveSection(preserveJavaScript.replacePreserveSection(codeJavaScript))
-        val codeJavascriptFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeJavaScriptAvecSection, 5)
-        utilitaire.ecrire_fichier(ficPropertyName, codeJavascriptFormatte)
-      } else {
-        val codeJavascriptFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeJavaScript, 5)
-        utilitaire.ecrire_fichier(ficPropertyName, codeJavascriptFormatte)
-      }
-
+      utilitaire.ecrire_fichier(ficPropertyName, codeJavaScript)
     }
 
   }

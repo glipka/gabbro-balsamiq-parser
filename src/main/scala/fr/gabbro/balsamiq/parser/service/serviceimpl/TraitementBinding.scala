@@ -241,8 +241,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   private def generation_code_source_classe(classeEnCours: Field, niveau: Int, pere: Field, hierarchiePere: String): Unit = {
     var codeDeLaClasse = new StringBuilder
     val tabulation = "\t" * niveau
-    val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
-    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+//    val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
+    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source1)
     // traitement de chaque champ de la classe      
     classeEnCours.children.foreach(field => {
@@ -255,29 +255,25 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
         val hierarchie = if (hierarchiePere == "") { classeEnCours.fieldNameOrClassName }
         else { hierarchiePere + "." + classeEnCours.fieldNameOrClassName }
         // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)
-        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
-        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
         codeDeLaClasse.append(source6 + source7)
         if (hierarchiePere == "") { generation_code_source_classe(field, niveau + 1, field, classeEnCours.fieldNameOrClassName) }
         else { generation_code_source_classe(field, niveau + 1, classeEnCours, hierarchiePere + "." + classeEnCours.fieldNameOrClassName) }
       } else {
         // **** c'est un champ ****  
         val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
 
         val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
         codeDeLaClasse.append(source3 + source4)
-
       }
     })
     // generation fin de classe et mise en cache du code de la classe 
-    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source2)
-    // modif le 28 avril 2015 par gl : rajout récupération traitement preserve section avant d'écrire le code de la classe
-    if (traitementPreserveSection != null) { mapCodeClasse.put(classeEnCours, traitementPreserveSection.replacePreserveSection(codeDeLaClasse.toString())) }
-    else { mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString()) }
-
+    mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString()) 
   }
 
   /**
