@@ -101,7 +101,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     val name = widget.getWidgetNameOrComponentName()
     return determinationNomDuTemplate(widget.getWidgetNameOrComponentName(), phase)
   }
-  
+
   /**
    * on récupère le nom du template dans la table des templates
    * puis on génère le nom des fichiers templates pour la partie HTML, javascript et code
@@ -186,10 +186,13 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @param NomDuFichierSourceJavaOuScala : html fileName to write
    * @param sourceEcran : buffer to write
    * @return : true or false
+   * modif le 28 avril 2015 : replace preserve
    */
   def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
     val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
-    val source = new Source(sourceEcran);
+    val preserveHtml =  new TraitementPreserveSection().process(fileName)
+    val sourcesAvecPreserve = if (preserveHtml != null) {preserveHtml.replacePreserveSection(sourceEcran)} else {sourceEcran}
+    val source = new Source(sourcesAvecPreserve);
     // Utilisation du parser Jericho pour formater le généré HTML.
     val sourceFormat = new SourceFormatter(source).setIndentString("\t").setTidyTags(true).setCollapseWhiteSpace(true);
     utilitaire.ecrire_fichier(fileName, sourceFormat.toString())

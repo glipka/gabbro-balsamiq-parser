@@ -21,6 +21,7 @@ import scala.collection.JavaConversions._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
+import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 // -----------------------------------------------
 // fragmentName : nom du fragment 
 // ficName : Nom du fichier 
@@ -70,7 +71,7 @@ class MockupContext() {
   @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]()
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   @BeanProperty var bindedForms = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les formulaires
-  @BeanProperty var fragments= new java.util.ArrayList[Fragment]() // table des fragments
+  @BeanProperty var fragments = new java.util.ArrayList[Fragment]() // table des fragments
   @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
   val utilitaire = new Utilitaire
   /**
@@ -87,14 +88,25 @@ class MockupContext() {
   /**
    * <p>écriture du code java ou scala genéré pour la page html en cours</p>
    * <p>la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java</p>
-   *
+   * <p> modif le 28 avril 2015 : ajout récupération des preserves sections au moment d'écrire le fichier
    * @return
    */
   def ecritureDuCodeJaveOuScala: Boolean = {
     val keysSet = tableDesCodesDesClassesJavaouScala.keys
     keysSet.foreach(classNameAliasName => {
+      val className = classNameAliasName._1
+      val subPackage = classNameAliasName._2
+      // modif le 28/4/15 on récupère la préserve section du fichier javascript et on remplace le contenu des preserve
+      //   val preserveJava = CommonObjectForMockupProcess.globalContext.getPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, className, CommonObjectForMockupProcess.templatingProperties.getPreserveCodeJavaOrScala(), subPackage)
+      // récupération du contenu des preserves section avant d'écrire le fichier. 
       val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala(classNameAliasName) // contient le nom dela classe et le nom du sous package sous forme de tuple
-      utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
+      val traitementPreserveSection = new TraitementPreserveSection().process(ficJavaName) // utilisé pour récupérer le contenu des preserves section
+
+      if (traitementPreserveSection!= null) {
+        utilitaire.ecrire_fichier(ficJavaName, traitementPreserveSection.replacePreserveSection(CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, "")))
+      } else {
+        utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
+      }
     })
     true
   }

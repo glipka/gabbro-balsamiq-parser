@@ -32,43 +32,7 @@ class GlobalContext() {
   var bindedForms = Map[(String, String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
-  // map utilisée spécifiquement pour les fichiers javascript. 
-  // cette map est en global contexte car les traitements preserveSection des fichiers javascript doivent être gardées pendant le traitement de tous les mockups
-  // en effet un fichier javascript est généré par écran principal, mais contient aussi le code des fragements de cet écran principal
-  // le traitement des mockups est aléatoire, il faut donc garder en mémoire les preserveSections.
-  // la clef de cette map est le useCaseName, ainsi que le nom du fichier, le type de preserve, et le sous package 
-  // Pour chaque mockup en cours de traitement on crée une preserve section pour les fichiers html, javascript, et java (dans le sous packages)
-  // les fichiers sources java qui sont bindés au champ sont gérées directement par la classe TraitementBInding.
-  var mapDesTraitementsPreserveSection = Map[(String, String, String, String), TraitementPreserveSection]() // clef= (usecase,nomDuFichierJavascript,type de preserve,sous package) type=javascript,html,code  
-  /**
-   * this method is called by freemarker Templates to get instance of traitementPreserveSection for the current file
-   * @param typeDePreserve : type de preserve : java, javascript,html, ...
-   * @param subPackage : nom du sous package
-   * @return : objet traitementPreserveSection
-   */
-  def getPreserveSection(typeDePreserve: String, subPackage: String): TraitementPreserveSection = {
-    getPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, typeDePreserve, subPackage)
-  }
-  /**
-   * correction du bug :  le 7/4/15  : pour un fragment, on récupère la preserve section de l'ecran contenant le fragment
-   * En effet, les preserve sections ne sont créées qu'à la lecture du fichier javascript principal.
-   * Les fragments n'ont pas de fichier javascript, le code javascript du fragment est inclus dans le code javascript du mockup principal.
-   * cette procédure est appelée par les templates javascript freemarker
-   * @param usecasName
-   * @param fileName
-   * @param typeDePreserve
-   * @param subPackage
-   */
-  def getPreserveSection(usecaseName: String, fileName: String, typeDePreserve: String, subPackage: String): TraitementPreserveSection = {
-    // pour un fragment, on récupère la preserve section de l'écran contenant le fragment.
-    if (CommonObjectForMockupProcess.isAfragment) {
-      mapDesTraitementsPreserveSection.getOrElse((usecaseName, CommonObjectForMockupProcess.ecranContenantLeSegment, typeDePreserve, subPackage), null)
-    } else {
-      mapDesTraitementsPreserveSection.getOrElse((usecaseName, fileName, typeDePreserve, subPackage), null)
-    }
-  }
-
-  /**
+   /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
    * on met en cache le code javascript : Le code des fragments est cumulé avec le code du fichier
    * rajout le 16/1/15 de la section de code pour hiérarchiser le code javascript
@@ -143,6 +107,19 @@ class GlobalContext() {
     }
     ficPropertyName
   }
+
+  /**
+   *  Récupération des tous les formulaires bindés
+   *  @return Array of FormulaireCode
+   */
+  def getBindedForms(): ArrayList[FormulaireCode] = {
+    val array1 = new ArrayList[FormulaireCode]()
+    bindedForms.foreach(keyValue => { array1.add(keyValue._2) })
+    //FIXME do bindedForms.values.toList ?
+    array1
+
+  }
+
   /**
    *  Récupération des formulaires bindés pour un fragment d'un écran principal
    *  @param useCaseName
@@ -174,6 +151,18 @@ class GlobalContext() {
     listeDesFormulaires.foreach(keyValue => { array1.add(keyValue._2) })
     array1
 
+  }
+
+  /**
+   *  Récupération de tous les itemsVars bindés
+   *
+   *  @return Array of ItemVar
+   */
+  def getItemsVars(): ArrayList[ItemVar] = {
+    val array1 = new ArrayList[ItemVar]()
+    itemsVars.foreach(keyValue => { array1.add(keyValue._2) })
+    //FIXME do bindedForms.values.toList ?
+    array1
   }
 
   /**
@@ -214,6 +203,7 @@ class GlobalContext() {
    * ecriture du coce javascript: On balaie la hashMap contenant le nom des fichiers
    * ainsi que le code javascript
    * modif le 16/15 : rajout du traitement des sections
+   * modif le 28/4/15 : ajout remplacement des preserve sections.
    * cette procédure est appelée après le traitement de tous les mockups
    *
    */
@@ -227,9 +217,8 @@ class GlobalContext() {
       val fileName = useCasefileName._2
       val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
       val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
-      val codeJavaScript = source6 + source7
+      val codeJavaScript = source6 + source7 // le code source est formaté par section
       ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire, traitementFormatageSourceJava)
-
     })
 
     /**
@@ -241,11 +230,18 @@ class GlobalContext() {
      * @param traitementFormatageSourceJava
      * @return true or false
      */
-    def ecritureDuCodeJavascript(outputFileName: String, codeJavascript: String, useCase: String, utilitaire: Utilitaire, traitementFormatageSourceJava: TraitementFormatageSourceJava): Boolean = {
-      //  val fileName = outputFileName.trim + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript
+    def ecritureDuCodeJavascript(outputFileName: String, codeJavaScript: String, useCase: String, utilitaire: Utilitaire, traitementFormatageSourceJava: TraitementFormatageSourceJava): Boolean = {
       val ficPropertyName = getNomduFichierJavascript(outputFileName, useCase)
-      val codeJavascriptFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeJavascript, 5)
-      utilitaire.ecrire_fichier(ficPropertyName, codeJavascriptFormatte)
+      val preserveJavaScript = new TraitementPreserveSection().process(ficPropertyName)
+      if (preserveJavaScript != null) {
+        val codeJavaScriptAvecSection = preserveJavaScript.replacePreserveSection(preserveJavaScript.replacePreserveSection(codeJavaScript))
+        val codeJavascriptFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeJavaScriptAvecSection, 5)
+        utilitaire.ecrire_fichier(ficPropertyName, codeJavascriptFormatte)
+      } else {
+        val codeJavascriptFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(codeJavaScript, 5)
+        utilitaire.ecrire_fichier(ficPropertyName, codeJavascriptFormatte)
+      }
+
     }
 
   }
@@ -329,6 +325,13 @@ class GlobalContext() {
     } else { null }
   }
 
+  def printBindedForms(): Unit = {
+
+    // useCase, l'ecran principal et le nom du fragment 
+    bindedForms.foreach(f => {
+      println("usecase %s ecran %s fragment%s identifiant %s".format(f._1._1, f._1._2, f._1._3, f._1._4))
+    })
+  }
   /**
    * on génération du Menu de l'application
    * @return source of menu

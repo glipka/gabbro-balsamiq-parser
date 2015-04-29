@@ -98,6 +98,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
       logBack.info(utilitaire.getContenuMessage("mes44"))
       globalContext.generation_fichiers_javascript
+      //globalContext.printBindedForms()
       logBack.info(utilitaire.getContenuMessage("mes59"))
       moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
       moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
@@ -125,21 +126,35 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     var compteur_fichiers_traites = 0
     logBack.info(utilitaire.getContenuMessage("mes60"), directory1)
     // on traite d'abord les fragments pour mettre en globalSection toutes les références
-    val fragmentsBalsamiq = new File(directory1).listFiles.toList.filter(file => file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
-    val fichiersBalsamiqSansLesFragments = new File(directory1).listFiles.toList.filter(file => !file.getName.contains(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator) && file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix))
-    traitementDesFichiers(fragmentsBalsamiq)
-    traitementDesFichiers(fichiersBalsamiqSansLesFragments)
+    val fichiersBalsamiqATraiter = new File(directory1).listFiles.toList
+    traitementDesFichiers(fichiersBalsamiqATraiter, true) // on traite d'abord les fragments 
+    traitementDesFichiers(fichiersBalsamiqATraiter, false) // puis on traite les autres fichiers (ecrans principaux).
+
     logBack.info(utilitaire.getContenuMessage("mes14"), directory1, compteur_fichiers_traites)
 
-    def traitementDesFichiers(files: List[File]): Unit = {
-      fragmentsBalsamiq.foreach(file => {
-        //    if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { compteur_fichiers_traites += traitementDesFichiersDuRepertoireBalsamiq(file.getPath()) }
-        //    else {
-        if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
-          compteur_fichiers_traites += 1;
-          traitementFichierBalsamiq(file)
+    def traitementDesFichiers(files: List[File], onlyFragment: Boolean): Unit = {
+      files.foreach(file => {
+        // on traite de façon itérative les sous répertoires.
+        if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { traitementDesFichiers(file.listFiles.toList, onlyFragment) }
+        else {
+          // on ne sélectionne que les fichiers se terminant par .bmml
+          if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
+            val (fic, rep, useCase, fileNameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
+            if (onlyFragment) { // on ne traite que les fragments 
+              if (isAfragment) {
+                compteur_fichiers_traites += 1;
+                traitementFichierBalsamiq(file)
+              }
+            } else { // on ne traite que les écrans principaux
+              if (!isAfragment) {
+                compteur_fichiers_traites += 1;
+                traitementFichierBalsamiq(file)
+
+              }
+            }
+          }
         }
-        //   }
+
       })
     }
     compteur_fichiers_traites
@@ -173,6 +188,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     logBack.info(utilitaire.getContenuMessage("mes8"), fichierBalsamiq.getCanonicalPath)
     var sourceEcran = new StringBuilder() // contiendra le code genere depuis les templates
     CommonObjectForMockupProcess.mockupContext = new MockupContext // zone commune de communication pour l'ensemble des widgets de la page
+    CommonObjectForMockupProcess.globalContext = globalContext
     var traitementBinding = new TraitementBinding(moteurTemplateFreeMarker, globalContext) // init de la classe binding
     // fileNameComplet contient 
     val (fic, rep, useCase, fileNameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(fichierBalsamiq)
@@ -187,35 +203,12 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances
     if (!isAfragment) { // si ce n'est pas un fragment => mise en table menu et recherche des fragments
       CommonObjectForMockupProcess.mockupContext.fragments ++= new DetectFragments(utilitaire).processEtMiseEntable() // mise en table des fragments
-      // si ce n'est pas un fragment, on génère le traitement preserve section pour le fichier javascript qui sera généré au niveau de l'écran principal
-      //     CommonObjectForMockupProcess.traitementPreserveSectionTemplateJavascript = new TraitementPreserveSection().process(globalContext.getNomduFichierJavascript(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) // on met en table le contenu du fichier javascript pour traitment des preserve section
-      globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeScript, "") -> new TraitementPreserveSection().process(globalContext.getNomduFichierJavascript(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)))
 
-      // on ne met en table les menus que pour les écrans. 
-      // on ne met en table les menus que pour les écrans. 
-      // les noms des écrans démarrent par "ec"
-      // la dépendance est sous la forme : uc1.ecr1.ecr2
-      if (CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement.toLowerCase().startsWith(CommonObjectForMockupProcess.generationProperties.generateControllerForPrefix.toLowerCase())) {
-        traitementMenu.mise_en_table_classes_menu_item(fileNameComplet, useCase, "url")
-      }
     } // fin de isAFragment
-    /**
-     * <p> ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
-     * <p> *** une preserve section pour le fichier code java par sous package***</p>
-     * <p> il faudra remodifier cette liste à chaque ajout de sous package de code java ou scala</p>
-     * <p> principe de la preserve section: on met en table le code lors de la lecture de la preserve section</p>
-     * <p> remarque : le code java est généré depuis freemarker par appel de la methode  MockupCOntext.setCodeClasse(className: String, classCode: String, subPackageName: String)</p>
-     * <p>
-     * <p> ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
-     */
-    val listeDesSubPackageCode = List(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias,
-      CommonObjectForMockupProcess.generationProperties.generatedSubPackage1,
-      CommonObjectForMockupProcess.generationProperties.generatedSubPackage2,
-      CommonObjectForMockupProcess.generationProperties.generatedSubPackage3)
-    setPreserveSection(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeJavaOrScala, listeDesSubPackageCode)
-    // création d'une preserve section pour le fichier html
-    globalContext.mapDesTraitementsPreserveSection += ((CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.templatingProperties.preserveCodeIhm, "") -> new TraitementPreserveSection().process(utilitaire.getEmplacementFichierHtml(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir))) // on met en table le contenu du fichier javascript pour traitment des preserve section
-    /**
+    else {
+
+    }
+      /**
      * ------------------------------------------------------------------------------------------
      * <p>*** on indique la location dans la zone de l'écran pour le moteur de template ***</p>
      * ------------------------------------------------------------------------------------------
@@ -291,24 +284,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     }
   } // fin de la fonction processFilea
 
-  /**
-   * <p>mise à jour table des preserves section pour le fichier de type code</p>
-   * <p>les fichiers codes peuvent être localisés dans les sous-packages suivant:</p>
-   *      <p>GenerationProperties.generatedOtherAlias = "" // alias other</p>
-   *       <p>GenerationProperties.generatedsubPackage1 = "" // sous package1</p>
-   *       <p>GenerationProperties.generatedsubPackage2 = "" // sous package2</p>
-   *      <p>GenerationProperties.generatedsubPackage3 = "" // sous package3</p>
-   *
-   * @param typeDePreserve : type of preserve : code, javascript, html
-   * @param subPackageList : List of subPackages
-   */
-  private def setPreserveSection(useCase: String, fileName: String, typeDePreserve: String, subPackageList: List[String]): Unit = {
-    subPackageList.foreach(subPackage => {
-      //FIXME passer TraitementPreserveSection en static ?
-      globalContext.mapDesTraitementsPreserveSection += ((useCase, fileName, typeDePreserve, subPackage) -> new TraitementPreserveSection().process(utilitaire.getNomDuFichierCodeJavaOuScala(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, subPackage)))
-    })
-
-  }
+  
 
   /**
    * -----------------------------------------------------------------------------------------------------------
@@ -344,7 +320,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * <p>Les propriétés sont classées de la façon suivante :</p>
    * <p> engineProperties     : propriétés d'exécution du moteur Gabbro</p>
    * <p> generationProperties : propriétés liées à la génération</p>
-   *  <p>templatingProperties : propriétés du moteur de templating freeMarker</p>
+   * <p>templatingProperties : propriétés du moteur de templating freeMarker</p>
    * <p>----------------------------------------------------------------------------------------------------</p>
    *
    * @return true or false

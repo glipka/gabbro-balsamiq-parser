@@ -214,8 +214,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       val fc = new FormulaireCode(classe.instanceName.capitalize, classe.instanceName, classe.widget, instanceCodeBegin + instanceCodeEnd, classe.widget.isFormulaireHTML, shortPath);
       if (classe.widget.isFormulaireHTML) {
         CommonObjectForMockupProcess.mockupContext.bindedForms.add(fc);
-        if (CommonObjectForMockupProcess.isAfragment) { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,fc.classname) -> fc }
-        else {sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement,"",fc.classname) -> fc }
+        if (CommonObjectForMockupProcess.isAfragment) { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, fc.classname) -> fc }
+        else { sessionBalsamiq.bindedForms += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", fc.classname) -> fc }
 
       } else { // la class n'est pas bindée par un formulaire HTML
         sessionBalsamiq.firstLevelObject.add(fc);
@@ -274,7 +274,9 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     // generation fin de classe et mise en cache du code de la classe 
     val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID), (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
     codeDeLaClasse.append(source2)
-    mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString())
+    // modif le 28 avril 2015 par gl : rajout récupération traitement preserve section avant d'écrire le code de la classe
+    if (traitementPreserveSection != null) { mapCodeClasse.put(classeEnCours, traitementPreserveSection.replacePreserveSection(codeDeLaClasse.toString())) }
+    else { mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString()) }
 
   }
 

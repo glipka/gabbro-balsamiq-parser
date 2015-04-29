@@ -82,9 +82,9 @@ class GenerationProperties {
     generatedControllerAlias = propsMap.getOrElse("config.generation.generatedControllerAlias", "").trim
     generateControllerForPrefix = propsMap.getOrElse("config.generation.generateControllerForPrefix", "ec").trim
     generatedOtherAlias = propsMap.getOrElse("config.generation.generatedOtherAlias", "").trim
-    generatedSubPackage1 = propsMap.getOrElse("config.generation.generatedsubPackage1", "").trim
-    generatedSubPackage2 = propsMap.getOrElse("config.generation.generatedsubPackage2", "").trim
-    generatedSubPackage3 = propsMap.getOrElse("config.generation.generatedsubPackage3", "").trim
+    generatedSubPackage1 = propsMap.getOrElse("config.generation.generatedSubPackage1", "").trim
+    generatedSubPackage2 = propsMap.getOrElse("config.generation.generatedSubPackage2", "").trim
+    generatedSubPackage3 = propsMap.getOrElse("config.generation.generatedSubPackage3", "").trim
     processI18nInFiles = propsMap.getOrElse("config.generation.processI18nInFiles", "false").trim
     generatedSuffixCodeFileName = propsMap.getOrElse("config.generation.generatedSuffixCodeFileName", "_code").trim
     srcBuildPathDir = propsMap.getOrElse("config.generation.srcBuildPathDir", "").trim.replace("%project%", projectName)
@@ -108,7 +108,7 @@ class GenerationProperties {
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     processI18nInScriptSection = propsMap.getOrElse("config.generation.processI18nInScriptSection", "false")
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
-    
+  //  generatedFolderForFragmentType.foreach { println(_)}
     // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"
     generatedFolderForFragmentType.foreach(typeFragment_subDirectory =>{
      if (typeFragment_subDirectory.contains(":")) {

@@ -23,6 +23,7 @@ import fr.gabbro.balsamiq.parser.service.TemplatingProperties
 import fr.gabbro.balsamiq.parser.modelimpl.MockupContext
 import fr.gabbro.balsamiq.parser.service.GenerationProperties
 import fr.gabbro.balsamiq.parser.service.Constants
+import fr.gabbro.balsamiq.parser.modelimpl._
 
 
 /**
@@ -44,5 +45,6 @@ object CommonObjectForMockupProcess {
   var isAfragment = false
   var subDirectoryName = List[String]()
   var listeNomdesFormulaires = new ArrayBuffer[String] // utilisé pour stocker le nom des formulaires 
+  var globalContext:GlobalContext= null // sera renseigné dans ibalsamiq freemarker
  
 }

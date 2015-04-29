@@ -35,8 +35,6 @@ class TemplatingProperties {
   @BeanProperty var preserveSectionFrontEnd = "" // contenu preserve section fin pour le code HTML
   @BeanProperty var preserveSectionCodeBegin = "" // contenu preserve section debut pour le code HTML
   @BeanProperty var preserveSectionCodeEnd = "" // contenu preserve section fin pour le code HTML
-  @BeanProperty var delimiterTemplateNameBeginInPreserveSection = "" // identification template name begin dans preserve section
-  @BeanProperty var delimiterTemplateNameEndInPreserveSection = "" // identification template name begin dans preserve section
   @BeanProperty var separator_template_file = "_" // separateur dans le nom du fichier template
   @BeanProperty var suffix_template_code = "" // suffix des templates code
   @BeanProperty var suffix_template_javascript = "" // suffix des templates javascript
@@ -67,8 +65,6 @@ class TemplatingProperties {
     preserveSectionFrontEnd = propsMap.getOrElse("config.templating.preserveSectionFrontEnd", "-->").trim // preserver Begin
     preserveSectionCodeBegin = propsMap.getOrElse("config.templating.preserveSectionCodeBegin", "// begin-preserve").trim // preserver Begin
     preserveSectionCodeEnd = propsMap.getOrElse("config.templating.preserveSectionCodeEnd", "// end-preserve").trim // preserver Begin
-    delimiterTemplateNameBeginInPreserveSection = propsMap.getOrElse("config.templating.delimiterTemplateNameBeginInPreserveSection", "**").trim
-    delimiterTemplateNameEndInPreserveSection = propsMap.getOrElse("config.templating.delimiterTemplateNameEndInPreserveSection", "**").trim
     phase_debut = propsMap.getOrElse("config.templating.suffixTemplateBegin", "begin").trim // preserver Begin
     phase_fin = propsMap.getOrElse("config.templating.suffixTemplateEnd", "end").trim // preserver Begin
     prefix_template_javascript = propsMap.getOrElse("config.templating.prefixTemplateJavascript", "js_").trim // prefix des templates javascript

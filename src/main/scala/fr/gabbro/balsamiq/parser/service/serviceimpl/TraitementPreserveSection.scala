@@ -34,9 +34,8 @@ import scala.beans.BeanProperty
 import java.nio.file.NoSuchFileException
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
-
 /**
- * 
+ *
  * <p>Traitement des preserves section</p>
  * <p>chaque section commence par preserve debut et est suivie par le nom du template.</p>
  * <p>chaque section se termine par preserve fin</p>
@@ -44,40 +43,27 @@ import fr.gabbro.balsamiq.parser.service.TTraitementCommun
  * <p>on utilise deux hashMap pour retrouver le contenu des sections </p>
  * <p>Une première Map dont la clef est le N° de section et le nom du template </p>
  * <p>Une deuxième Map permet de retrouver le n° de section pour le template en cours. </p>
- * <p>Pour mémorise les n° de sections extraites par template (grace à la map mapDesPreserveSection)
+ * <p>Pour mémoriser les n° de sections extraites par template (grace à la map mapDesPreserveSection)
  * @author georges Lipka
  *
  */
 class TraitementPreserveSection extends TTraitementCommun {
-  
+
   // la map des preservesections
-  private var mapDesPreserveSection = Map[(Int, String), String]() // clef = n° de section et nom de template
-  private var maptemplateByKeyNumber = Map[String, Int]() // clef = templateName valeur=n° de clef
+  private var mapDesPreserveSection = Map[Int, String]() // clef = n° de section et nom de template
+  //  private var maptemplateByKeyNumber = Map[String, Int]() // clef = templateName valeur=n° de clef
+  private var numeroSection = 0
   var fichierEnCoursDeTraitement = ""
   @BeanProperty var fichierPresent = false
-
-  /**
-   * <p>Récupération du code de la section, cette procédure est appelée depuis le template freemarker</p>
-   * <p>maptemplateByKeyNumber sert à stocker le dernier numéro de préserve section utilisé pour ce template</p>
-   * <p>mapDesPreserveSection contient le code des sections (la clef est le nom du template et le n° de section pour ce template</p>
-   *
-   * @param templateName
-   * @param initialContent contenu initial qui sera retourné si le contenu de la section n'a pas été modifié.
-   * @return content of section
-   */
-  def getSectionContent(templateName: String, initialContent: String): String = {
-    var dernierNumeroClefPourLeTemplate = maptemplateByKeyNumber.getOrElse(templateName, -1) // dernièr n° de clef lu pour le template ?
-    dernierNumeroClefPourLeTemplate += 1
-    maptemplateByKeyNumber.put(templateName, dernierNumeroClefPourLeTemplate) // on met à jour le n° de la dernière section pour le template
-    // Si le contenu a été modifié on retourne le contenu modifié, sinon on retourne le contenu initial
-    val codeDeLaSection = mapDesPreserveSection.getOrElse((dernierNumeroClefPourLeTemplate, templateName), "")
-    logBack.debug(utilitaire.getContenuMessage("mes53"), fichierEnCoursDeTraitement, templateName, codeDeLaSection)
-    if (codeDeLaSection.trim != "" && codeDeLaSection != initialContent) {
-      codeDeLaSection
-    } else {
-      initialContent
-    }
-
+  var preserveSectionBegin = ""
+  var preserveSectionEnd = ""
+  // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
+  if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
+    preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
+    preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
+  } else {
+    preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
+    preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
   }
 
   /**
@@ -106,8 +92,8 @@ class TraitementPreserveSection extends TTraitementCommun {
 
       }
       fichierPresent = true
+      numeroSection = 0
       traitementPreserve(bufferATraiter.mkString("\r\n")) // enrichissement de la table mapDesPreserveSection
-      maptemplateByKeyNumber = maptemplateByKeyNumber.empty // table de travail
       this // on retourne l'instance de l'objet
 
     } catch {
@@ -128,60 +114,47 @@ class TraitementPreserveSection extends TTraitementCommun {
    * @param bufferATraiter
    */
   private def traitementPreserve(bufferATraiter: String): Unit = {
-    var preserveSectionBegin = ""
-    var preserveSectionEnd = ""
-    // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
-    if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
-      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
-      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
-    } else {
-      preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
-      preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd
-    }
     val positionPreserveDebut = bufferATraiter.indexOf(preserveSectionBegin)
     val positionPreserveFin = bufferATraiter.indexOf(preserveSectionEnd, 1)
     if (positionPreserveDebut >= 0) {
       if (positionPreserveFin > 0 && positionPreserveFin > positionPreserveDebut + preserveSectionBegin.size) {
         val content = bufferATraiter.substring(positionPreserveDebut + preserveSectionBegin.size, positionPreserveFin)
-        val (templateName, positionFinTemplateName) = getTemplateName(content) // nom du template qui a généré la section
-        if (positionFinTemplateName > 0) { // on ne met en talbe que si on trouve un nom de template
-          val key = maptemplateByKeyNumber.getOrElse(templateName, -1)
-          // la map mapKeyNumberByTemplate sert à stocker les numeros de contenu par template
-          maptemplateByKeyNumber.put(templateName, key + 1)
-          mapDesPreserveSection += ((key + 1, templateName) -> content.substring(positionFinTemplateName))
-        }
+        mapDesPreserveSection += (numeroSection -> content)
+        numeroSection += 1 // incrémentation de la clef de la Map.
         traitementPreserve(bufferATraiter.substring(positionPreserveFin + preserveSectionEnd.size))
-
       } else { return }
     } else { return }
 
   }
   /**
-   * **** récupération nom du template dans le header ****
-   * @param content
-   * @return (templateName, position fin du template)
+   * <p> *** Remplacement du contenu de la preserve section ***
+   * <p> Lecture de la map mapDesPreserveSection par n° croissant de clef et récupération du contenu de la preserve section à remplacer.
+   * <p> Positionnement sur la preserve section et remplacement du contenu précédemment lu.  
+   * <p>
+   * 
+   * <p>
+   *
+   * @param bufferATraiter
    */
-  private def getTemplateName(content: String): (String, Int) = {
-    var templateName = ""
-    val positionTemplateNameDebut = content.indexOf(CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameBeginInPreserveSection)
-    val positionTemplateNameFin = content.indexOf(CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameEndInPreserveSection, 1)
-    if (positionTemplateNameDebut >= 0) {
-      if (positionTemplateNameFin > 0 && positionTemplateNameFin > positionTemplateNameDebut + CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameEndInPreserveSection.size) {
-        templateName = content.substring(positionTemplateNameDebut + CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameBeginInPreserveSection.size, positionTemplateNameFin).trim
-        logBack.debug(utilitaire.getContenuMessage("mes52"), templateName, fichierEnCoursDeTraitement, "x")
-        val position_fin = positionTemplateNameFin + CommonObjectForMockupProcess.templatingProperties.delimiterTemplateNameEndInPreserveSection.size
-        return (templateName.trim, position_fin)
-
-      } else {
-        logBack.debug(utilitaire.getContenuMessage("mes52"), templateName, fichierEnCoursDeTraitement, "x")
-
-        return ("", -1)
+  def replacePreserveSection(bufferATraiter: String): String = {
+    var bufferModifie = bufferATraiter
+    var positionGlobaleDansLeBuffer = 0
+    for (key <- 0 until mapDesPreserveSection.size) {
+      if (positionGlobaleDansLeBuffer < bufferModifie.size) { // on est toujours dans les limites du buffer à traiter
+        val valeurPreserveSectionSauvegardee = mapDesPreserveSection.getOrElse(key, "") // n° de preserve section
+        val positionPreserveDebut = bufferModifie.indexOf(preserveSectionBegin, positionGlobaleDansLeBuffer)
+        val positionPreserveFin = bufferModifie.indexOf(preserveSectionEnd, positionGlobaleDansLeBuffer)
+        if ((positionPreserveDebut >= 0) && (positionPreserveFin > 0) && (positionPreserveFin >= positionPreserveDebut + preserveSectionBegin.size)) {
+          val contenuARemplacer = bufferModifie.substring(positionPreserveDebut + preserveSectionBegin.size, positionPreserveFin)
+          // on recopie le buffer en changeant le contenu de la preserve section
+          bufferModifie = bufferModifie.substring(0, positionPreserveDebut + preserveSectionBegin.size) + valeurPreserveSectionSauvegardee + bufferModifie.substring(positionPreserveFin)
+          positionGlobaleDansLeBuffer = positionPreserveDebut + preserveSectionBegin.size + valeurPreserveSectionSauvegardee.size + preserveSectionEnd.size // on se positionne après la fin de preserve section.
+        }
       }
-    } else {
-      logBack.debug(utilitaire.getContenuMessage("mes52"), templateName, fichierEnCoursDeTraitement, "x")
 
-      return (templateName.trim, -1)
     }
+    bufferModifie
+
   }
 
 }
