@@ -70,7 +70,7 @@ class TraitementPreserveSection extends TTraitementCommun {
     if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
-      println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
+   //   println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
     } else {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionCodeEnd

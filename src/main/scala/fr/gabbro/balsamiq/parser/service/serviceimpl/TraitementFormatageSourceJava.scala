@@ -14,6 +14,8 @@ import javax.script.ScriptEngineManager
 import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.Context
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
+import net.htmlparser.jericho.SourceFormatter
+import net.htmlparser.jericho.Source
 
 /**
  * @author Georges Lipka
@@ -28,7 +30,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * @return formated buffer
    */
   def indentSourceCodeJava(bufferAformater: String): String = {
-    // take default Eclipse formatting options
+     // take default Eclipse formatting options
     val options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
     val settings = new HashMap[String, String]();
     settings.put(JavaCore.COMPILER_SOURCE, "1.7");
@@ -54,7 +56,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
   }
 
-   /**
+  /**
    * @param jsCode
    * @param indentSize
    * @return formated buffer
@@ -77,6 +79,18 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
         return jsCode
     }
 
+  }
+  /**
+   * indent the HTML source file
+   * The identation is performed by Jerichi Source Formatter class
+   * @param html file location
+   * @return None
+   */
+  def indentSourceHtml(fichierHtml: String): Unit = {
+    val sourceFormatter = new SourceFormatter(new Source(new InputStreamReader(new FileInputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8)))
+    val fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8));
+    sourceFormatter.setIndentString("\t").setTidyTags(true).setCollapseWhiteSpace(true).writeTo(fileWriter);
+    fileWriter.close();
   }
 
 }

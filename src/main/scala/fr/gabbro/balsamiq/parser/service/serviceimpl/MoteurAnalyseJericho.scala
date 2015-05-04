@@ -1,41 +1,31 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
-// Version 1.0
-// Copyright (C) 2014 Georges Lipka
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of either one of the following licences:
-//
-// 1. The Eclipse Public License (EPL) version 1.0,
-//   available at http://www.eclipse.org/legal/epl-v10.html
-//
-// 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
-//    available at http://www.gnu.org/licenses/lgpl.txt
-//
-// This program is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the individual licence texts for more details.
 
-import net.htmlparser.jericho._
-import java.net.URL
-import scala.collection.JavaConversions._
-import java.io.FileInputStream
-import scala.collection.immutable.List
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileWriter
-import java.util.Properties
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import scala.collection.mutable.ArrayBuffer
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import fr.gabbro.balsamiq.parser.service.TMoteurAnalyseJericho
+import java.util.Properties
+
+import scala.annotation.migration
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.enumerationAsScalaIterator
+import scala.collection.JavaConversions.mutableMapAsJavaMap
+import scala.collection.JavaConversions.seqAsJavaList
+import scala.collection.immutable.List
+import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.Map
+
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
+import fr.gabbro.balsamiq.parser.service.TMoteurAnalyseJericho
+import net.htmlparser.jericho.Attribute
+import net.htmlparser.jericho.Element
+import net.htmlparser.jericho.OutputDocument
+import net.htmlparser.jericho.Source
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
+  val traitementFormatageSourceJava = new TraitementFormatageSourceJava
 
   /**
    * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
@@ -204,7 +194,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
           mapAttributes += (attribute.getName -> clefDeTraduction.trim)
         } else { mapAttributes += (attribute.getName -> replaceSpecialCharValue(attribute.getValue)) }
       } else { // l'attribut n'est pas modifé on le repasse tel quel 
-        mapAttributes += (attribute.getName -> replaceSpecialCharValue(attribute.getValue))
+        mapAttributes += (attribute.getName -> attribute.getValue)
       }
     })
     mapAttributes
@@ -218,7 +208,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    *   <p>on filtre cette hiérarchie avec les élements qui sont dans la liste des containers HTML (htmlContainerListForI18nGeneration) et on récupère l'id
    *    de chaque élément filtré.</p>
    *   <p>Appel du template BuildTraductionKey afin de générer la clef du fichier properties (usecase,Mockupname,FormName,HtmlTag,Index)</p>
-   *
+   * <p> modif le 4 may 2015 : on ne traite la valeur de la clef à traduire que si le tag est dans body.
    * @param valeur : valeur à traduire
    * @param element
    * @param attributeName : nom de l'attribut
@@ -230,31 +220,33 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     if (valeurATraduire.length() > 0 && !valeurATraduire.forall(_.isDigit)) { //if1
       // valeur non déjà traduite pour le usecase et écran en cours. 
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
-        counterClef += 1 // compteur unicité des clefs
         val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
-        // on filtre la table hiérachie par les élements qui sont dans la liste des htmlContainerListForI18nGeneration
-        val table_formulaire = table_hierachie.filter(element => {
-          val x1 = element.getStartTag.getName
-          List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.htmlContainerListForI18nGeneration).size > 0
-        })
+        // On en fait la traduction que si le tag est contenu dans une balise body ou si c'est un tag de type title
+        if (table_hierachie.filter(element => { element.getStartTag.getName == CommonObjectForMockupProcess.constants.tagBody || element.getStartTag.getName == CommonObjectForMockupProcess.constants.tagTitle }).size > 0) {
+          counterClef += 1 // compteur unicité des clefs
+          // on filtre la table hiérachie par les élements qui sont dans la liste des htmlContainerListForI18nGeneration
+          val table_formulaire = table_hierachie.filter(element => {
+            val x1 = element.getStartTag.getName
+            List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.htmlContainerListForI18nGeneration).size > 0
+          })
 
-        var container = ""
-        // pour chaque élement de la table des formulaires, on récupère l'attribut id de l'élément.
-        table_formulaire.foreach(formulaire => {
-          val id = formulaire.getAttributeValue(CommonObjectForMockupProcess.constants.id)
-          if (id != null && id != "") { container = container + id + "." }
-          else { container = container + formulaire.getStartTag().getName + "." }
-        })
-        if (container.endsWith(".")) { container = container.substring(0, container.size - 1) } // on supprime le .
-        // on appelle le template CommonObjectForMockupProcess.constants.templateBuildTraductionKey afin de générer la clef du fichier properties
-        var isAttribute = if (attributeName != "") { true } else { false }
-        val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
-        val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
-        var key = replaceSpecialCharKey(source6.trim + source7.trim)
-        tableDesClefsValeursDeTraduction += (key -> valeurATraduire);
-        tableDesValeursClefsDeTraduction += ((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement) -> key)
-        return key
-
+          var container = ""
+          // pour chaque élement de la table des formulaires, on récupère l'attribut id de l'élément.
+          table_formulaire.foreach(formulaire => {
+            val id = formulaire.getAttributeValue(CommonObjectForMockupProcess.constants.id)
+            if (id != null && id != "") { container = container + id + "." }
+            else { container = container + formulaire.getStartTag().getName + "." }
+          })
+          if (container.endsWith(".")) { container = container.substring(0, container.size - 1) } // on supprime le .
+          // on appelle le template CommonObjectForMockupProcess.constants.templateBuildTraductionKey afin de générer la clef du fichier properties
+          var isAttribute = if (attributeName != "") { true } else { false }
+          val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
+          val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
+          var key = replaceSpecialCharKey(source6.trim + source7.trim)
+          tableDesClefsValeursDeTraduction += (key -> valeurATraduire);
+          tableDesValeursClefsDeTraduction += ((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement) -> key)
+          return key
+        }
       } else { // la clef existe déjà
         val clef = tableDesValeursClefsDeTraduction.getOrElse((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement), "");
         return clef
@@ -268,13 +260,14 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
   def replaceSpecialCharKey(valeur: String): String = {
     //   0X22 = double quote
     valeur.replace("\n", "").replace("\t", "").replace(":", "-").replace("0x22", "")
+    //valeur.replace("\n", "").replace("\t", "").replace("0x22", "")
   }
   // --------------------------------------------------------------------------
   // *** remplacement des caractères spéciaux dans les fichiers properties***
   // ---------------------------------------------------------------------------
   def replaceSpecialCharValue(valeur: String): String = {
     //   0X22 = double quote
-    valeur.replace("\n", "").replace("\t", "").replace("0x22", "").replace(":", "¨")
+    valeur.replace("\n", "").replace("\t", "").replace("0x22", "") //.replace(":", "¨")
   }
   /**
    *  récupération de la hiérarchie de l'element en cours pour retrouver facilement le widget dans la page.
@@ -288,9 +281,11 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     tableHierarchie
 
   }
- 
-  /**
+
+  /*
    * <p>Lecture du fichier html extraction de l'ensemble des elements de la page. (fonction extractMessages)</p>
+   * <p> le fichier html a été crée et les preserve sections récupérés dans un traitement précédent. 
+   *<p> Il ne faut donc pas repasser par la fonction utilitaire.create_fichier. 
    * <p>et réécriture du fichier html.</p>
    * @param fileName
    * @param subDirectory
@@ -309,10 +304,12 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     // création du fichier
     val rep1 = fichierHtmlTraduit.replace(System.getProperty("file.separator"), "/").split("/").init.mkString(System.getProperty("file.separator"))
     utilitaire.createRepostoriesIfNecessary(rep1)
-    val fileWriter = new FileWriter(new File(fichierHtmlTraduit))
+    val fileWriter =
+      new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierHtmlTraduit), CommonObjectForMockupProcess.constants.utf8));
     outputDocument.writeTo(fileWriter);
-    fileWriter.close();
-
+    fileWriter.close
+    // indentation du fichier créé  
+    traitementFormatageSourceJava.indentSourceHtml(fichierHtmlTraduit)
   }
 
 } // fin de la classe

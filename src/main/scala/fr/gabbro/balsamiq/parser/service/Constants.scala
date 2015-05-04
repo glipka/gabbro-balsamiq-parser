@@ -155,6 +155,8 @@ class Constants {
   val tabbar = "com.balsamiq.mockups::TabBar"
   val tabs = "tabs"
   val tabulation = "tabulation"
+  val tagBody = "body"
+  val tagTitle = "title"
   val templateBuildTraductionKey = "buildTraductionKey"
   val templateClass = "class"
   val templateClefDeTraduction = "clefDeTraduction"
