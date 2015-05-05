@@ -89,7 +89,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
   def indentSourceHtml(fichierHtml: String): Unit = {
     val sourceFormatter = new SourceFormatter(new Source(new InputStreamReader(new FileInputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8)))
     val fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8));
-    sourceFormatter.setIndentString("\t").setTidyTags(true).setCollapseWhiteSpace(true).writeTo(fileWriter);
+    sourceFormatter.setIndentString("\t").setCollapseWhiteSpace(true).writeTo(fileWriter);
     fileWriter.close();
   }
 

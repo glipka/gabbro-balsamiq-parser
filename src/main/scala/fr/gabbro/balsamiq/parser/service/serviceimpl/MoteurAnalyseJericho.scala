@@ -44,7 +44,6 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     tableDesValeursClefsDeTraduction.clear
     var clefMaxi = 0;
     try {
-
       val props = new Properties();
       val ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
       props.load(new InputStreamReader(new FileInputStream(ficPropertyName), CommonObjectForMockupProcess.constants.utf8));
@@ -60,7 +59,6 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         if (clefNumerique > clefMaxi) clefMaxi = clefNumerique // va servir pour generer les nouvelles clefs
 
       })
-
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
 
@@ -110,7 +108,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties du Pays
       clefDuFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => {
         if (propsPays.getProperty(clefnonlocalisee.toString) == null) {
-          propsPays.setProperty(clefnonlocalisee.toString, propsLocal.getProperty(clefnonlocalisee.toString.toString()))
+          propsPays.setProperty(clefnonlocalisee.toString, propsLocal.getProperty(clefnonlocalisee.toString))
         }
       })
       val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), CommonObjectForMockupProcess.constants.utf8)
@@ -147,11 +145,13 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     elements.foreach(element => {
       // remplacement des attributs
       val textExtractor = element.getTextExtractor();
-      val mapAttributes = traitementAttributsElement(element)
-      if (mapAttributes.size > 0) { // des clefs à traduire ??
+      
+      val (mapAttributes,modifAttribut) = traitementAttributsElement(element)
+      if (mapAttributes.size > 0 && modifAttribut) { // des clefs à traduire ??
         outputDocument.replace(element.getAttributes, mapAttributes)
+        println("outputReplaceElement" +element.getName + mapAttributes.foreach(println))
+        
       }
-
       val childElements = element.getChildElements().toList
       if (childElements != null && childElements.size() > 0) {
         extractMessages(childElements, outputDocument);
@@ -179,13 +179,15 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param element
    * @return Map of Attributes
    */
-  def traitementAttributsElement(element: Element): Map[String, String] = {
+  def traitementAttributsElement(element: Element): (Map[String, String],Boolean) = {
+    var modifAttribut=false // indicateur attribut modifie
     val attributes = if (element.getAttributes != null) element.getAttributes.toList else List[Attribute]()
     val elementName = element.getStartTag.getName
     var mapAttributes = scala.collection.mutable.Map[String, String]()
     attributes.foreach(attribute => {
       // le nom de l'attribut est dans la liste des attributs à traduire ? 
       if (List(attribute.getName).intersect(CommonObjectForMockupProcess.generationProperties.attributesToProcessI18n).size > 0) {
+        modifAttribut=true
         val key = traduction_valeur(replaceSpecialCharKey(attribute.getValue), element, attribute.getName)
         if (key != "") {
           val (_, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
@@ -197,7 +199,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         mapAttributes += (attribute.getName -> attribute.getValue)
       }
     })
-    mapAttributes
+    (mapAttributes,modifAttribut)
   }
 
   /**
