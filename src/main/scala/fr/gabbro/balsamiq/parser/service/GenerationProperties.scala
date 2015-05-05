@@ -55,7 +55,7 @@ class GenerationProperties {
   @BeanProperty var localExecutionTemplate3 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var fragmentTypesList = Map[String, String]() // table de lookup des noms des fragments clef=nom du fragment, valeur= sous repertoire du fragment  
   @BeanProperty var processI18nInFiles = "" // internationalisation du fichier html ou jps = true ou false
-  @BeanProperty var processI18nInScriptSection = "" // process i18N in script tag of html files
+  @BeanProperty var processI18nTagHierachy = List[String]() // tags pour lesquels les descendants doivent être traduits.
   @BeanProperty var projectName = "" // nom du projet
   @BeanProperty var srcBuildPathDir = "" // src/main/java
   @BeanProperty var srcDtoFilesDir = "" // sous répertoire des dto : com/auchan/%project%/web
@@ -106,18 +106,18 @@ class GenerationProperties {
     localExecutionTemplate3 = propsMap.getOrElse("config.generation.localExecutionTemplate3", "").trim // execute this global template after generation of all screens
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
-    processI18nInScriptSection = propsMap.getOrElse("config.generation.processI18nInScriptSection", "false")
+    processI18nTagHierachy = propsMap.getOrElse("config.generation.processI18nTagHierachy", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
-  //  generatedFolderForFragmentType.foreach { println(_)}
+    //  generatedFolderForFragmentType.foreach { println(_)}
     // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"
-    generatedFolderForFragmentType.foreach(typeFragment_subDirectory =>{
-     if (typeFragment_subDirectory.contains(":")) {
-       val typeFragment=typeFragment_subDirectory.split(":").head.toUpperCase()
-       val subDirectoryDuFragment=typeFragment_subDirectory.split(":").last
-       fragmentTypesList+=(typeFragment -> subDirectoryDuFragment)
-     }
-   })
-    
+    generatedFolderForFragmentType.foreach(typeFragment_subDirectory => {
+      if (typeFragment_subDirectory.contains(":")) {
+        val typeFragment = typeFragment_subDirectory.split(":").head.toUpperCase()
+        val subDirectoryDuFragment = typeFragment_subDirectory.split(":").last
+        fragmentTypesList += (typeFragment -> subDirectoryDuFragment)
+      }
+    })
+
     i18nLocales = propsMap.getOrElse("config.generation.i18nLocales", "").split(",").toList.map(_.trim)
     srcDtoFilesFullPath = generatedProjectDir + System.getProperty("file.separator") + srcBuildPathDir + System.getProperty("file.separator") + propsMap.getOrElse("config.generation.srcDtoFilesDir", "").trim.replace("%project%", projectName)
 

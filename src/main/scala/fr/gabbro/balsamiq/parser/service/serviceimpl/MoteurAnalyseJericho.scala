@@ -222,14 +222,12 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
         val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
         // On en fait la traduction que si le tag est contenu dans une balise body ou si c'est un tag de type title
-        if (table_hierachie.filter(element => { element.getStartTag.getName == CommonObjectForMockupProcess.constants.tagBody || element.getStartTag.getName == CommonObjectForMockupProcess.constants.tagTitle }).size > 0) {
+        if (table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.processI18nTagHierachy).size > 0 })) {
           counterClef += 1 // compteur unicité des clefs
           // on filtre la table hiérachie par les élements qui sont dans la liste des htmlContainerListForI18nGeneration
           val table_formulaire = table_hierachie.filter(element => {
-            val x1 = element.getStartTag.getName
             List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.htmlContainerListForI18nGeneration).size > 0
           })
-
           var container = ""
           // pour chaque élement de la table des formulaires, on récupère l'attribut id de l'élément.
           table_formulaire.foreach(formulaire => {
@@ -254,20 +252,22 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     }
     return ""
   }
-  // --------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------
   // *** remplacement des caractères spéciaux dans les fichiers properties***
-  // ---------------------------------------------------------------------------
+  // * remplacemnt des caractères spéciaux dans la clef des élements du fichier properties
+  // ------------------------------------------------------------------------------------------- 
   def replaceSpecialCharKey(valeur: String): String = {
     //   0X22 = double quote
-    valeur.replace("\n", "").replace("\t", "").replace(":", "-").replace("0x22", "")
-    //valeur.replace("\n", "").replace("\t", "").replace("0x22", "")
+    valeur.replace("\n", "").replace("\t", "").replace("0x22", "")
+    valeur
   }
   // --------------------------------------------------------------------------
   // *** remplacement des caractères spéciaux dans les fichiers properties***
   // ---------------------------------------------------------------------------
   def replaceSpecialCharValue(valeur: String): String = {
     //   0X22 = double quote
-    valeur.replace("\n", "").replace("\t", "").replace("0x22", "") //.replace(":", "¨")
+    valeur.replace("\n", "").replace("\t", "").replace("0x22", "")
+    valeur
   }
   /**
    *  récupération de la hiérarchie de l'element en cours pour retrouver facilement le widget dans la page.
@@ -301,14 +301,14 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     val childElements = source.getChildElements().toList
     extractMessages(childElements, outputDocument); // on met à jour le fichier HTML
     val fichierHtmlTraduit = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
-    // création du fichier
+    // création des répertoires
     val rep1 = fichierHtmlTraduit.replace(System.getProperty("file.separator"), "/").split("/").init.mkString(System.getProperty("file.separator"))
     utilitaire.createRepostoriesIfNecessary(rep1)
     val fileWriter =
       new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierHtmlTraduit), CommonObjectForMockupProcess.constants.utf8));
     outputDocument.writeTo(fileWriter);
     fileWriter.close
-    // indentation du fichier créé  
+    // ré-indentation du fichier créé  
     traitementFormatageSourceJava.indentSourceHtml(fichierHtmlTraduit)
   }
 
