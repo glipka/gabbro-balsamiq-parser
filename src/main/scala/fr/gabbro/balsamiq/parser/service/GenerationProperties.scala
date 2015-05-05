@@ -55,7 +55,7 @@ class GenerationProperties {
   @BeanProperty var localExecutionTemplate3 = "" // nom du template a exécuter après le traitement du mockup en cours
   @BeanProperty var fragmentTypesList = Map[String, String]() // table de lookup des noms des fragments clef=nom du fragment, valeur= sous repertoire du fragment  
   @BeanProperty var processI18nInFiles = "" // internationalisation du fichier html ou jps = true ou false
-  @BeanProperty var processI18nTagHierachy = List[String]() // tags pour lesquels les descendants doivent être traduits.
+  @BeanProperty var bypassProcessI18nTagHierachy = List[String]() // tags pour lesquels les descendants doivent être traduits.
   @BeanProperty var projectName = "" // nom du projet
   @BeanProperty var srcBuildPathDir = "" // src/main/java
   @BeanProperty var srcDtoFilesDir = "" // sous répertoire des dto : com/auchan/%project%/web
@@ -106,7 +106,7 @@ class GenerationProperties {
     localExecutionTemplate3 = propsMap.getOrElse("config.generation.localExecutionTemplate3", "").trim // execute this global template after generation of all screens
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
-    processI18nTagHierachy = propsMap.getOrElse("config.generation.processI18nTagHierachy", "").split(",").toList.map(_.trim)
+     bypassProcessI18nTagHierachy = propsMap.getOrElse("config.generation.bypassProcessI18nTagHierachy", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
     //  generatedFolderForFragmentType.foreach { println(_)}
     // à partir de la liste des fragments on créee un map en splittant le contenu du fragment par ":"

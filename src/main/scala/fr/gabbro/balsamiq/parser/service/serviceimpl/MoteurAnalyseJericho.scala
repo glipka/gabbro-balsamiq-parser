@@ -222,7 +222,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
         val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
         // On en fait la traduction que si le tag est contenu dans une balise body ou si c'est un tag de type title
-        if (table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.processI18nTagHierachy).size > 0 })) {
+        if (!table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.bypassProcessI18nTagHierachy).size > 0 })) {
           counterClef += 1 // compteur unicité des clefs
           // on filtre la table hiérachie par les élements qui sont dans la liste des htmlContainerListForI18nGeneration
           val table_formulaire = table_hierachie.filter(element => {
