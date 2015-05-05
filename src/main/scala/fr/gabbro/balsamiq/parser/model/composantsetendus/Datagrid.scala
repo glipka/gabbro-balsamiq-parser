@@ -62,7 +62,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     // on parcourt le tableau des noms des colonnes et pour chaque colonne on 
     // récupère la largeur de la colonne dans la table (
     // -----------------------------------------------------------------------------------
- 
+
     tableauDesNomsDesColonnes.foreach(column => {
       var sort = " "
       var columnName = " "
@@ -216,6 +216,10 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
           }
           case CommonObjectForMockupProcess.constants.image => { // image
             typeDeColonne = CommonObjectForMockupProcess.constants.img // type=img
+          }
+
+          case CommonObjectForMockupProcess.constants.icon => { // iconShort
+            typeDeColonne = CommonObjectForMockupProcess.constants.iconShort // type=iconShort
           }
 
           case _ => logBack.info(utilitaire.getContenuMessage("mes18"), widgetFils.controlTypeID)

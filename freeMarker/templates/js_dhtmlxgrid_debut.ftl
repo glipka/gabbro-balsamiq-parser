@@ -14,7 +14,7 @@
 </dhtmlx:grid> 
 </#assign>
 
-${globalContext.registerJavascriptSection(js1,isAFragment, "sectionDhtmlxgrid")}
+${globalContext.cached_javascript_code(js1,isAFragment, "sectionDhtmlxgrid")}
  	 
 <#function typeDeWidget type readonly>  
   <#if type == "numeric"><#return "ron"> 
@@ -39,6 +39,8 @@ ${globalContext.registerJavascriptSection(js1,isAFragment, "sectionDhtmlxgrid")}
   <#elseif type == "link" && readonly == "false"><#return "link">  
   <#elseif type == "img"><#return "img"> 
   <#elseif type == "img" && readonly == "false"><#return "img"> 
+  <#elseif type == "icon"><#return "img"> 
+  <#elseif type == "icon" && readonly == "false"><#return "img"> 
    </#if>
    <#return "????">
 </#function>
