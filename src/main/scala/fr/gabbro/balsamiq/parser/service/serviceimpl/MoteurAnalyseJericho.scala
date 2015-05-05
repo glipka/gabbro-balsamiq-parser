@@ -13,10 +13,10 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.enumerationAsScalaIterator
 import scala.collection.JavaConversions.mutableMapAsJavaMap
 import scala.collection.JavaConversions.seqAsJavaList
+import scala.collection.JavaConversions._
 import scala.collection.immutable.List
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Map
-
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.service.TMoteurAnalyseJericho
 import net.htmlparser.jericho.Attribute
@@ -102,17 +102,25 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     // pour chaque langue à traiter
     CommonObjectForMockupProcess.generationProperties.i18nLocales.foreach(country => {
       val ficPropertyPays = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").head + "_" + country + "." + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").last
-      val propsPays = new Properties();
+      val propsPays = new java.util.Properties();
       val filePays = new File(ficPropertyPays)
       if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), CommonObjectForMockupProcess.constants.utf8)); }
+      val sbuf = new StringBuilder
+      val propsPaysMap = propsPays.toMap[String, String]
       // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties du Pays
       clefDuFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => {
         if (propsPays.getProperty(clefnonlocalisee.toString) == null) {
-          propsPays.setProperty(clefnonlocalisee.toString, propsLocal.getProperty(clefnonlocalisee.toString))
+        //  propsPays.setProperty(clefnonlocalisee.toString, propsLocal.getProperty(clefnonlocalisee.toString))
+          sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n");
+        } else {
+          sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n");
+          
         }
       })
       val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), CommonObjectForMockupProcess.constants.utf8)
-      propsPays.store(filewriter, "generatedByGabbro")
+      filewriter.write(sbuf.toString())
+      filewriter.close
+      //propsPays.store(filewriter, "generatedByGabbro")
     })
     true
 
@@ -145,12 +153,10 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     elements.foreach(element => {
       // remplacement des attributs
       val textExtractor = element.getTextExtractor();
-      
-      val (mapAttributes,modifAttribut) = traitementAttributsElement(element)
+      // remplacement si nécessaire des attributs avec leurs valeurs traduites
+      val (mapAttributes, modifAttribut) = traitementAttributsElement(element)
       if (mapAttributes.size > 0 && modifAttribut) { // des clefs à traduire ??
         outputDocument.replace(element.getAttributes, mapAttributes)
-        println("outputReplaceElement" +element.getName + mapAttributes.foreach(println))
-        
       }
       val childElements = element.getChildElements().toList
       if (childElements != null && childElements.size() > 0) {
@@ -179,15 +185,15 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param element
    * @return Map of Attributes
    */
-  def traitementAttributsElement(element: Element): (Map[String, String],Boolean) = {
-    var modifAttribut=false // indicateur attribut modifie
+  def traitementAttributsElement(element: Element): (Map[String, String], Boolean) = {
+    var modifAttribut = false // indicateur attribut modifie
     val attributes = if (element.getAttributes != null) element.getAttributes.toList else List[Attribute]()
     val elementName = element.getStartTag.getName
     var mapAttributes = scala.collection.mutable.Map[String, String]()
     attributes.foreach(attribute => {
       // le nom de l'attribut est dans la liste des attributs à traduire ? 
       if (List(attribute.getName).intersect(CommonObjectForMockupProcess.generationProperties.attributesToProcessI18n).size > 0) {
-        modifAttribut=true
+        modifAttribut = true
         val key = traduction_valeur(replaceSpecialCharKey(attribute.getValue), element, attribute.getName)
         if (key != "") {
           val (_, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
@@ -199,7 +205,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         mapAttributes += (attribute.getName -> attribute.getValue)
       }
     })
-    (mapAttributes,modifAttribut)
+    (mapAttributes, modifAttribut)
   }
 
   /**
