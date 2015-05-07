@@ -84,13 +84,15 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * indent the HTML source file
    * The identation is performed by Jerichi Source Formatter class
    * @param html file location
-   * @return None
+   * @return source formated
    */
-  def indentSourceHtml(fichierHtml: String): Unit = {
-    val sourceFormatter = new SourceFormatter(new Source(new InputStreamReader(new FileInputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8)))
-    val fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fichierHtml), CommonObjectForMockupProcess.constants.utf8));
-    sourceFormatter.setIndentString("\t").setCollapseWhiteSpace(true).writeTo(fileWriter);
-    fileWriter.close();
-  }
+   
+   def indentSourceHtml(sourceMockup:String): String = {
+    val source = new Source(sourceMockup);
+    // Utilisation du parser Jericho pour formater le généré HTML.
+    val sourceFormat = new SourceFormatter(source).setIndentString("\t").setCollapseWhiteSpace(true);
+    return  sourceFormat.toString()
+   }
+
 
 }

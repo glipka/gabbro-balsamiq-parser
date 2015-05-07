@@ -208,7 +208,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     else {
 
     }
-      /**
+    /**
      * ------------------------------------------------------------------------------------------
      * <p>*** on indique la location dans la zone de l'écran pour le moteur de template ***</p>
      * ------------------------------------------------------------------------------------------
@@ -284,8 +284,6 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     }
   } // fin de la fonction processFilea
 
-  
-
   /**
    * -----------------------------------------------------------------------------------------------------------
    * *** appel d'un template local ou global ***
@@ -299,17 +297,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   private def traitementLocalOuGlobalTemplate(localExecutionTemplate: String, localExecutionPath: String, traitementFormatageSourceJava: TraitementFormatageSourceJava): Unit = {
     if (localExecutionTemplate != "") {
       val filename = CommonObjectForMockupProcess.generationProperties.generatedProjectDir + System.getProperty("file.separator") + utilitaire.substituteKeywords(localExecutionPath).replace(System.getProperty("file.separator"), "/").replace("//", "/")
-      val traitementPreserveSection = new TraitementPreserveSection().process(filename) // utilisé pour récupérer le contenu des preserves section
-      val (ret1, source1, _, _) = moteurTemplateFreeMarker.generationDuTemplate(localExecutionTemplate, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
-      val (ret2, source2, _, _) = moteurTemplateFreeMarker.generationDuTemplate(localExecutionTemplate, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.traitementPreserveSection, traitementPreserveSection))
+      val (ret1, source1, _, _) = moteurTemplateFreeMarker.generationDuTemplate(localExecutionTemplate, CommonObjectForMockupProcess.templatingProperties.phase_debut, null)
+      val (ret2, source2, _, _) = moteurTemplateFreeMarker.generationDuTemplate(localExecutionTemplate, CommonObjectForMockupProcess.templatingProperties.phase_fin, null)
       if ((source1 + source2).trim.size > 0) {
-        var codeFormatte = ""
-        if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.languageSource)) {
-          codeFormatte = traitementFormatageSourceJava.indentSourceCodeJava(source1 + source2)
-        } else if (filename.endsWith(CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript)) {
-          codeFormatte = traitementFormatageSourceJava.indentSourceCodeJavaScript(source1 + source2, 5)
-        } else { codeFormatte = source1 + source2 }
-        utilitaire.ecrire_fichier(filename, codeFormatte)
+        utilitaire.ecrire_fichier(filename, source1 + source2)
       }
     }
   }

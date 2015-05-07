@@ -160,8 +160,7 @@ class GlobalContext() {
    */
   def getItemsVars(): ArrayList[ItemVar] = {
     val array1 = new ArrayList[ItemVar]()
-    itemsVars.foreach(keyValue => { array1.add(keyValue._2) })
-    //FIXME do bindedForms.values.toList ?
+    itemsVars.foreach(keyValue => { array1.add(keyValue._2) })   // return an array containaing value of itemsvars
     array1
   }
 

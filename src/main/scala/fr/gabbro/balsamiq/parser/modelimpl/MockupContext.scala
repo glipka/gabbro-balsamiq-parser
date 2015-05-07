@@ -109,6 +109,7 @@ class MockupContext() {
    * @param typeDeFragment : Panel, Popup, ...
    * @return ArrayList[Fragment]
    */
+  
   def getFragmentsByType(typeDeFragment: String): java.util.ArrayList[Fragment] = {
     val listeDesFragments = new java.util.ArrayList[Fragment]
     fragments.foreach(fragment => {
@@ -117,5 +118,7 @@ class MockupContext() {
       }
     })
     listeDesFragments
-  }
+  } 
+   
+   
 }
