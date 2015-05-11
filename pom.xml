@@ -22,6 +22,7 @@
 		<mavenCompiler>1.7</mavenCompiler>
 		<eclipsecore>3.3.0-v_771</eclipsecore>
 		<rhinoVersion>1.7R4</rhinoVersion>
+		<shadeVersion>2.3</shadeVersion>
 
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -203,7 +204,38 @@
 					</arguments>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>${shadeVersion}</version>
+				<configuration>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+					<transformers>
+						<!-- add Main-Class to manifest file -->
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>fr.gabbro.balsamiq.parser.service.serviceimpl.IBalsamiqFreeMarker</mainClass>
+						</transformer>
+					</transformers>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

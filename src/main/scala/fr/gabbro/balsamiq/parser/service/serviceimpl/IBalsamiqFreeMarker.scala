@@ -319,12 +319,12 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   private def initProperties(): Boolean = {
     var ok = true
     logBack.info(utilitaire.getContenuMessage("mes58"))
-    //     CommonObjectForMockupProcess .generationProperties.projectName = System.getProperty("gencodefrombalsamiq.projectName").trim
+
+    CommonObjectForMockupProcess.generationProperties.projectName = System.getProperty("gencodefrombalsamiq.projectName")
     CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatePropertiesFile = System.getProperty("gencodefrombalsamiq.freemarkerTemplatesPropertiesFile")
     CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir = System.getProperty("gencodefrombalsamiq.freemarkerTemplatesDir")
     CommonObjectForMockupProcess.engineProperties.messagesFile = System.getProperty("gencodefrombalsamiq.messagesFile")
-    CommonObjectForMockupProcess.generationProperties.projectName = System.getProperty("gencodefrombalsamiq.projectName")
-    CommonObjectForMockupProcess.generationProperties.generatedProjectDir = System.getProperty("gencodefrombalsamiq.generatedProjectDir").trim.replace("%project%", CommonObjectForMockupProcess.generationProperties.projectName)
+    if (CommonObjectForMockupProcess.generationProperties.projectName != null) { CommonObjectForMockupProcess.generationProperties.generatedProjectDir = System.getProperty("gencodefrombalsamiq.generatedProjectDir").trim.replace("%project%", CommonObjectForMockupProcess.generationProperties.projectName) }
     CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir = System.getProperty("gencodefrombalsamiq.freemarkerTemplatesDir")
     CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir = System.getProperty("gencodefrombalsamiq.balsamiqBmmlDir")
     CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir = System.getProperty("gencodefrombalsamiq.freemarkerCatalogComposantsDir")
@@ -334,11 +334,13 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir == null ||
       CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir == null ||
       CommonObjectForMockupProcess.engineProperties.messagesFile == null ||
+      CommonObjectForMockupProcess.generationProperties.projectName == null ||
       CommonObjectForMockupProcess.generationProperties.configProperties == null) {
       logBack.error(utilitaire.getContenuMessage("mes31"))
       ok = false
 
     } else {
+      CommonObjectForMockupProcess.generationProperties.projectName = CommonObjectForMockupProcess.generationProperties.projectName.trim
       val props = new Properties();
       val ficPropertyName = CommonObjectForMockupProcess.generationProperties.configProperties
       props.load(new InputStreamReader(new FileInputStream(ficPropertyName), CommonObjectForMockupProcess.constants.utf8));
