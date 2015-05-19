@@ -7,4 +7,4 @@
    -Dgencodefrombalsamiq.propertiesFile="c:/Temp/balsamiq/sourcesBalsamiq/config.properties" ^
    -Dgencodefrombalsamiq.messagesFile="c:/temp/balsamiq/sourcesBalsamiq/messages.properties" ^
    -Dfile.encoding=UTF-8 ^
-   -jar target/gabbro.balsamiq.parser.jar  
+   -jar target/gabbro.balsamiq.parser-exec.jar

@@ -44,6 +44,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
    * 
   */
   override def enrichissementParametres(param1: String): (String, Object) = {
+    // récupération des infos du datatable depuis l'attribut text du datatable. 
     val les3lignesDuTableau: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
     // on récupère les noms des colonnes (ainsi que leur tri) dans la 1ere ligne.
     val tableauDesNomsDesColonnes = les3lignesDuTableau.head.split(",").map(_.trim)
@@ -100,6 +101,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
 
       numeroColonneEnCours += 1
 
+      
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
       if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
       else { largeurTotaleEnpourcentage += width.toInt }

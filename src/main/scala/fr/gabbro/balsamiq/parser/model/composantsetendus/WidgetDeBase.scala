@@ -388,8 +388,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @param key : String
    * @return
    */
-  def getExtendedAttributes(key: String): String = {
-    return this.mapExtendedAttribut.getOrElse(key, "").toString()
+  def getExtendedAttributes(key: String): Object = {
+    return this.mapExtendedAttribut.getOrElse(key, "")
   }
   /**
    *

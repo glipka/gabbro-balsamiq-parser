@@ -23,6 +23,7 @@
 		<eclipsecore>3.3.0-v_771</eclipsecore>
 		<rhinoVersion>1.7R4</rhinoVersion>
 		<shadeVersion>2.3</shadeVersion>
+		<springBootRelease>1.2.3.RELEASE</springBootRelease>
 
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -204,38 +205,31 @@
 					</arguments>
 				</configuration>
 			</plugin>
+			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>${shadeVersion}</version>
-				<configuration>
-					<filters>
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/*.SF</exclude>
-								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
-							</excludes>
-						</filter>
-					</filters>
-					<transformers>
-						<!-- add Main-Class to manifest file -->
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>fr.gabbro.balsamiq.parser.service.serviceimpl.IBalsamiqFreeMarker</mainClass>
-						</transformer>
-					</transformers>
-				</configuration>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${springBootRelease}</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>repackage</goal>
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<mainClass>fr.gabbro.balsamiq.parser.service.serviceimpl.IBalsamiqFreeMarker</mainClass>
+					<classifier>exec</classifier>
+					<addResources>true</addResources>
+				</configuration>
+				
 			</plugin>
+			
+			
+			
+
+
+
 		</plugins>
 	</build>
 </project>
