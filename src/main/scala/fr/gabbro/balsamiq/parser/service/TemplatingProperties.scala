@@ -38,7 +38,6 @@ class TemplatingProperties {
   @BeanProperty var separator_template_file = "_" // separateur dans le nom du fichier template
   @BeanProperty var suffix_template_code = "" // suffix des templates code
   @BeanProperty var suffix_template_javascript = "" // suffix des templates javascript
-  @BeanProperty var validationKeywords = List[String]() // mots clefs permis pour la validation des champs
   @BeanProperty var widgetsConsideredAsAForm = List[String]() // liste des widgets composants d'un formulaire
   @BeanProperty var widgetsListProcessedLocally = List[String]() // liste des composants à traiter localement (chaque widget est traité cas par cas)
   @BeanProperty var preserveCodeIhm = ""
@@ -50,7 +49,6 @@ class TemplatingProperties {
    * @param propsMap
    */
   def loadProperties(propsMap: Map[String, String]): Unit = {
-    validationKeywords = propsMap.getOrElse("config.templating.validationKeywords", "required").split(",").toList.map(_.trim)
     freemarkerAutoImportFile = propsMap.getOrElse("config.templating.freemarkerAutoImportFile", "")
     freemarkerAutoIncludeFile = propsMap.getOrElse("config.templating.freemarkerAutoIncludeFile", "")
     freemarkerAutoImportNamespace = propsMap.getOrElse("config.templating.freemarkerAutoImportNamespace", "")

@@ -615,12 +615,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   /**
    * on renseigne les token de validation dans la table tableauValidation
-   * La liste des tokens autorisés est définie dans la table CommonObjectForMockupProcess .templatingProperties.validationKeywords
    * la syntaxe autorisée est :
    * validate=token1,token2=valeur2,token3
    * @param input
    * @return (true or false, Array of Token
-   * //TODO ajouter parametrage * qui permet n'importe quel saisie
    */
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
     val validate = CommonObjectForMockupProcess.constants.validate + "="
@@ -631,14 +629,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
         if (token.contains("=")) {
           val clef = token.split("=").head.trim.toLowerCase()
           val valeur = token.split("=").last.trim.toLowerCase()
-          if (CommonObjectForMockupProcess.templatingProperties.validationKeywords.exists(x => {
-            x.trim.toLowerCase() == clef
-          }))
-            tableauValidation.add(new Token(clef, valeur))
+          tableauValidation.add(new Token(clef, valeur))
         } else {
-          if (CommonObjectForMockupProcess.templatingProperties.validationKeywords.exists(x => {
-            x.trim.toLowerCase() == token.trim.toLowerCase()
-          }))
             tableauValidation.add(new Token(token.trim.toLowerCase(), ""))
         }
       })
