@@ -389,7 +389,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @return
    */
   def getExtendedAttributes(key: String): Object = {
-    return this.mapExtendedAttribut.getOrElse(key, "")
+    return this.mapExtendedAttribut.getOrElse(key,null)
   }
   /**
    *

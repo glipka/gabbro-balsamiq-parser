@@ -662,8 +662,10 @@ class Utilitaire {
   
   // methode appelée depuis freemarker pour récupérer l'objet fragment
   def getFragmentFromWidget(widget:WidgetDeBase): Fragment = {
-    val fragment= widget.getExtendedAttributes(CommonObjectForMockupProcess.constants.fragment).asInstanceOf[Fragment]
-    fragment
+    val fragment= widget.getExtendedAttributes(CommonObjectForMockupProcess.constants.fragment)
+    if (fragment != null ) return fragment.asInstanceOf[Fragment]
+    else null
+    
   }
   // -------------------------------------------------------------------------------
 
