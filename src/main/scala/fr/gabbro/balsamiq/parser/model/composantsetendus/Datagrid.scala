@@ -160,6 +160,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
           }
 
           case CommonObjectForMockupProcess.constants.textInput => { // Text
+    
             if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
               typeDeColonne = text // type =ro
               readonly = CommonObjectForMockupProcess.constants.trueString
