@@ -239,7 +239,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * <p>Attention le controlID n'est unique que dans un groupe</p>
    * <p>Si le widget est dans un groupe, ses coordonnées sont relatives par rapport au groupe</p>
    * <p>on verifie qu'on est dans le bon groupe</p>
-   *<p>Si le groupe est un composant, on recalcule les coordonnées du widget</p>
+   * <p>Si le groupe est un composant, on recalcule les coordonnées du widget</p>
    * <p>     (les parametres en override ont été stockés dans le traitement du composant )</p>
    *
    * @param e : Element
@@ -294,12 +294,12 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    *
    * <p>Les attributs étendus sont récupérés et stockés sous forme de clef, valeur.</p>
    * <p>POur les composants, il y a</p>
-   *<p> Il y a un traitement particulier pour le binding des données ainsi que pour la validation</p>
-   *<p> Pourle binding on utilise le champ customControlId et pour la validation le champ customControlData</p>
-   *<p> Il y a 2 types de binding possibles :</p>
+   * <p> Il y a un traitement particulier pour le binding des données ainsi que pour la validation</p>
+   * <p> Pourle binding on utilise le champ customControlId et pour la validation le champ customControlData</p>
+   * <p> Il y a 2 types de binding possibles :</p>
    * <p> Bind = class1.class2.valeur:Int    // on bind le widget avec le champ décrit</p>
-   *<p>  bind=map(clef1,valeur1)  // on binde le contenu du widget avec un map existante, par exemple en localStorage.</p>
-   *<p> pour la validation : validate=valeur1,valeur2,...</p>
+   * <p>  bind=map(clef1,valeur1)  // on binde le contenu du widget avec un map existante, par exemple en localStorage.</p>
+   * <p> pour la validation : validate=valeur1,valeur2,...</p>
    * <p>******  Exemple de contenu ******</p>
    * <p> <controlProperties></p>
    * <p>     <href>testgl01%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml%26bm%3Btestgl01.bmml</href></p>
@@ -389,7 +389,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @return
    */
   def getExtendedAttributes(key: String): String = {
-    return this.mapExtendedAttribut.getOrElse(key, "").toString()
+    return this.mapExtendedAttribut.getOrElse(key, "").asInstanceOf[String]
   }
   /**
    *
@@ -404,7 +404,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * les attributs ne sont surchargés au niveau du widget en cours, ils seronts alors mis en table</p>
    *
    * <p>--------------------------------------------------------------------------------------------</p>
-   *       <p>    Cas d'un composant : on récupère les attributs étendus dans la balise override</p> 
+   *       <p>    Cas d'un composant : on récupère les attributs étendus dans la balise override</p>
    * <p>--------------------------------------------------------------------------------------------</p>
    *     <p>    control controlID="24" controlTypeID="com.balsamiq.mockups::Component" x="544" y="389" w="97" h="19" measuredW="97" measuredH="19" zOrder="5" locked="false" isInGroup="-1"></p>
    *   <p>   <controlProperties></p>

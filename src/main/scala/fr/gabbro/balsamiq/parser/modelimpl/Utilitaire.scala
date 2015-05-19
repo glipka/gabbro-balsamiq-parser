@@ -32,6 +32,7 @@ import java.io.BufferedWriter
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
+import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 
 class Utilitaire {
   val logBack = LoggerFactory.getLogger(this.getClass());
@@ -657,6 +658,14 @@ class Utilitaire {
     val v9 = v8.replace("%customProperty3%", CommonObjectForMockupProcess.templatingProperties.customProperty3)
     val v10 = v9.replace("%mainScreen%", CommonObjectForMockupProcess.ecranContenantLeSegment)
     v10
+  } 
+  
+  // methode appelée depuis freemarker pour récupérer l'objet fragment
+  def getFragmentFromWidget(widget:WidgetDeBase): Fragment = {
+    val fragment= widget.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.fragment,null)
+    if (fragment != null ) return fragment.asInstanceOf[Fragment]
+    else null
+    
   }
   // -------------------------------------------------------------------------------
 
