@@ -84,19 +84,19 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       // on récupère la largeur de la colonne (en %)
       // le dernier caractere peut inidquer l'alignement dans la cellule
       //{30L, 30R, 35, 25C}
-      var largeuretAlignement = if (numeroColonneEnCours < tableauDesLargeursDesColonnes.size) { tableauDesLargeursDesColonnes(numeroColonneEnCours) }
+      var largeurEtAlignement = if (numeroColonneEnCours < tableauDesLargeursDesColonnes.size) { tableauDesLargeursDesColonnes(numeroColonneEnCours) }
       else { (100 / tableauDesNomsDesColonnes.size).toString + CommonObjectForMockupProcess.constants.center } // largeur pas renseignée 
       // ------------------------------------------------------------------------------------------------------
       // *** si la largeur se termine par center, left ou right => on extrait la largeur et l'alignement ***
       // ------------------------------------------------------------------------------------------------------
-      if (largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.center) || // align CommonObjectForMockupProcess.constants.center
-        largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.left) || // align CommonObjectForMockupProcess.constants.left
-        largeuretAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.right) // align Right
+      if (largeurEtAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.center) || // align CommonObjectForMockupProcess.constants.center
+        largeurEtAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.left) || // align CommonObjectForMockupProcess.constants.left
+        largeurEtAlignement.toUpperCase.endsWith(CommonObjectForMockupProcess.constants.right) // align Right
         ) {
-        width = largeuretAlignement.substring(0, largeuretAlignement.length() - 1).trim
-        alignment = largeuretAlignement.substring(largeuretAlignement.length() - 1, largeuretAlignement.length()) // on prend le dernier caractère
+        width = largeurEtAlignement.substring(0, largeurEtAlignement.length() - 1).trim
+        alignment = largeurEtAlignement.substring(largeurEtAlignement.length() - 1, largeurEtAlignement.length()) // on prend le dernier caractère
       } else {
-        width = largeuretAlignement.substring(0, largeuretAlignement.length()).trim
+        width = largeurEtAlignement.substring(0, largeurEtAlignement.length()).trim
       }
 
       numeroColonneEnCours += 1
@@ -135,11 +135,11 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     // on récupère le header de chaque colonne
     // var tableau_des_colonnes = getColonneDefinition().toList
     val tableauEnrichi = new java.util.ArrayList[ColumnDefinition]
+    // on récupère la table des fils du widget en cours 
     val tableau_des_widgets_fils = this.tableau_des_fils
     var position = 0
-
     val text = CommonObjectForMockupProcess.constants.text
-
+    
     tableau_des_colonnes.foreach(colonne => {
       var typeDeColonne = text
       var readonly = CommonObjectForMockupProcess.constants.falseString
@@ -228,7 +228,6 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
           case _ => logBack.info(utilitaire.getContenuMessage("mes18"), widgetFils.controlTypeID)
 
         }
-
         colonne.columnType = typeDeColonne
         colonne.readonly = readonly
       } else colonne.columnType = text
