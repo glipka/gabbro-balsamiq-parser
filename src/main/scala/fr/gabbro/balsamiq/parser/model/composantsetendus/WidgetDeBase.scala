@@ -63,6 +63,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   var xRelative: Int = 0; // abscisse relative du widget par rapport à son conteneur
   var yRelative: Int = 0; // ordonnee relative du widget par rapport à son conteneur
+  var container:WidgetDeBase=null; // modif le 22/5/15 par gl : ajoutcontainer du widget en cours
   @BeanProperty var positionDansLeConteneur: Int = 0 // position du widget dans le conteneur (sans tenir compte des n° de lignes et colonnes)
   @BeanProperty var labelFor = "";
   @BeanProperty var labelForWidget: WidgetDeBase = null;

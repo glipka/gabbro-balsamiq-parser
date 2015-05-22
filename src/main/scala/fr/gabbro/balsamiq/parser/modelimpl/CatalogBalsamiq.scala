@@ -71,6 +71,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
         widget.projectionX = widget.xAbsolute * ratioW
         widget.projectionY = widget.yAbsolute * ratioH
       }
+      // modif le 22/5 : sauvegarde du container du widget en cours
+      widget.container = container // on renseigne le container du widget en cours 
       if (container != null) {
         if (container.w > 0) widget.percentageLargeurParRapportPere = Math.ceil((widget.w.toDouble / container.w.toDouble) * 100.0)
         if (container.h > 0) widget.percentageHauteurparRapportPere = Math.ceil((widget.h.toDouble / container.h) * 100.0)
@@ -100,8 +102,11 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // les widgets de type radiobuttonGroup induisent par defaut un formlaire (ils n'ont pas de fils
       // il faudra récupérer l'action d'un bouton et la stocker dans mapExtendedAttribut
       // seuls les containers de type canvas peuvent contenir un formulaire
+      // modif le 22/5 un container n'est pas un formulaire s'il est déjà inclus dans un container de type formulaire
 
+      val containerIsAformulaire = if (container != null && container.isFormulaireHTML) true else false
       if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0) &&
+        (!containerIsAformulaire ) && // un formulaire ne peut être inclus dans un autre formulaire    
         (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))) {
         widget.isFormulaireHTML = true
         var actionDuFormulaire = ListBuffer[String]()
