@@ -111,14 +111,14 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     var nomDesObjets = input.trim
     // si le containerPere est un container qui contient une valeur de bind valide  
     // on concatène le nom de classe bindée dans le containerPere avec le champ bindé du composant en cours.
+    // modif le 22/5 si le bind du container est null on récupere le bind du container de container
     if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind != "") {
       nomDesObjets = containerPere.bind.trim + "." + nomDesObjets
     } else { // ajout le 22/5. Si le container a un champ bind null et que le container du container a un bind valide => on concatene le bind du container du container avec le champ en cours
-      if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind == "" && containerPere.container != null && containerPere.bind != ""){
-         nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets
+      if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind == "" && containerPere.container != null && containerPere.container.bind!= "") {
+        nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets
       }
-      
-      
+
     }
     if (nomDesObjets.contains(".")) {
       val tableauObjets = nomDesObjets.split("\\.")
@@ -247,7 +247,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   private def generation_code_source_classe(classeEnCours: Field, niveau: Int, pere: Field, hierarchiePere: String): Unit = {
     var codeDeLaClasse = new StringBuilder
     val tabulation = "\t" * niveau
-//    val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
+    //    val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
     val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source1)
     // traitement de chaque champ de la classe      
@@ -279,7 +279,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     // generation fin de classe et mise en cache du code de la classe 
     val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source2)
-    mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString()) 
+    mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString())
   }
 
   /**
