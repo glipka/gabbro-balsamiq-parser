@@ -622,16 +622,16 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    */
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
     val validate = CommonObjectForMockupProcess.constants.validate + "="
-    val value = input.toLowerCase().trim
-    if (value.startsWith(validate)) {
+    val value = input.trim
+    if (value.toLowerCase().startsWith(validate)) {
       val tokenDeValidation = value.substring(validate.length()).split(",")
       tokenDeValidation.foreach(token => {
         if (token.contains("=")) {
-          val clef = token.split("=").head.trim.toLowerCase()
-          val valeur = token.split("=").last.trim.toLowerCase()
+          val clef = token.split("=").head.trim
+          val valeur = token.split("=").last.trim
           tableauValidation.add(new Token(clef, valeur))
         } else {
-            tableauValidation.add(new Token(token.trim.toLowerCase(), ""))
+            tableauValidation.add(new Token(token.trim, ""))
         }
       })
       (true, tableauValidation)
