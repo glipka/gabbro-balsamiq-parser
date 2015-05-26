@@ -113,10 +113,11 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     // on concatène le nom de classe bindée dans le containerPere avec le champ bindé du composant en cours.
     // modif le 22/5 si le bind du container est null on récupere le bind du container de container
     if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind != "") {
-      nomDesObjets = containerPere.bind.trim + "." + nomDesObjets
+      if (!nomDesObjets.startsWith(containerPere.bind.trim)) {nomDesObjets = containerPere.bind.trim + "." + nomDesObjets}
+      
     } else { // ajout le 22/5. Si le container a un champ bind null et que le container du container a un bind valide => on concatene le bind du container du container avec le champ en cours
       if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind == "" && containerPere.container != null && containerPere.container.bind!= "") {
-        nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets
+        if (!nomDesObjets.startsWith(containerPere.container.bind.trim)) { nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets}
       }
 
     }
