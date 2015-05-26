@@ -21,10 +21,7 @@ import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
- 
- 
 class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker) extends TTraitementCommun {
-
   /**
    * dans le catalogue chaque container est matérialisé par une branche.
    * un container peut être lui même contenu dans un container.
@@ -43,7 +40,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
    * @param forceFormulaire boolean
    * @return  (sourceHtml, sourceJavascript, sourceJavaOuScala) : (StringBuilder, StringBuilder, StringBuilder)
    */
-  def traitement_widget_par_ligne_colonne(branche_catalog: ArrayBuffer[WidgetDeBase], rowNumber: Int, niveau: Int, branche_pere: ArrayBuffer[WidgetDeBase], container: WidgetDeBase, forceFormulaire: Boolean): (StringBuilder, StringBuilder, StringBuilder) = {
+  def traitement_widget_par_ligne_colonne(branche_catalog: ArrayBuffer[WidgetDeBase], rowNumber: Int, niveau: Int, branche_perex: ArrayBuffer[WidgetDeBase], container: WidgetDeBase, forceFormulaire: Boolean): (StringBuilder, StringBuilder, StringBuilder) = {
     var sourceHtml: StringBuilder = new StringBuilder()
     var sourceJavascript: StringBuilder = new StringBuilder()
     var sourceJavaOuScala: StringBuilder = new StringBuilder()
@@ -51,19 +48,74 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
     val containerName = if (container != null) { container.getWidgetNameOrComponentName().split("::").last } else {
       null
     }
-    var etoile = "*" * niveau
-    val brancheFiltreeParLigne = branche_catalog.filter(widget => widget.rowNumber == rowNumber)
-    if (brancheFiltreeParLigne.size > 0) {
-      var widgetPrecedent: WidgetDeBase = null
-      val (ret1, source1, sourceJavaScript1, codeEcran1) = if ((container != null) && (container.isFormulaireHTML)) { moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString), (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container)) }
-      else { moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container)) }
-      sourceHtml = sourceHtml.append(source1)
-      sourceJavascript = sourceJavascript.append(sourceJavaScript1)
-      sourceJavaOuScala = sourceJavaOuScala.append(codeEcran1)
+    traitementPrincipal
+    return (sourceHtml, sourceJavascript, sourceJavaOuScala)
+    // ------------------------------------------------
+    // *** Traitement des fils du widget en cours ***
+    // ------------------------------------------------
+    def traitementDesFilsDuWidgetDeLaColonneEnCours(widget: WidgetDeBase): Unit = {
+      // *** traitement des fils si nécessaire ***
+      if (widget.tableau_des_fils.size > 0) {
+        if ((container != null) && (container.isFormulaireHTML)) {
+          val (source20, javascript20, codeEcran20) = traitement_widget_par_ligne_colonne(widget.tableau_des_fils, 0, niveau + 4, branche_catalog, widget, true)
+          sourceHtml = sourceHtml.append(source20)
+          sourceJavascript = sourceJavascript.append(javascript20)
+          sourceJavaOuScala = sourceJavaOuScala.append(codeEcran20)
+
+        } else { // le container est nul
+          val (source21, javascript21, codeEcran21) = traitement_widget_par_ligne_colonne(widget.tableau_des_fils, 0, niveau + 4, branche_catalog, widget, false)
+          sourceHtml = sourceHtml.append(source21)
+          sourceJavascript = sourceJavascript.append(javascript21)
+          sourceJavaOuScala = sourceJavaOuScala.append(codeEcran21)
+
+        }
+
+      }
+    }
+    // -------------------------------------------------------
+    // *** traitement des colonnes de la ligne de la table en cours ***
+    // -------------------------------------------------------
+    def traitementDesColonnesDeLaTable(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): Unit = {
+      val brancheFiltreeParPositionWidget = brancheFiltreeParLigne.sortWith((x, y) => x.positionDansLeConteneur < y.positionDansLeConteneur)
+      // *** appel du template pour générer le séparateur de colonne début *** 
+      var numeroColonne = 0
+      // on traite chaque widget par n° de position 
+      brancheFiltreeParPositionWidget.foreach(widget => {
+        // template colonne début
+        val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.colNumber, numeroColonne.toString))
+        sourceHtml = sourceHtml.append(source7)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript7)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
+        // template widget debut
+        val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString))
+        else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.container, container))
+        sourceHtml = sourceHtml.append(source8)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript8)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
+        traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
+        // appel template widget fin
+        val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.container, container))
+        sourceHtml = sourceHtml.append(source9)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript9)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
+        // template colonne fin
+        val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.colNumber, numeroColonne.toString))
+        sourceHtml = sourceHtml.append(source10)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript10)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
+        numeroColonne += 1
+
+      }) // fin de calcul du widget  
+      // appel du templateCol fin 
+
+    }
+    // traitement des colonnes du container bootstrap (qui n'est pas une table)
+    def traitementDesColonnesBootstrap(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): Unit = {
       // --------------------------------------------------------------------
       // Pour la ligne sélectionnée on balaie chaque colonne en douzieme 
       // Les colonnes vides sont gérées par offset.
       // -------------------------------------------------------------------- 
+      var widgetPrecedent: WidgetDeBase = null
       var numeroColonneEnDouziemeDeLecran = 0
       var numeroColonne = 0
       val tailleCelluleEnDouzieme = calculTailleCelluleEnDouzieme(container)
@@ -75,7 +127,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         val brancheFiltreeParColonneEnDouzieme = brancheFiltreeParLigne.filter(widget => widget.positionEnDouzieme == numeroColonneEnDouziemeDeLecran)
         // si la colonne en douzieme est vide on incrémente le colspan.
         val colN = brancheFiltreeParColonneEnDouzieme.size
-
         if (brancheFiltreeParColonneEnDouzieme.size <= 0) {
           colspan += 1
           numeroColonneEnDouziemeDeLecran += 1
@@ -107,7 +158,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           sourceHtml = sourceHtml.append(source7)
           sourceJavascript = sourceJavascript.append(sourceJavaScript7)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
-
           colspan = 0 // on réinitalise le colspan après avoir généré md_offset
           // on traite chaque widget dans le div
           var positionWidget = 0
@@ -117,33 +167,15 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
-
-            if (widget.tableau_des_fils.size > 0) {
-
-              if ((container != null) && (container.isFormulaireHTML)) {
-                val (source20, javascript20, codeEcran20) = traitement_widget_par_ligne_colonne(widget.tableau_des_fils, 0, niveau + 4, branche_catalog, widget, true)
-                sourceHtml = sourceHtml.append(source20)
-                sourceJavascript = sourceJavascript.append(javascript20)
-                sourceJavaOuScala = sourceJavaOuScala.append(codeEcran20)
-
-              } else {
-                val (source21, javascript21, codeEcran21) = traitement_widget_par_ligne_colonne(widget.tableau_des_fils, 0, niveau + 4, branche_catalog, widget, false)
-                sourceHtml = sourceHtml.append(source21)
-                sourceJavascript = sourceJavascript.append(javascript21)
-                sourceJavaOuScala = sourceJavaOuScala.append(codeEcran21)
-
-              }
-
-            }
+            traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
             val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.container, container))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
-
             widgetPrecedent = widget
             positionWidget += 1
           }) // fin de calcul du widget  
-          // on ne gere la colonne qui s'il y a des widgets
+          // Appel template col fin
           val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.colNumber, numeroColonne.toString), (CommonObjectForMockupProcess.constants.container, container))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
@@ -154,27 +186,50 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         } // fin de else1 
         numeroColonneEnDouziemeDeLecran += tailleEnCoursEnDouzieme // traitement colonne en douzieme suivante
       } // fin de while numeroColonneEnDouzieme < 12
-
-      val (ret10, source10, sourceJavaScript10, codeEcran10) = if (container != null && container.isFormulaireHTML)
-        moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString))
-      else moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container))
-      sourceHtml = sourceHtml.append(source10)
-      sourceJavascript = sourceJavascript.append(sourceJavaScript10)
-      sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
-
-      val (source30, javaScript30, codeEcran30) = traitement_widget_par_ligne_colonne(branche_catalog, rowNumber + 1, niveau, branche_catalog, container, forceFormulaire) // appel traitement ligne suivante
-      sourceHtml = sourceHtml.append(source30)
-      sourceJavascript = sourceJavascript.append(javaScript30)
-      sourceJavaOuScala = sourceJavaOuScala.append(codeEcran30)
-
-    } else {
-
     }
+    // ------------------------------------------------------------------------------
+    // Traitement des colonnes de la table 
+    // ------------------------------------------------------------------------------
+    def traitementPrincipal: Unit = {
+      var etoile = "*" * niveau
+      // traitement de la ligne en cours
+      val brancheFiltreeParLigne = branche_catalog.filter(widget => widget.rowNumber == rowNumber)
+      if (brancheFiltreeParLigne.size > 0) { // il y a des colonnes à traiter ?
 
-    (sourceHtml, sourceJavascript, sourceJavaOuScala)
+        // ------------------------------------------------------------------------------------------
+        // __________________________________________________________________________________________
+
+        val (ret1, source1, sourceJavaScript1, codeEcran1) = if ((container != null) && (container.isFormulaireHTML)) { moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString), (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container)) }
+        else { moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container)) }
+        sourceHtml = sourceHtml.append(source1)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript1)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran1)
+
+        // est-on dans le traitement d'une table ? le container est dans la liste des widget de type datatable ?
+        if ((container != null) && (CommonObjectForMockupProcess.generationProperties.listDataTableWidget.exists(x => x.equalsIgnoreCase(container.getShortWidgetName)))) { // on est dans le traitement d'une table => on extrait les widgets 
+          traitementDesColonnesDeLaTable(brancheFiltreeParLigne, container)
+        } else { // on n'est pas dans le traitement d'une table => on extrait les widgets par cellule bootstrap
+          traitementDesColonnesBootstrap(brancheFiltreeParLigne, container)
+        }
+
+        val (ret10, source10, sourceJavaScript10, codeEcran10) = if (container != null && container.isFormulaireHTML)
+          moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString))
+        else moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateRow, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container))
+        sourceHtml = sourceHtml.append(source10)
+        sourceJavascript = sourceJavascript.append(sourceJavaScript10)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
+
+        val (source30, javaScript30, codeEcran30) = traitement_widget_par_ligne_colonne(branche_catalog, rowNumber + 1, niveau, branche_catalog, container, forceFormulaire) // appel traitement ligne suivante
+        sourceHtml = sourceHtml.append(source30)
+        sourceJavascript = sourceJavascript.append(javaScript30)
+        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran30)
+
+      }
+    } // fin de la fonction traitement principal
+    return (sourceHtml, sourceJavascript, sourceJavaOuScala)
   } // fin de la fonction balayage_catalog
 
-   /**
+  /**
    * le calcul de la taile de la cellule se fait par rapport à la taille du conteneur
    * la taille de cellule est en pixel
    * @param widget : widgetDeBase
@@ -186,7 +241,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
     tailleCelluleEnDouzieme
   }
   /**
-   * Terminologie : un colonne = un eensemble de cellules en 12eme bootstrap.
+   * Terminologie : un colonne = un ensemble de cellules en 12eme bootstrap.
    * recadrage de la taille pour eviter de ne pas traiter des widgets
    * En effet, la taille des cellule en12Eme se fait par arrondi.
    *
@@ -215,6 +270,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       } else { tailleDeLaColonne }
 
     }
-
   }
+
 }

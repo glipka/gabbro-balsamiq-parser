@@ -1,37 +1,14 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
-// Version 1.0
-// Copyright (C) 2014 Georges Lipka
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of either one of the following licences:
-//
-// 1. The Eclipse Public License (EPL) version 1.0,
-//   available at http://www.eclipse.org/legal/epl-v10.html
-//
-// 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
-//    available at http://www.gnu.org/licenses/lgpl.txt
-//
-// This program is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the individual licence texts for more details.package fr.gencodefrombalsamiq.service.serviceimpl
 
-import freemarker.cache.URLTemplateLoader
-import freemarker.cache.TemplateLoader
-import java.net.URL
-import java.io._
-import java.nio.file.Paths
-import java.net.URI
-import java.io.FileReader
-import java.nio.file.Paths
-import java.nio.file.Files
 import java.nio.charset.Charset
-import scala.collection.JavaConversions._
-import scala.collection.mutable.Map
-import scala.collection.mutable.ArrayBuffer
-import org.mozilla.javascript.BeanProperty
-import scala.beans.BeanProperty
+import java.nio.file.Files
 import java.nio.file.NoSuchFileException
+import java.nio.file.Paths
+
+import scala.beans.BeanProperty
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.mutable.Map
+
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
 /**
@@ -61,11 +38,12 @@ class TraitementPreserveSection extends TTraitementCommun {
    * @param filename : nom du fichier à traiter
    * @return traitementPreserveSection
    */
-  def process(filename: String): TraitementPreserveSection= {
+  def process(filename: String): TraitementPreserveSection = {
     var bufferATraiter = List[String]()
     fichierEnCoursDeTraitement = filename
     // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
-    if (fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) {
+    if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
+      (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => fichierEnCoursDeTraitement.endsWith(suffix)))) {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
       //   println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
