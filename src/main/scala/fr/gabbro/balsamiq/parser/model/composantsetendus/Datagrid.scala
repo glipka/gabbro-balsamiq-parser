@@ -25,7 +25,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 
-class ColumnDefinition(@BeanProperty var columnName: String, @BeanProperty var sort: String, @BeanProperty var width: String, @BeanProperty var alignment: String, @BeanProperty var columnType: String, @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase)
+class ColumnDefinition(@BeanProperty var columnName: String, @BeanProperty var sort: String, @BeanProperty var width: String, @BeanProperty var alignment: String, @BeanProperty var columnType: String, @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase, var beginningPositionRelativeToContainer: Int, var endPositionRelativeToContainer: Int)
 
 class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
@@ -63,7 +63,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     // on parcourt le tableau des noms des colonnes et pour chaque colonne on 
     // récupère la largeur de la colonne dans la table (
     // -----------------------------------------------------------------------------------
-
+    var positionEnCoursDeLaColonne = 0
     tableauDesNomsDesColonnes.foreach(column => {
       var sort = " "
       var columnName = " "
@@ -101,13 +101,17 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
 
       numeroColonneEnCours += 1
 
-      
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
       if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
       else { largeurTotaleEnpourcentage += width.toInt }
       if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
+      // les postions départ et fin sont calculées à partir des pourcentages de la largeur des colonnes en rapport avec la largeur de la table en pixels.
+      var positionDepart = positionEnCoursDeLaColonne
+      var positionFin = positionDepart + (this.w.toInt * width.toInt) / 100 - 1
+      positionEnCoursDeLaColonne = positionFin + 1
       // met en table la colonne 
-      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, "", "", null)
+      logBack.debug("traitementcolonne n°:" + numeroColonneEnCours + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
+      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, "", "", null, positionDepart, positionFin)
       tableauDesColonnes.add(columnDefinition)
 
     })
@@ -139,7 +143,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     val tableau_des_widgets_fils = this.tableau_des_fils
     var position = 0
     val text = CommonObjectForMockupProcess.constants.text
-    
+
     tableau_des_colonnes.foreach(colonne => {
       var typeDeColonne = text
       var readonly = CommonObjectForMockupProcess.constants.falseString
@@ -160,7 +164,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
           }
 
           case CommonObjectForMockupProcess.constants.textInput => { // Text
-    
+
             if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
               typeDeColonne = text // type =ro
               readonly = CommonObjectForMockupProcess.constants.trueString

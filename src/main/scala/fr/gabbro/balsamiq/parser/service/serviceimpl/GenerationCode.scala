@@ -1,25 +1,11 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
-// Version 1.0
-// Copyright (C) 2014 Georges Lipka
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of either one of the following licences:
-//
-// 1. The Eclipse Public License (EPL) version 1.0,
-//   available at http://www.eclipse.org/legal/epl-v10.html
-//
-// 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
-//    available at http://www.gnu.org/licenses/lgpl.txt
-//
-// This program is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the individual licence texts for more details.
 
 import scala.collection.mutable.ArrayBuffer
-import org.slf4j.LoggerFactory
+
+import fr.gabbro.balsamiq.parser.model.composantsetendus.Datagrid
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
+import scala.collection.JavaConversions._
 
 class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker) extends TTraitementCommun {
   /**
@@ -79,35 +65,50 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       val brancheFiltreeParPositionWidget = brancheFiltreeParLigne.sortWith((x, y) => x.positionDansLeConteneur < y.positionDansLeConteneur)
       // *** appel du template pour générer le séparateur de colonne début *** 
       var numeroColonne = 0
+      var numeroWidget = 0
       // on traite chaque widget par n° de position 
-      brancheFiltreeParPositionWidget.foreach(widget => {
-        // template colonne début
+      // on récupère la liste des colonnes de la table
+      val tableDesWidgets = container.asInstanceOf[Datagrid]
+      val tableauDesColonnes = tableDesWidgets.getColumns().toList
+
+      // ----------------------------------------------
+      // **** traitement de chaque colonne **** 
+      // -----------------------------------------------
+      tableauDesColonnes.foreach(colonne => {
+        var positionDebut = colonne.beginningPositionRelativeToContainer
+        var positionFin = colonne.beginningPositionRelativeToContainer
+        // template colonne debut 
         val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.colNumber, numeroColonne.toString))
         sourceHtml = sourceHtml.append(source7)
         sourceJavascript = sourceJavascript.append(sourceJavaScript7)
         sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
-        // template widget debut
-        val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString))
-        else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.container, container))
-        sourceHtml = sourceHtml.append(source8)
-        sourceJavascript = sourceJavascript.append(sourceJavaScript8)
-        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
-        traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
-        // appel template widget fin
-        val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.container, container))
-        sourceHtml = sourceHtml.append(source9)
-        sourceJavascript = sourceJavascript.append(sourceJavaScript9)
-        sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
+        // on balaie l'ensemble des widgets et on sélectionne les widgets dont la position début est incluse dans la position début et fin de la colonne
+        brancheFiltreeParPositionWidget.foreach(widget => {
+          // on ne s'occupe que des abscisses, il faut donc faire attention que les widgets soient bien alignés dans le container 
+          // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
+          if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
+            // generation du template widget début
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.containerIsForm, CommonObjectForMockupProcess.constants.trueString))
+            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (CommonObjectForMockupProcess.constants.container, container))
+            sourceHtml = sourceHtml.append(source8)
+            sourceJavascript = sourceJavascript.append(sourceJavaScript8)
+            sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
+            traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
+            // génération du  template widget fin
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.container, container))
+            sourceHtml = sourceHtml.append(source9)
+            sourceJavascript = sourceJavascript.append(sourceJavaScript9)
+            sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
+
+          }
+        }) // fin de   brancheFiltreeParPositionWidget.foreach
         // template colonne fin
         val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.containerName, containerName), (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.colNumber, numeroColonne.toString))
         sourceHtml = sourceHtml.append(source10)
         sourceJavascript = sourceJavascript.append(sourceJavaScript10)
         sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
         numeroColonne += 1
-
-      }) // fin de calcul du widget  
-      // appel du templateCol fin 
-
+      })
     }
     // traitement des colonnes du container bootstrap (qui n'est pas une table)
     def traitementDesColonnesBootstrap(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): Unit = {
