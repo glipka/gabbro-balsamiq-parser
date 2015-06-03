@@ -58,9 +58,13 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
 
       }
     }
-    // -------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------------------------------------
     // *** traitement des colonnes de la ligne de la table en cours ***
-    // -------------------------------------------------------
+    // ce traitement est spécifique au traitement d'une table 
+    // on récupère la liste des colonnes de l'objet Datagrid. Chaque colonne contient sa position départ et fin en pixels.
+    // pour chaque colonne, on balaie la liste des widgets du container et on sélectionne les widgets ayant une abscisse relative
+    // au debut du container incluse dans la colonne en cours. Pour chaque widget, on traite les fils
+    // --------------------------------------------------------------------------------------------------------------------------------
     def traitementDesColonnesDeLaTable(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): Unit = {
       val brancheFiltreeParPositionWidget = brancheFiltreeParLigne.sortWith((x, y) => x.positionDansLeConteneur < y.positionDansLeConteneur)
       // *** appel du template pour générer le séparateur de colonne début *** 
@@ -93,7 +97,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
-            traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
+            traitementDesFilsDuWidgetDeLaColonneEnCours(widget) // traitement des fils du widget en cours 
             // génération du  template widget fin
             val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (CommonObjectForMockupProcess.constants.container, container))
             sourceHtml = sourceHtml.append(source9)
@@ -188,9 +192,12 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         numeroColonneEnDouziemeDeLecran += tailleEnCoursEnDouzieme // traitement colonne en douzieme suivante
       } // fin de while numeroColonneEnDouzieme < 12
     }
-    // ------------------------------------------------------------------------------
-    // Traitement des colonnes de la table 
-    // ------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+    // Traitement Principal : 
+    // on traite 2 types de container : 
+    //  Les container de type Bootstrap. Le positionnement des widgets se fait 12eme 
+    //  Les container de type table. le positionnement des widgets se fait par colonne 
+    // --------------------------------------------------------------------------------------
     def traitementPrincipal: Unit = {
       var etoile = "*" * niveau
       // traitement de la ligne en cours

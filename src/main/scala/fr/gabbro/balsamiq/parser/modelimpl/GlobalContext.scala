@@ -24,7 +24,9 @@ class GlobalContext() {
   // modif le 22/4/15 par gl Itemsvars est une Map dont la clef est le usecase,ecran principla, fragmentName, identifiabt unique et la valeur itemsVar
   // cette table va servir à lister des listes des itemsvars pour un ecran principal et pour l'ensemble de ses fragments.
   var itemsVars = Map[(String, String, String, String), ItemVar]() // pour stocker les itemsvar
-  @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
+  @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur  
+  @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
+
   // modif le 22/4/15 par georges 
   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
   // pour un écran principal, le nom du fragment est vide 
@@ -32,6 +34,28 @@ class GlobalContext() {
   var bindedForms = Map[(String, String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
+  /**
+   * <p>methode appelée par freeMarker pour mettre en table le code source des classes java.</p>
+   * <p>subPackageName est le sous package dans lequel sera générée la classe</p>
+   *
+   * @param className
+   * @param classCode
+   * @param subPackageName
+   */
+  def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
+    tableDesCodesDesClassesJavaouScala += (className, subPackageName) -> classCode
+  }
+
+  /**
+   * @param className
+   * @param subPackageName
+   * @return content of java code for the className
+   */
+  def RetrieveCodeJaveOuScala(className: String, subPackageName: String): String = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackageName), "")
+    codeJavaOrScala
+  }
+
   /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
    * on met en cache le code javascript : Le code des fragments est cumulé avec le code du fichier
@@ -67,6 +91,7 @@ class GlobalContext() {
    */
   def getJavascriptSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
+
   }
 
   /**
@@ -160,7 +185,7 @@ class GlobalContext() {
    */
   def getItemsVars(): ArrayList[ItemVar] = {
     val array1 = new ArrayList[ItemVar]()
-    itemsVars.foreach(keyValue => { array1.add(keyValue._2) })   // return an array containaing value of itemsvars
+    itemsVars.foreach(keyValue => { array1.add(keyValue._2) }) // return an array containaing value of itemsvars
     array1
   }
 
@@ -210,14 +235,13 @@ class GlobalContext() {
     // regoupement des fichiers usecase  : on ne tient pas compte de la section 
     val liste_fichiers_javascript = mapSourcesJavascript.keys.map(key => (key._1, key._2)).toList.distinct
     val utilitaire = new Utilitaire
-    val traitementFormatageSourceJava = new TraitementFormatageSourceJava
     liste_fichiers_javascript.foreach(useCasefileName => {
       val useCase = useCasefileName._1
       val fileName = useCasefileName._2
       val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
       val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
       val codeJavaScript = source6 + source7 // le code source est formaté par section
-      ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire, traitementFormatageSourceJava)
+      ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire)
     })
 
     /**
@@ -229,7 +253,7 @@ class GlobalContext() {
      * @param traitementFormatageSourceJava
      * @return true or false
      */
-    def ecritureDuCodeJavascript(outputFileName: String, codeJavaScript: String, useCase: String, utilitaire: Utilitaire, traitementFormatageSourceJava: TraitementFormatageSourceJava): Boolean = {
+    def ecritureDuCodeJavascript(outputFileName: String, codeJavaScript: String, useCase: String, utilitaire: Utilitaire): Boolean = {
       val ficPropertyName = getNomduFichierJavascript(outputFileName, useCase)
       utilitaire.ecrire_fichier(ficPropertyName, codeJavaScript)
     }

@@ -62,6 +62,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * @return formated buffer
    */
   def indentSourceCodeJavaScript(jsCode: String, indentSize: Int): String = {
+    return jsCode // en attentant de corriger le bug
     val BEAUTIFY_JS = System.getProperty("user.dir") + "/" + "beautify.js"
     try {
       val cx = Context.enter();
