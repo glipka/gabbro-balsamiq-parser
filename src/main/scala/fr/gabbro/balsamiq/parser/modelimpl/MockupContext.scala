@@ -83,7 +83,7 @@ class MockupContext() {
    * @param subPackageName
    */
   def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
-    tableDesCodesDesClassesJavaouScala += (className, subPackageName) -> classCode
+    tableDesCodesDesClassesJavaouScala += (className.trim, subPackageName.trim) -> classCode
   }
   /**
    * <p>écriture du code java ou scala genéré pour la page html en cours</p>
