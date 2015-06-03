@@ -55,6 +55,17 @@ class GlobalContext() {
     val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackageName), "")
     codeJavaOrScala
   }
+  
+  /**
+   * @param className
+   * @param subPackageName
+   * @return content of java code for the className
+   */
+  def generateImportFor(className: String, subPackageName: String): Boolean = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackageName), "")
+    if (codeJavaOrScala.trim.size >0) {true}
+    else {false}
+  }
 
   /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
