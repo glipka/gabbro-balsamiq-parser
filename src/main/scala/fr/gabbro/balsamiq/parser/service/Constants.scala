@@ -99,6 +99,7 @@ class Constants {
   val img = "img"
   val index = "index"
   val internalId = "internalId"
+  val isAnArray="isAnArray"
   val isAttribute = "isAttribute"
   val isAFragment = "isAFragment"
   val isForm = "isForm"

@@ -113,11 +113,11 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
     // on concatène le nom de classe bindée dans le containerPere avec le champ bindé du composant en cours.
     // modif le 22/5 si le bind du container est null on récupere le bind du container de container
     if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind != "") {
-      if (!nomDesObjets.startsWith(containerPere.bind.trim)) {nomDesObjets = containerPere.bind.trim + "." + nomDesObjets}
-      
+      if (!nomDesObjets.startsWith(containerPere.bind.trim)) { nomDesObjets = containerPere.bind.trim + "." + nomDesObjets }
+
     } else { // ajout le 22/5. Si le container a un champ bind null et que le container du container a un bind valide => on concatene le bind du container du container avec le champ en cours
-      if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind == "" && containerPere.container != null && containerPere.container.bind!= "") {
-        if (!nomDesObjets.startsWith(containerPere.container.bind.trim)) { nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets}
+      if (CommonObjectForMockupProcess.generationProperties.concatenateContainerIdToWidgetId && containerPere != null && containerPere.bind == "" && containerPere.container != null && containerPere.container.bind != "") {
+        if (!nomDesObjets.startsWith(containerPere.container.bind.trim)) { nomDesObjets = containerPere.container.bind.trim + "." + nomDesObjets }
       }
 
     }
@@ -147,45 +147,45 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * @param widgetEnCours
    * @return
    */
-  private def traitement_branche(brancheEnCours: ArrayBuffer[Field], champs: Array[String], widgetEnCours: WidgetDeBase): ArrayBuffer[Field] = {
+  private def traitement_branche(brancheEnCours: ArrayBuffer[Field], expression: Array[String], widgetEnCours: WidgetDeBase): ArrayBuffer[Field] = {
     var typeDuChamp = ""
-    var premierChamp = champs.head.trim // on prend le 1er champ
-    var fieldName = ""
+    var nomDuchampEnCoursDeTraitement = ""
     val controlTypeID = if (widgetEnCours.isAComponent) { widgetEnCours.componentName } else { widgetEnCours.controlTypeID.split(":").last }
-
-    // ------------------------------------------------------------
-    // traitement du 1er champ qui peut aussi contenir un type 
-    // ------------------------------------------------------------
-    if (premierChamp.contains(":")) {
+    var isAnArray = ""
+    // --------------------------------------------------------------------------------
+    // traitement du 1er champ de l'expression  qui peut aussi contenir un type 
+    // l'expression peut être sous la forme a.b.c:Int 
+    // ---------------------------------------------------------------------------------
+    var premierChamp = expression.head.trim // on prend le 1er champ
+    if (premierChamp.contains(":")) { // le caracterè : est le séparateur de type de données.
       val tableau1 = premierChamp.split(":")
       typeDuChamp = tableau1.last
-      fieldName = tableau1.head
+      nomDuchampEnCoursDeTraitement = getArrayNameOrFieldName(tableau1.head)._1
+      isAnArray = getArrayNameOrFieldName(tableau1.head)._2
     } else {
       typeDuChamp = "????"
-      fieldName = premierChamp
+      nomDuchampEnCoursDeTraitement = getArrayNameOrFieldName(premierChamp)._1
+      isAnArray = getArrayNameOrFieldName(premierChamp)._2
     }
-
     // le champ en cours n'existe pas dans la branche
-    if (!brancheEnCours.exists(field => { (field.instanceName == fieldName) })) {
-      // s'il y a plusieurs champs on crée le 1er champ dans la table et on traite les enfants
-      if (champs.size > 1) {
-        val newField = new Field(fieldName.capitalize, fieldName, typeDuChamp, new ArrayBuffer[Field](), controlTypeID, widgetEnCours)
-        newField.children = traitement_branche(newField.children, champs.tail, widgetEnCours)
-        brancheEnCours += newField
+    if (!brancheEnCours.exists(field => { (field.instanceName == nomDuchampEnCoursDeTraitement) })) {
+      // s'il y a plusieurs champs dans l'expression on crée le 1er champ dans la table et on traite les enfants
+      if (expression.size > 1) {
+        val newField = new Field(nomDuchampEnCoursDeTraitement.capitalize, nomDuchampEnCoursDeTraitement, typeDuChamp, new ArrayBuffer[Field](), controlTypeID, widgetEnCours, isAnArray)
+        newField.children = traitement_branche(newField.children, expression.tail, widgetEnCours)
+        brancheEnCours += newField // on rajoute le nouveau champ (avec ses enfants) dans la branche 
         brancheEnCours
       } // un seul champ on le cree
       else {
-        val newField = new Field(fieldName, fieldName, typeDuChamp, new ArrayBuffer[Field](), controlTypeID, widgetEnCours)
+        val newField = new Field(nomDuchampEnCoursDeTraitement, nomDuchampEnCoursDeTraitement, typeDuChamp, new ArrayBuffer[Field](), controlTypeID, widgetEnCours, isAnArray)
         brancheEnCours += newField
         brancheEnCours
       }
     } else { // le champ existe dans la branche
       // on se repositionne sur l'objet déjà défini afin d'enrichir les fils
-      // on vérifie qye l'objet déjà défini est du même type
-
       val brancheEnrichie = brancheEnCours.map(field => {
-        if (field.instanceName == fieldName) {
-          if (champs.size > 1) { field.children = traitement_branche(field.children, champs.tail, widgetEnCours) }
+        if (field.instanceName == nomDuchampEnCoursDeTraitement) {
+          if (expression.size > 1) { field.children = traitement_branche(field.children, expression.tail, widgetEnCours) }
         }
 
         field
@@ -193,6 +193,16 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       brancheEnrichie
 
     }
+
+  }
+  // --------------------------------------------------------- 
+  // le nom de la variable peut être sous la forme a(2) ou bien a 
+  // si on trouve le caractère () => c'est un tableau sinon c'est un champ 
+  // ---------------------------------------------------------
+  def getArrayNameOrFieldName(variableName: String): (String, String) = {
+    if (variableName.contains("(")) {
+      (variableName.substring(0, variableName.indexOf("(")), CommonObjectForMockupProcess.constants.trueString) // on prend caractères avant le caractère (      
+    } else { (variableName, CommonObjectForMockupProcess.constants.falseString) } // ce n'est pas un tableau
 
   }
 
@@ -248,7 +258,6 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   private def generation_code_source_classe(classeEnCours: Field, niveau: Int, pere: Field, hierarchiePere: String): Unit = {
     var codeDeLaClasse = new StringBuilder
     val tabulation = "\t" * niveau
-    //    val traitementPreserveSection = new TraitementPreserveSection().process(getClassLocation(classeEnCours.fieldNameOrClassName)) // utilisé pour récupérer le contenu des preserves section
     val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source1)
     // traitement de chaque champ de la classe      
@@ -261,19 +270,40 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       if (field.children.size > 0) {
         val hierarchie = if (hierarchiePere == "") { classeEnCours.fieldNameOrClassName }
         else { hierarchiePere + "." + classeEnCours.fieldNameOrClassName }
-        // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)
-        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
-        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.instanceName), (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+        // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)(CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID)
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, 
+          (CommonObjectForMockupProcess.constants.fieldName, field.instanceName),
+          (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), // on force comme tyoe le type de la classe
+          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray),
+           (CommonObjectForMockupProcess.constants.tabulation, tabulation),
+          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+          CommonObjectForMockupProcess.templatingProperties.phase_fin, null,
+          (CommonObjectForMockupProcess.constants.fieldName, field.instanceName),
+          (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize),
+           (CommonObjectForMockupProcess.constants.tabulation, tabulation),
+          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray),
+          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
         codeDeLaClasse.append(source6 + source7)
         if (hierarchiePere == "") { generation_code_source_classe(field, niveau + 1, field, classeEnCours.fieldNameOrClassName) }
         else { generation_code_source_classe(field, niveau + 1, classeEnCours, hierarchiePere + "." + classeEnCours.fieldNameOrClassName) }
       } else {
         // **** c'est un champ ****  
-        val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+        val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+          CommonObjectForMockupProcess.templatingProperties.phase_debut, null,
+          (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp),
+          (CommonObjectForMockupProcess.constants.tabulation, tabulation),
+          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),
+          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray))
 
-        val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+        val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+          CommonObjectForMockupProcess.templatingProperties.phase_fin, null,
+          (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
+          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp),
+          (CommonObjectForMockupProcess.constants.tabulation, tabulation),
+          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),
+            (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray))
         codeDeLaClasse.append(source3 + source4)
       }
     })

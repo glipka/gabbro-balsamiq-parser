@@ -39,7 +39,7 @@ trait TTraitementBinding {
    * @author fra9972467
    *
    */
-  class Field(val fieldNameOrClassName: String, val instanceName: String, val typeDuChamp: String, var children: ArrayBuffer[Field], var controlTypeID: String, var widget: WidgetDeBase)
+  class Field(val fieldNameOrClassName: String, val instanceName: String, val typeDuChamp: String, var children: ArrayBuffer[Field], var controlTypeID: String, var widget: WidgetDeBase,var isAnArray:String)
   protected var tableauDesVariables = ArrayBuffer[Field]()
   protected val point = "."
 

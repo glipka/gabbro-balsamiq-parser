@@ -113,7 +113,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
         // id formulaire renseigné ? 
         if (controle.customId == "") { logBack.error(utilitaire.getContenuMessage("mes29"), controle.controlTypeID.split("::").last) }
         // plus de 1 formulaire avec le même Nom ? 
-        else if (CommonObjectForMockupProcess.listeNomdesFormulaires.filter(_ == controle.customId).size > 1) { logBack.error(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last) }
+        else if (CommonObjectForMockupProcess.tableauDesIdsDesWidgets.filter(_ == controle.customId).size > 1) { logBack.error(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last) }
       }
       if (controle.tableau_des_fils.size > 0) { verification_binding_variable(controle.tableau_des_fils, controle) }
 

@@ -44,7 +44,7 @@ object CommonObjectForMockupProcess {
   var generateController = false
   var isAfragment = false
   var subDirectoryName = List[String]()
-  var listeNomdesFormulaires = new ArrayBuffer[String] // utilisé pour stocker le nom des formulaires 
+  var tableauDesIdsDesWidgets = new ArrayBuffer[String] // utilisé pour stocker les ids des widgets du mockup
   var globalContext:GlobalContext= null // sera renseigné dans ibalsamiq freemarker
  
 }

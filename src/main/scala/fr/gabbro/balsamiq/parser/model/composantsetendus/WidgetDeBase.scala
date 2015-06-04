@@ -63,7 +63,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
 
   var xRelative: Int = 0; // abscisse relative du widget par rapport à son conteneur
   var yRelative: Int = 0; // ordonnee relative du widget par rapport à son conteneur
-  var container:WidgetDeBase=null; // modif le 22/5/15 par gl : ajoutcontainer du widget en cours
+  var container: WidgetDeBase = null; // modif le 22/5/15 par gl : ajoutcontainer du widget en cours
   @BeanProperty var positionDansLeConteneur: Int = 0 // position du widget dans le conteneur (sans tenir compte des n° de lignes et colonnes)
   @BeanProperty var labelFor = "";
   @BeanProperty var labelForWidget: WidgetDeBase = null;
@@ -329,14 +329,14 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           else if (elementName == CommonObjectForMockupProcess.constants.customID) {
             val id = if (elementValue != "") elementValue.trim else ""
             this.customId = id
-            if (id != "") { CommonObjectForMockupProcess.listeNomdesFormulaires += this.customId } // on met en table le nom des formulaires
+            if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets  += this.customId } // on met en table le nom des formulaires
 
           } else if (elementName == CommonObjectForMockupProcess.constants.customData) {
             val tableValue = elementValue.split(";").map(_.trim)
 
             tableValue.foreach(value => {
               // id ne doit être renseigné que pour un container.
-              if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(")) {
+              if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(") && value.contains(",")) {
                 val (retCode, structureMap) = traitementBinding.traitementMap(value)
                 if (retCode) { mapExtendedAttribut += (CommonObjectForMockupProcess.constants.mapBinding -> structureMap) }
 
@@ -459,14 +459,15 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
                   ""
                 }
                 this.customId = id // custom ID
-                if (id != "") { CommonObjectForMockupProcess.listeNomdesFormulaires += this.customId } // on met en table le nom des formulaires
+               
+                if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets+= this.customId } // on met en table le nom des formulaires
 
                 mapExtendedAttributDuComposant += (CommonObjectForMockupProcess.constants.customID -> id)
               } else if (paramName == CommonObjectForMockupProcess.constants.customData) {
                 val tableValue = paramValue.split(";").map(_.trim)
                 tableValue.foreach(value => {
                   // id ne doit être renseigné que pour un container.
-                  if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(")) {
+                  if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(") && value.contains(",")) {
                     val (retCode, structureMap) = traitementBinding.traitementMap(value)
                     if (retCode) { mapExtendedAttributDuComposant += (CommonObjectForMockupProcess.constants.mapBinding -> structureMap) }
 
@@ -506,10 +507,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
       repositoryName = tab1.head.split("/").last.replace(".", ":").split(":").head
 
       logBack.debug(utilitaire.getContenuMessage("mes5"), Array(componentName, repositoryName))
-      // -----------------------------------------------------------------------------------------
+      // ------------------------------------------------------------------------------------------------------------
       // la liste va contenir le composant, on va alors recupérer les attributs de base 
       // et si les attributs ne sont surchargés au niveau du widget en cours, ils seronts alors mis en table
-      // -----------------------------------------------------------------------------------------
+      // ------------------------------------------------------------------------------------------------------------
       val listFiltree = catalogDesComposants.catalogs.getOrElse(repositoryName, List.empty).filter(widget => widget.componentName == componentName)
       if (listFiltree != List.empty) {
         val composant = listFiltree.head
@@ -632,7 +633,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           val valeur = token.split("=").last.trim
           tableauValidation.add(new Token(clef, valeur))
         } else {
-            tableauValidation.add(new Token(token.trim, ""))
+          tableauValidation.add(new Token(token.trim, ""))
         }
       })
       (true, tableauValidation)

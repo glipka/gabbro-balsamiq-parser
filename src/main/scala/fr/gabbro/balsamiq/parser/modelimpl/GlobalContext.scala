@@ -7,6 +7,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
+import scala.collection.JavaConversions._
 
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le menu par exemple.  
@@ -25,7 +26,7 @@ class GlobalContext() {
   // cette table va servir à lister des listes des itemsvars pour un ecran principal et pour l'ensemble de ses fragments.
   var itemsVars = Map[(String, String, String, String), ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur  
-  @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
+  @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String,String,String, String), String]() // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
 
   // modif le 22/4/15 par georges 
   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
@@ -38,34 +39,60 @@ class GlobalContext() {
    * <p>methode appelée par freeMarker pour mettre en table le code source des classes java.</p>
    * <p>subPackageName est le sous package dans lequel sera générée la classe</p>
    *
+   * @param usecaseName
+   * @param mockupName
+   * @param subPackageName
    * @param className
    * @param classCode
    * @param subPackageName
    */
-  def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
-    tableDesCodesDesClassesJavaouScala += (className, subPackageName) -> classCode
+  def setCodeClasse(usecaseName:String,mockupName:String,subPackageName:String,className: String, classCode: String): Unit = {
+    tableDesCodesDesClassesJavaouScala += (usecaseName,mockupName,subPackageName,className) -> classCode
   }
 
   /**
+   * @param usecaseName
+   * @param mockupName
+   * @param subPackageName
    * @param className
    * @param subPackageName
    * @return content of java code for the className
    */
-  def RetrieveCodeJaveOuScala(className: String, subPackageName: String): String = {
-    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackageName), "")
+  def RetrieveCodeJaveOuScala(usecaseName:String,mockupName:String,className: String, subPackageName: String): String = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName,mockupName, subPackageName,className), "")
     codeJavaOrScala
   }
   
   /**
-   * @param className
+   * @param usecaseName
+   * @param mockupName
    * @param subPackageName
-   * @return content of java code for the className
+   * @param className
+   * @return true or false
    */
-  def generateImportFor(className: String, subPackageName: String): Boolean = {
-    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackageName), "")
+  def generateImportFor(usecaseName:String,mockupName:String,className: String, subPackageName: String): Boolean = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName,mockupName,subPackageName,className), "")
     if (codeJavaOrScala.trim.size >0) {true}
     else {false}
   }
+  
+   /**
+   * @param usecaseNmae
+   * @param className
+   * @return Array of String. 
+   */
+  def listOfSubPackageInJavaOrScalaCode(usecaseName:String,mockupName:String): java.util.ArrayList[String] = {
+   val tableDesPackages= new java.util.ArrayList[String]
+    val t1=tableDesCodesDesClassesJavaouScala.map(clefValue=>{
+      // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
+      if (clefValue._1._1 == usecaseName && clefValue._1._2 == mockupName) {tableDesPackages.add(clefValue._1._3)} //  recupération non du package
+      clefValue._1._3 // récupération nom du package
+    }).toList
+   tableDesPackages
+     
+  }
+    
+    
 
   /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
