@@ -668,6 +668,11 @@ class Utilitaire {
     else {null}
     
   }
+  // utilisé en debug par freeMarker
+  def printTrace(x:String) : Unit = {
+    
+    println("freeMarker:"+ x)
+  }
   // -------------------------------------------------------------------------------
 
 }

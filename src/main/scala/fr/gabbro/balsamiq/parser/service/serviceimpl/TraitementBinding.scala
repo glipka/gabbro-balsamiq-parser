@@ -36,8 +36,9 @@ import fr.gabbro.balsamiq.parser.service.TTraitementBinding
  * Le champ CustomControl ID doit commencer par bind=obj1.obj2.champ1:Int
  *     les types permis sont :
  *   datetime, date, Int, long,double, string
- *     les listes se terminent par * (pas encore implémenté)
- *     Exemple bind=personne/adresse:Int
+ *     Toute variable contenant un indice prefixé par ( et suffixé par ) est considérée comme une liste
+ *     Exemple1 bind=personne.adresse:Int   // adresse est ici un entier
+ *     Exemple2 bind=personne.adresse(1).rue   // adresse est tableau de type Adresse contenant le champ rue 
  *
  *
  * le champ CustomControl ID peut être aussi du type : bind=map1("nom","adresse")

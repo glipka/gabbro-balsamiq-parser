@@ -23,11 +23,31 @@ import scala.collection.JavaConversions._
 import scala.beans.BeanProperty
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
-import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
+import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants //class ColumnDefinitionNewVersion(@BeanProperty var columnName: String, @BeanProperty var sort: String, @BeanProperty var width: String, @BeanProperty var alignment: String, @BeanProperty var columnType: String, @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase, var beginningPositionRelativeToContainer: Int, var endPositionRelativeToContainer: Int)
+class WidgetInThisColumn (@BeanProperty var widgetType: String,
+  @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase)
 
-class ColumnDefinition(@BeanProperty var columnName: String, @BeanProperty var sort: String, @BeanProperty var width: String, @BeanProperty var alignment: String, @BeanProperty var columnType: String, @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase, var beginningPositionRelativeToContainer: Int, var endPositionRelativeToContainer: Int)
+// pour simplification sur le traitement de dhmlxgrid, on garde les champs alignment,columntype,readonly,widget.
+// le tableau widgetList sera utilisé pour les composants autre que dhtmlxgrid supportant nativement plusieurs composants
+// dans une même colonne.
+class ColumnDefinition(
+  @BeanProperty var columnName: String,
+  @BeanProperty var sort: String,
+  @BeanProperty var width: String,
+  @BeanProperty var alignment: String,
+  @BeanProperty var widgetList: java.util.ArrayList[WidgetInThisColumn ],
+  var beginningPositionRelativeToContainer: Int, // mémorisation offset début de la colonne utilisé pour détecter les widgets inclus dans cette colonne
+  var endPositionRelativeToContainer: Int,
+  @BeanProperty var columnType: String, // utilisé seulement pour compatibilité dhtmlxgrid
+  @BeanProperty var readonly: String, // utilisé seulement pour compatibilité dhtmlxgrid
+  @BeanProperty var widget: WidgetDeBase) // 1er widget de la colonne que l'on garde pour compatibilité avec dhtmlxgrid
 
+/**
+ * @author fra9972467
+ *
+ */
 class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
+  val text = CommonObjectForMockupProcess.constants.text
 
   /* (non-Javadoc)
    * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
@@ -98,24 +118,22 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       } else {
         width = largeurEtAlignement.substring(0, largeurEtAlignement.length()).trim
       }
-
       numeroColonneEnCours += 1
 
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
       if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
       else { largeurTotaleEnpourcentage += width.toInt }
       if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
-      // les postions départ et fin sont calculées à partir des pourcentages de la largeur des colonnes en rapport avec la largeur de la table en pixels.
+      // les positions départ et fin sont calculées à partir des pourcentages de la largeur des colonnes en rapport avec la largeur de la table en pixels.
       var positionDepart = positionEnCoursDeLaColonne
       var positionFin = positionDepart + (this.w.toInt * width.toInt) / 100 - 1
       positionEnCoursDeLaColonne = positionFin + 1
       // met en table la colonne 
       logBack.debug("traitementcolonne n°:" + numeroColonneEnCours + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
-      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, "", "", null, positionDepart, positionFin)
+      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, new java.util.ArrayList[WidgetInThisColumn ], positionDepart, positionFin,null,null,null)
       tableauDesColonnes.add(columnDefinition)
 
     })
-    val x = enrichissementDuTableau(tableauDesColonnes)
     (CommonObjectForMockupProcess.constants.columns, enrichissementDuTableau(tableauDesColonnes))
 
   } // fin de la methode 
@@ -133,115 +151,139 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
    * on parcourt la liste des widgets fils pour récupérer leur type ainsi que l'attribut readonly
    *
    * @param tableau_des_colonnes
-   * @return
+   * @return tableau_des_colonnes enrichi
    */
   private def enrichissementDuTableau(tableau_des_colonnes: java.util.ArrayList[ColumnDefinition]): java.util.ArrayList[ColumnDefinition] = {
     // on récupère le header de chaque colonne
     // var tableau_des_colonnes = getColonneDefinition().toList
     val tableauEnrichi = new java.util.ArrayList[ColumnDefinition]
     // on récupère la table des fils du widget en cours 
-    val tableau_des_widgets_fils = this.tableau_des_fils
+    val tableau_des_widgets_fils = this.tableau_des_fils.sortWith((x, y) => x.positionDansLeConteneur < y.positionDansLeConteneur) // tableau des widgets Fils
     var position = 0
-    val text = CommonObjectForMockupProcess.constants.text
-
-    tableau_des_colonnes.foreach(colonne => {
-      var typeDeColonne = text
-      var readonly = CommonObjectForMockupProcess.constants.falseString
+    tableau_des_colonnes.foreach(colonne => {    
+      // traitement spécifique à dhtmxgrid, qui ne sait générer nativement qu'un widget par colonne 
       if (position < tableau_des_widgets_fils.size) {
-        val widgetFils = tableau_des_widgets_fils(position)
-        colonne.widget = widgetFils // on renseigne le widget du composant de la colonne
-        val state = widgetFils.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.state, "")
-        // test du type d'objet . ON se 
-        widgetFils.controlTypeID match {
-          case CommonObjectForMockupProcess.constants.numericStepper => { // NUmerifc 
-            if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
-              typeDeColonne = CommonObjectForMockupProcess.constants.numeric // type de colonne = ron
-              readonly = CommonObjectForMockupProcess.constants.trueString
-            } else {
-              typeDeColonne = CommonObjectForMockupProcess.constants.numeric // type de colonne = edn
-              readonly = CommonObjectForMockupProcess.constants.falseString // 
-            }
-          }
-
-          case CommonObjectForMockupProcess.constants.textInput => { // Text
-
-            if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
-              typeDeColonne = text // type =ro
-              readonly = CommonObjectForMockupProcess.constants.trueString
-            } else {
-              typeDeColonne = text // type="ed"
-              readonly = CommonObjectForMockupProcess.constants.falseString
-
-            }
-          }
-          case CommonObjectForMockupProcess.constants.label => { // Text
-            typeDeColonne = text // type =ro
-            readonly = CommonObjectForMockupProcess.constants.trueString
-
-          }
-          case CommonObjectForMockupProcess.constants.textArea => { // TextArea
-            typeDeColonne = CommonObjectForMockupProcess.constants.textareaShort
-            readonly = CommonObjectForMockupProcess.constants.falseString
-          }
-          case CommonObjectForMockupProcess.constants.checkBox => { // checkbox
-            typeDeColonne = CommonObjectForMockupProcess.constants.checkboxShort // type=ch
-            if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
-              readonly = CommonObjectForMockupProcess.constants.trueString
-            } else {
-              readonly = CommonObjectForMockupProcess.constants.falseString
-            }
-          }
-          case CommonObjectForMockupProcess.constants.radioButton => { // RadioButton
-            typeDeColonne = CommonObjectForMockupProcess.constants.radiobuttonShort // type=ra
-            if (state == CommonObjectForMockupProcess.constants.disabled || state == "ra") {
-              readonly = CommonObjectForMockupProcess.constants.trueString
-            } else {
-              readonly = CommonObjectForMockupProcess.constants.falseString
-            }
-          }
-          case CommonObjectForMockupProcess.constants.comboBox => { // combobox
-            typeDeColonne = CommonObjectForMockupProcess.constants.combobox // type=combo
-          }
-          case CommonObjectForMockupProcess.constants.listHTML => { // editable select box
-            typeDeColonne = CommonObjectForMockupProcess.constants.list //type=co
-            readonly = CommonObjectForMockupProcess.constants.falseString
-          }
-          // -------------- Trouver le bon composant -------------------------
-          case "com.balsamiq.mockups::Listx" => { // not editable select box
-            typeDeColonne = CommonObjectForMockupProcess.constants.list //type=coro
-            readonly = CommonObjectForMockupProcess.constants.trueString
-          }
-
-          case CommonObjectForMockupProcess.constants.colorPicker => { // ColorPicker
-            typeDeColonne = CommonObjectForMockupProcess.constants.colorPicker // type=cp
-          }
-          case CommonObjectForMockupProcess.constants.dateChooser => { // datePicker
-            typeDeColonne = CommonObjectForMockupProcess.constants.calendar //type=dhxCalendar
-          }
-          case CommonObjectForMockupProcess.constants.link => { // lien 
-            typeDeColonne = CommonObjectForMockupProcess.constants.linkShort // type=link 
-          }
-          case CommonObjectForMockupProcess.constants.image => { // image
-            typeDeColonne = CommonObjectForMockupProcess.constants.img // type=img
-          }
-
-          case CommonObjectForMockupProcess.constants.icon => { // iconShort
-            typeDeColonne = CommonObjectForMockupProcess.constants.iconShort // type=iconShort
-          }
-
-          case _ => logBack.info(utilitaire.getContenuMessage("mes18"), widgetFils.controlTypeID)
-
+        colonne.widget = tableau_des_widgets_fils(position)
+         val (typeDeWidget, readOnly) = getTypeAndReadOnly(colonne.widget)
+   //      println("numero de colonne %s, columnType: %s, readonly :%s".format(colonne,typeDeWidget,readOnly))
+         colonne.columnType = typeDeWidget
+         colonne.readonly=readOnly
+      }  
+      // ---------------------------------------------------------------------------------------------------------
+      // pour chaque colonne, on récupère l'ensemble des widgets qui sont positionnés dans la colonne. 
+      // on se sert pour chaque des positions relatives des widgets par rapport au container (donc la table)
+      // ainsi que des postitions relatives de la colonne par rapport à la table.
+      // les widgets inclus sont stcokés dans la table widgetList 
+      // ---------------------------------------------------------------------------------------------------------
+      tableau_des_widgets_fils.foreach(widget => {
+        // on ne s'occupe que des abscisses, il faut donc faire attention que les widgets soient bien alignés dans le container 
+        // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
+        if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
+          val (typeDeWidget, readOnly) = getTypeAndReadOnly(widget)
+          colonne.widgetList.add(new WidgetInThisColumn (typeDeWidget, readOnly, widget))
+         // println("n°de colonne %s ajout widget %s %s".format(position,typeDeWidget,readOnly))
         }
-        colonne.columnType = typeDeColonne
-        colonne.readonly = readonly
-      } else colonne.columnType = text
+      }) // fin de tableau_des_widgets_fils.foreach(widge
 
       tableauEnrichi.add(colonne)
       position += 1
     })
-
     tableauEnrichi
+  }
 
+  /**
+   * return type of widget and readOnly true or False
+   * @param widgetFils : WidgetDeBase
+   * @return (typeOfWidget,ReadOnly)
+   */
+  def getTypeAndReadOnly(widgetFils: WidgetDeBase): (String, String) = {
+    val state = widgetFils.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.state, "") // on récupère l'état du composant
+    var typeDeColonne = text
+    var readonly = CommonObjectForMockupProcess.constants.falseString
+
+    // on determine un type générique qui sera interprété par le template freeMarker. 
+    widgetFils.controlTypeID match {
+      case CommonObjectForMockupProcess.constants.numericStepper => { // NUmerifc 
+        if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
+          typeDeColonne = CommonObjectForMockupProcess.constants.numeric // type de colonne = ron
+          readonly = CommonObjectForMockupProcess.constants.trueString
+        } else {
+          typeDeColonne = CommonObjectForMockupProcess.constants.numeric // type de colonne = edn
+          readonly = CommonObjectForMockupProcess.constants.falseString // 
+        }
+      }
+
+      case CommonObjectForMockupProcess.constants.textInput => { // Text
+
+        if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
+          typeDeColonne = text // type =ro
+          readonly = CommonObjectForMockupProcess.constants.trueString
+        } else {
+          typeDeColonne = text // type="ed"
+          readonly = CommonObjectForMockupProcess.constants.falseString
+
+        }
+      }
+      case CommonObjectForMockupProcess.constants.label => { // Text
+        typeDeColonne = text // type =ro
+        readonly = CommonObjectForMockupProcess.constants.trueString
+
+      }
+      case CommonObjectForMockupProcess.constants.textArea => { // TextArea
+        typeDeColonne = CommonObjectForMockupProcess.constants.textareaShort
+        readonly = CommonObjectForMockupProcess.constants.falseString
+      }
+      case CommonObjectForMockupProcess.constants.checkBox => { // checkbox
+        typeDeColonne = CommonObjectForMockupProcess.constants.checkboxShort // type=ch
+        if (state == CommonObjectForMockupProcess.constants.disabled || state == CommonObjectForMockupProcess.constants.disabledSelected) {
+          readonly = CommonObjectForMockupProcess.constants.trueString
+        } else {
+          readonly = CommonObjectForMockupProcess.constants.falseString
+        }
+      }
+      case CommonObjectForMockupProcess.constants.radioButton => { // RadioButton
+        typeDeColonne = CommonObjectForMockupProcess.constants.radiobuttonShort // type=ra
+        if (state == CommonObjectForMockupProcess.constants.disabled || state == "ra") {
+          readonly = CommonObjectForMockupProcess.constants.trueString
+        } else {
+          readonly = CommonObjectForMockupProcess.constants.falseString
+        }
+      }
+      case CommonObjectForMockupProcess.constants.comboBox => { // combobox
+        typeDeColonne = CommonObjectForMockupProcess.constants.combobox // type=combo
+      }
+      case CommonObjectForMockupProcess.constants.listHTML => { // editable select box
+        typeDeColonne = CommonObjectForMockupProcess.constants.list //type=co
+        readonly = CommonObjectForMockupProcess.constants.falseString
+      }
+      // -------------- Trouver le bon composant -------------------------
+      case "com.balsamiq.mockups::Listx" => { // not editable select box
+        typeDeColonne = CommonObjectForMockupProcess.constants.list //type=coro
+        readonly = CommonObjectForMockupProcess.constants.trueString
+      }
+
+      case CommonObjectForMockupProcess.constants.colorPicker => { // ColorPicker
+        typeDeColonne = CommonObjectForMockupProcess.constants.colorPicker // type=cp
+      }
+      case CommonObjectForMockupProcess.constants.dateChooser => { // datePicker
+        typeDeColonne = CommonObjectForMockupProcess.constants.calendar //type=dhxCalendar
+      }
+      case CommonObjectForMockupProcess.constants.link => { // lien 
+        typeDeColonne = CommonObjectForMockupProcess.constants.linkShort // type=link 
+      }
+      case CommonObjectForMockupProcess.constants.image => { // image
+        typeDeColonne = CommonObjectForMockupProcess.constants.img // type=img
+      }
+
+      case CommonObjectForMockupProcess.constants.icon => { // iconShort
+        typeDeColonne = CommonObjectForMockupProcess.constants.iconShort // type=iconShort
+      }
+
+      case _ => logBack.info(utilitaire.getContenuMessage("mes18"), widgetFils.controlTypeID)
+
+    }
+
+    (typeDeColonne, readonly)
   }
 
 }
