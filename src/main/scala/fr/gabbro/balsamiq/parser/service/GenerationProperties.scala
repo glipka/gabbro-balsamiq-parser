@@ -110,7 +110,7 @@ class GenerationProperties {
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     bypassProcessI18nTagHierachy = propsMap.getOrElse("config.generation.bypassProcessI18nTagHierachy", "").split(",").toList.map(_.trim)
-    generatedOtherConfFilesSuffix = propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim)
+    generatedOtherConfFilesSuffix = if (propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").trim !="" )propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim) else List.empty
     listDataTableWidget = propsMap.getOrElse("config.generation.listDataTableWidget", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
     //  generatedFolderForFragmentType.foreach { println(_)}

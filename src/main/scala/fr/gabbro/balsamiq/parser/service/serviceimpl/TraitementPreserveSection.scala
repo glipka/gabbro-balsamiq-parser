@@ -32,6 +32,9 @@ class TraitementPreserveSection extends TTraitementCommun {
   @BeanProperty var fichierPresent = false
   var preserveSectionBegin = ""
   var preserveSectionEnd = ""
+     val l=CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix
+     val m=CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
+
 
   /**
    * lecture du fichier pour extraire les preserve sections
@@ -42,8 +45,9 @@ class TraitementPreserveSection extends TTraitementCommun {
     var bufferATraiter = List[String]()
     fichierEnCoursDeTraitement = filename
     // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
-    if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
-      (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => fichierEnCoursDeTraitement.endsWith(suffix)))) {
+    // rajout le 5/6/14 par gl d'un test sur la liste generatedOtherConfFilesSuffix n'est pas vide
+     if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
+      ((!CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.isEmpty) && (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => {println("sufix="+suffix);fichierEnCoursDeTraitement.endsWith(suffix)})))) {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
       //   println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
@@ -121,6 +125,7 @@ class TraitementPreserveSection extends TTraitementCommun {
       }
       position = position - 1 // caractère précédent dans le buffer 
     }
+    logBack.debug("contenu du sceau pour la preserve=" + sceau)
     sceau
 
   }
