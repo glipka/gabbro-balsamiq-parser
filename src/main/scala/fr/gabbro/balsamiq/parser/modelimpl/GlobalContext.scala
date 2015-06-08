@@ -26,7 +26,7 @@ class GlobalContext() {
   // cette table va servir à lister des listes des itemsvars pour un ecran principal et pour l'ensemble de ses fragments.
   var itemsVars = Map[(String, String, String, String), ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur  
-  @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String,String,String, String), String]() // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
+  @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String, String, String), String]() // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
 
   // modif le 22/4/15 par georges 
   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
@@ -46,8 +46,8 @@ class GlobalContext() {
    * @param classCode
    * @param subPackageName
    */
-  def setCodeClasse(usecaseName:String,mockupName:String,subPackageName:String,className: String, classCode: String): Unit = {
-    tableDesCodesDesClassesJavaouScala += (usecaseName,mockupName,subPackageName,className) -> classCode
+  def setCodeClasse(usecaseName: String, mockupName: String, subPackageName: String, className: String, classCode: String): Unit = {
+    tableDesCodesDesClassesJavaouScala += (usecaseName, mockupName, subPackageName, className) -> classCode
   }
 
   /**
@@ -58,11 +58,11 @@ class GlobalContext() {
    * @param subPackageName
    * @return content of java code for the className
    */
-  def RetrieveCodeJaveOuScala(usecaseName:String,mockupName:String,className: String, subPackageName: String): String = {
-    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName,mockupName, subPackageName,className), "")
+  def RetrieveCodeJaveOuScala(usecaseName: String, mockupName: String, className: String, subPackageName: String): String = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, className), "")
     codeJavaOrScala
   }
-  
+
   /**
    * @param usecaseName
    * @param mockupName
@@ -70,29 +70,27 @@ class GlobalContext() {
    * @param className
    * @return true or false
    */
-  def generateImportFor(usecaseName:String,mockupName:String,className: String, subPackageName: String): Boolean = {
-    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName,mockupName,subPackageName,className), "")
-    if (codeJavaOrScala.trim.size >0) {true}
-    else {false}
+  def generateImportFor(usecaseName: String, mockupName: String, className: String, subPackageName: String): Boolean = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, className), "")
+    if (codeJavaOrScala.trim.size > 0) { true }
+    else { false }
   }
-  
-   /**
+
+  /**
    * @param usecaseNmae
    * @param className
-   * @return Array of String. 
+   * @return Array of String.
    */
-  def listOfSubPackageInJavaOrScalaCode(usecaseName:String,mockupName:String): java.util.ArrayList[String] = {
-   val tableDesPackages= new java.util.ArrayList[String]
-    val t1=tableDesCodesDesClassesJavaouScala.map(clefValue=>{
+  def listOfSubPackageInJavaOrScalaCode(usecaseName: String, mockupName: String): java.util.ArrayList[String] = {
+    val tableDesPackages = new java.util.ArrayList[String]
+    val t1 = tableDesCodesDesClassesJavaouScala.map(clefValue => {
       // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
-      if (clefValue._1._1 == usecaseName && clefValue._1._2 == mockupName) {tableDesPackages.add(clefValue._1._3)} //  recupération non du package
+      if (clefValue._1._1 == usecaseName && clefValue._1._2 == mockupName) { tableDesPackages.add(clefValue._1._3) } //  recupération non du package
       clefValue._1._3 // récupération nom du package
     }).toList
-   tableDesPackages
-     
+    tableDesPackages
+
   }
-    
-    
 
   /**
    *  le code javascript est mis dans une hashMap afin de concaténer le code de l'ecran et des fragments
@@ -121,15 +119,30 @@ class GlobalContext() {
   }
   /**
    * Get a javascript section beforehand cached thanks to registerJavascriptSection function
-   * @param section name of cached section
    * @param useCase
    * @param fileName
+   *  * @param section name of cached section
    * @return code of the section
    * //TODO deduire du code scala ?
    */
   def getJavascriptSection(useCase: String, fileName: String, section: String): String = {
     mapSourcesJavascript.getOrElse((useCase, fileName, section), "")
 
+  }
+  /**
+   * Get a javascript section beforehand cached thanks to registerJavascriptSection function
+   * @param section name of cached section
+     * @return code of the section
+   * //TODO deduire du code scala ?
+   */
+  def getJavascriptSection(section: String): String = {
+    var sourceDeLaSection = ""
+    mapSourcesJavascript.foreach(keyValue => {
+      if (keyValue._1._3.trim == section.trim) {  // filtre sur la section en cours
+        sourceDeLaSection += keyValue._2 // on cumule le code de la section
+      }
+    })
+    sourceDeLaSection
   }
 
   /**
