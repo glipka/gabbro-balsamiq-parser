@@ -144,6 +144,21 @@ class GlobalContext() {
     })
     sourceDeLaSection
   }
+  /**
+   * Get a javascript section beforehand cached thanks to registerJavascriptSection function
+   * @param section name of cached section
+     * @return code of the section
+   * //TODO deduire du code scala ?
+   */
+  def getJavascriptSection(usecaseName:String,section: String): String = {
+    var sourceDeLaSection = ""
+    mapSourcesJavascript.foreach(keyValue => {
+      if (keyValue._1._3.trim == section.trim && keyValue._1._1.trim == usecaseName.trim) {  // filtre sur la section en cours et le usecaseName
+        sourceDeLaSection += keyValue._2 // on cumule le code de la section
+      }
+    })
+    sourceDeLaSection
+  }
 
   /**
    * Exposition à freemarker des noms des fichiers javascript générés. (sans les doublons)
