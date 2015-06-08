@@ -13,7 +13,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTemplatingFreeMarker, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants) extends TCatalogAPlat {
   /**
    * <p>chargement du catalog à plat : procédure appelée depuis IBalsamiqFreeMarker</p>
@@ -35,7 +35,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
         return (false, 0, 0)
       }
     }
-    traitementDesWidgets(mockup.getChild(CommonObjectForMockupProcess.constants.controls), null) // le groupe en cours est nul 
+    traitementDesWidgets(mockup.getChild(cstControls), null) // le groupe en cours est nul 
     rechercheDesFils(this.catalog) // pour chaque container, on renseigne les fils
     if (this.catalog.size > 0) { return (verification_doublon_catalogue, maxWidth(), maxHeight()) }
     else { return (false, 0, 0) } // catalogue vide
@@ -70,25 +70,25 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
    * @param groupe_en_cours : WidgetDeBase
    */
   private def traitementDesWidgets(controlsXML: Element, groupe_en_cours: WidgetDeBase) {
-    val controlXML = controlsXML.getChildren(CommonObjectForMockupProcess.constants.control).toList
+    val controlXML = controlsXML.getChildren(cstControl).toList
     controlXML.foreach(elementXML => {
       val controle_en_cours = new InstanciationTypeDeWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants).process() // traitement du contrôle en cours
       // bypass des widgets ayant l'attribut markup positionné à true
       //FIXME bug markup - 
-      if (controle_en_cours.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.markup, "") != "true") { // if1
+      if (controle_en_cours.mapExtendedAttribut.getOrElse(cstMarkup, "") != "true") { // if1
         // controle en cours est un composant qui doit être traité localement ?
         if (controle_en_cours.isAComponent && controle_en_cours.componentXML != null && List(controle_en_cours.componentName).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsListProcessedLocally).size > 0) {
           traitementGroupe(controle_en_cours.componentXML, controle_en_cours) // on traite le code xml du composant qui a été récupéré dans le traitement du catalogue des composants
         } // le controle groupe n'est pas mis en table, mais va servir à recalculer les coordonnées du fils 
         // l'id interne n'est pas incrémenté après un grpupe car il sert à récuperer les adresses des élements
-        else if (controle_en_cours.controlTypeID == CommonObjectForMockupProcess.constants.groupConstante) traitementGroupe(elementXML, controle_en_cours)
+        else if (controle_en_cours.controlTypeID == cstGroupConstante) traitementGroupe(elementXML, controle_en_cours)
         else {
           // si le widget est un element d'un composant traité localement, on récupère les 
           // attributs en override du groupe.
           // les attributs en override sont stockés sous la forme "CustomIDuComposantCLef" -> valeur
           if (groupe_en_cours != null && groupe_en_cours.isAComponent) {
             groupe_en_cours.mapExtendedAttribut.foreach(valeur => {
-              if(controle_en_cours.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.markup, "") == "true"){
+              if(controle_en_cours.mapExtendedAttribut.getOrElse(cstMarkup, "") == "true"){
               
                 // la clef commence par le cutomID du widget du commposant ? 
                 if (controle_en_cours.customId != "" && valeur._1.toString().startsWith(controle_en_cours.customId)) {
@@ -104,7 +104,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           catalog += controle_en_cours
           id_interne = id_interne + 1
         }
-      } // fin de if1 (CommonObjectForMockupProcess.constants.markup, "") != "true") 
+      } // fin de if1 (markup, "") != "true") 
 
     }) // fin de control.foreach 
   }
@@ -117,7 +117,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
    * @param groupe_en_cours
    */
   private def traitementGroupe(elementXML: Element, groupe_en_cours: WidgetDeBase): Unit = {
-    val groupChildrenDescriptor = elementXML.getChild(CommonObjectForMockupProcess.constants.groupChildrenDescriptors);
+    val groupChildrenDescriptor = elementXML.getChild(cstGroupChildrenDescriptors);
     return traitementDesWidgets(groupChildrenDescriptor, groupe_en_cours)
   }
   /**

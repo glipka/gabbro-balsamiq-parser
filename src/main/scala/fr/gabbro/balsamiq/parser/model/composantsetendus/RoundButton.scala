@@ -24,7 +24,7 @@ import org.jdom2.Element
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class DirectoryFile(@BeanProperty var directory: String, @BeanProperty var file: String)
 // on recupere le champ href 
 class RoundButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
@@ -35,16 +35,16 @@ class RoundButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: El
 override def enrichissementParametres(param: String): (String, Object) = {
     var tabs = new java.util.ArrayList[Href]()
     // l'adresse doit être sous la forme : http://directory/fichier 
-    val href = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.href, "").toString
-    if (href.startsWith(CommonObjectForMockupProcess.constants.headerHttp)) {
-      val str1 = href.substring(CommonObjectForMockupProcess.constants.headerHttp.size)
+    val href = this.mapExtendedAttribut.getOrElse(cstHref, "").toString
+    if (href.startsWith(cstHeaderHttp)) {
+      val str1 = href.substring(cstHeaderHttp.size)
       val directory = str1.split("/").head
       val file = str1.split("/").last
       val directoryFile = new DirectoryFile(directory, file)
       // ce lien sera accessible depuis tous les écrans
       CommonObjectForMockupProcess.mockupContext.links += directoryFile.asInstanceOf[DirectoryFile]
-      (CommonObjectForMockupProcess.constants.directoryFile, directoryFile)
-    } else { (CommonObjectForMockupProcess.constants.directoryFile, null) }
+      (cstDirectoryFile, directoryFile)
+    } else { (cstDirectoryFile, null) }
 
   }
 }

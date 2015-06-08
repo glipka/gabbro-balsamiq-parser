@@ -24,6 +24,7 @@ import org.jdom2.Element
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class ListItem(@BeanProperty var content: String, @BeanProperty var enabled: Boolean)
 class ListHTML(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
@@ -32,7 +33,7 @@ class ListHTML(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
  */
 override def enrichissementParametres(param: String): (String, Object) = {
     var items = new java.util.ArrayList[ListItem]()
-    val str1 = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\n").toList
+    val str1 = this.mapExtendedAttribut.getOrElse(cstText, "").toString().split("\n").toList
     var nbre_lignes = 0
     str1.foreach(item =>
       {
@@ -42,6 +43,6 @@ override def enrichissementParametres(param: String): (String, Object) = {
         nbre_lignes += 1
 
       })
-    (CommonObjectForMockupProcess.constants.items, items)
+    (cstItems, items)
   }
 }

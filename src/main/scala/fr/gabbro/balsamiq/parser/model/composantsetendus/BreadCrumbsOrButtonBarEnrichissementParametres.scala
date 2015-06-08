@@ -24,6 +24,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.service.serviceimpl.IBalsamiqFreeMarker
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class Adresse(@BeanProperty var href: java.lang.String,
   @BeanProperty var libelle: java.lang.String, @BeanProperty var id: java.lang.String)
 
@@ -36,9 +37,9 @@ class BreadCrumbsOrButtonBarEnrichissementParametres(id_interne: Int, groupe_en_
    * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
  */
   override def enrichissementParametres(param: String): (String, Object) = {
-    val parts: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
-    val hrefs: Array[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.hrefs, "").toString().split(",")
-    val libelles = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split(", ")
+    val parts: List[String] = this.mapExtendedAttribut.getOrElse(cstText, "").toString().split("\\n").toList
+    val hrefs: Array[String] = this.mapExtendedAttribut.getOrElse(cstHrefs, "").toString().split(",")
+    val libelles = this.mapExtendedAttribut.getOrElse(cstText, "").toString().split(", ")
     val tableDesUrls = new java.util.ArrayList[Href]();
 
     var i = 0
@@ -54,7 +55,7 @@ class BreadCrumbsOrButtonBarEnrichissementParametres(id_interne: Int, groupe_en_
       i += 1
     })
     // on renseigne la table des urls qui sera traite comme une liste dans le template
-    (CommonObjectForMockupProcess.constants.urls, tableDesUrls)
+    (cstUrls, tableDesUrls)
 
   }
 

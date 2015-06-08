@@ -23,7 +23,8 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.service.TControleValidite
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.modelimpl.ItemVar
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl._
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 /**
  * *** verification de la validité de la position des widgets ***
  * @author fra9972467
@@ -105,8 +106,8 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     branche.foreach(controle => {
       // si le container Pere est un formulaire, on vérifie que chaque widget de type formulaire est bindé à une valeur
       if (widgetPere.isFormulaireHTML && CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == controle.controlTypeID || x == controle.componentName))) {
-        val v1 = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.variableBinding, "").toString()
-        val v2 = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.mapBinding, "").toString()
+        val v1 = controle.mapExtendedAttribut.getOrElse(cstVariableBinding, "").toString()
+        val v2 = controle.mapExtendedAttribut.getOrElse(cstMapBinding, "").toString()
         if (v1 == "" && v2 == "") { logBack.error(utilitaire.getContenuMessage("mes23"), controle.controlTypeID.split("::").last) }
       }
       if (controle.isFormulaireHTML) {
@@ -128,7 +129,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
   def mise_en_table_items_vars(branche: ArrayBuffer[WidgetDeBase], containerPere: WidgetDeBase) {
     //   val listeDesengineProperties.widgetsEnablingContainerAsAForm = CommonObjectForMockupProcess .engineProperties.widgetsEnablingContainerAsAForm.split(",").map(_.trim).toList
     branche.foreach(controle => {
-      val itemsVar = controle.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.itemsVar, "").toString()
+      val itemsVar = controle.mapExtendedAttribut.getOrElse(cstItemsVar, "").toString()
       if (itemsVar != "" && !CommonObjectForMockupProcess.mockupContext.itemsVars.exists { item => item.content == itemsVar }) { CommonObjectForMockupProcess.mockupContext.itemsVars.add(new ItemVar(itemsVar, itemsVar.toUpperCase())) }
       if (itemsVar != "") {
         val itemVar = new ItemVar(itemsVar, itemsVar.toUpperCase())

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.modelimpl.MockupContext
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // --------------------------------------------------------------------------------------------------------
 // Détermination des dépendances.  
 // on scanne les sous repertoires afin de trouver les fichiers commençant par le nom de l'ecran en cours
@@ -51,7 +51,7 @@ class DetectDependencies(mockupContext: MockupContext) {
     val fichiersBalsamiqAtraiter = new File(directory1).listFiles
     if (fichiersBalsamiqAtraiter != null) {
       fichiersBalsamiqAtraiter.foreach(file => {
-        if (file.isFile && file.getName().startsWith(nomEcran) && file.getName().endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
+        if (file.isFile && file.getName().startsWith(nomEcran) && file.getName().endsWith(cstBalsamiqFileSuffix)) {
           val fileName = file.getName().split("\\.").head
           val filePath = file.getPath().split("\\.").init.mkString(".") + "/" + fileName + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
           if (fileName != nomEcran) { // on ne traite pas le fichier en cours 

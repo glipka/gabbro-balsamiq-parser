@@ -24,13 +24,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.TComponentBalsamiq
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // --------------------------------------------------------------------------------
 // Pour un composant Balsamiq, on ne récupère que le nom du composant 
 // --------------------------------------------------------------------------------
 class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
-  var controlTypeID: String = elementXML.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
-  if (controlTypeID == CommonObjectForMockupProcess.constants.groupConstante) {
+  var controlTypeID: String = elementXML.getAttributeValue(cstControlTypeID)
+  if (controlTypeID == cstGroupConstante) {
     componentName = getComponentName(elementXML)
     if (componentName != "") {is_a_group = true}
     element = elementXML // sauvegarde du code XML pour récupération 
@@ -44,13 +44,13 @@ class ComponentBalsamiq(elementXML: Element) extends TComponentBalsamiq {
   private def getComponentName(e: Element): String = {
     var name = ""
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           val elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
-          if (elementName == CommonObjectForMockupProcess.constants.controlName) { name = elementValue; }
+          if (elementName == cstControlName) { name = elementValue; }
         }) // fin de cp.foreach
       }
     } // fin de if 

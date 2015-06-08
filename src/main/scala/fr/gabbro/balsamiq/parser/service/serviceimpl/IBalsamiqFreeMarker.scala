@@ -12,6 +12,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.MockupContext
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogBalsamiq
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 
 /**
  * <p>==============================================================================================================================   </p>
@@ -135,10 +136,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     def traitementDesFichiers(files: List[File], onlyFragment: Boolean): Unit = {
       files.foreach(file => {
         // on traite de façon itérative les sous répertoires.
-        if ((file.isDirectory()) && (file.getName() != CommonObjectForMockupProcess.constants.assets)) { traitementDesFichiers(file.listFiles.toList, onlyFragment) }
+        if ((file.isDirectory()) && (file.getName() != cstAssets)) { traitementDesFichiers(file.listFiles.toList, onlyFragment) }
         else {
           // on ne sélectionne que les fichiers se terminant par .bmml
-          if (file.getName.endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
+          if (file.getName.endsWith(cstBalsamiqFileSuffix)) {
             val (fic, rep, useCase, fileNameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
             if (onlyFragment) { // on ne traite que les fragments 
               if (isAfragment) {
@@ -238,14 +239,14 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       // catalogBalsamiq.catalog(0) contient le widget gabarit de la pagel
       // qui doit être généré après le contenu de la page afin de traiter le javascript et le code
       // de l'ensemble des widgets de la maquette.
-      val (_, source1, sourceJavascript1, code1) = moteurTemplateFreeMarker.generationDuTemplate(catalogBalsamiq.catalog(0), CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.javascript, sourceJavascript))
+      val (_, source1, sourceJavascript1, code1) = moteurTemplateFreeMarker.generationDuTemplate(catalogBalsamiq.catalog(0), CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstJavascript, sourceJavascript))
       sourceEcran = sourceEcran.append(source1); // header
       sourceEcran = sourceEcran.append(source2); // contenu
       sourceJavascript = sourceJavascript.append(sourceJavascript1)
       sourceJavascript = sourceJavascript.append(sourceJavascript2)
       codeDesComposants = codeDesComposants.append(code1) // code java ou scala début du gabarit
       codeDesComposants = codeDesComposants.append(code2) // code java ou scala début du gabarit
-      val (_, source3, sourceJavascript3, code3) = moteurTemplateFreeMarker.generationDuTemplate(catalogBalsamiq.catalog(0), CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.javascript, sourceJavascript))
+      val (_, source3, sourceJavascript3, code3) = moteurTemplateFreeMarker.generationDuTemplate(catalogBalsamiq.catalog(0), CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstJavascript, sourceJavascript))
       sourceEcran = sourceEcran.append(source3); // footer
       sourceJavascript = sourceJavascript.append(sourceJavascript3)
       codeDesComposants = codeDesComposants.append(code3) // code java ou scala fin du gabarit
@@ -343,7 +344,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       CommonObjectForMockupProcess.generationProperties.projectName = CommonObjectForMockupProcess.generationProperties.projectName.trim
       val props = new Properties();
       val ficPropertyName = CommonObjectForMockupProcess.generationProperties.configProperties
-      props.load(new InputStreamReader(new FileInputStream(ficPropertyName), CommonObjectForMockupProcess.constants.utf8));
+      props.load(new InputStreamReader(new FileInputStream(ficPropertyName), cstUtf8));
       //    props.load(new FileInputStream(ficPropertyName))
       val propsMap = props.toMap[String, String]
       CommonObjectForMockupProcess.engineProperties.loadProperties(propsMap)

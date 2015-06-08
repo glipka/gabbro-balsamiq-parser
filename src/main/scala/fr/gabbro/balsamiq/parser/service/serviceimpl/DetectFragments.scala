@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
 import java.util.ArrayList
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.modelimpl.Fragment
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 /**
  *  Determination des fragments de l'écran en cours
  * on scanne le repertoire en cours afin de trouver les fichiers commençant par le nom de l'ecran en cours
@@ -61,7 +61,7 @@ private def traitementDesFragmentsDuRepertoireBalsamiq(directory1: String, nomEc
     val fichiersBalsamiqAtraiter = new File(directory1).listFiles
     if (fichiersBalsamiqAtraiter != null) {
       fichiersBalsamiqAtraiter.foreach(file => {
-        if (file.getName().endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) { // on ne traite que les fichiers bmml
+        if (file.getName().endsWith(cstBalsamiqFileSuffix)) { // on ne traite que les fichiers bmml
           val (ficname, rep, usecaseDuSegment, fileNameComplet, isAfragment, fragmentName, generateContoller, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
           if (isAfragment && ficname.toLowerCase().startsWith(nomEcran.toLowerCase()) && (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement == usecaseDuSegment)) {
             listeDesFragments.add(IBalsamiqFreeMarker.globalContext.createFragment(file.getName.split("\\.").head))

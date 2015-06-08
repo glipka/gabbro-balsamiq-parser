@@ -33,7 +33,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.RoundButton
 import fr.gabbro.balsamiq.parser.model.composantsetendus.BreadCrumbsOrButtonBarEnrichissementParametres
 import fr.gabbro.balsamiq.parser.model.composantsetendus.Datagrid
 import fr.gabbro.balsamiq.parser.model.composantsetendus.CheckBoxRadioButton
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // ---------------------------------------------------------------------------------------------------------------
 //  controlID="6" 
 // controlTypeID="com.balsamiq.mockups::Label" 
@@ -50,7 +50,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.CheckBoxRadioButton
 // -------------------------------------------------------------------------------------------------------------
 
 class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants) {
-  val controlTypeID = elementXML.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
+  val controlTypeID = elementXML.getAttributeValue(cstControlTypeID)
   var componentName = ""
   //  var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
   val utilitaire = new Utilitaire
@@ -68,28 +68,28 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
       // traitement d'un composant : src contient le nom du compsant ainsi que 
       // le nom du repository.
       // ------------------------------------------------------------------------------------------------------------------
-      case CommonObjectForMockupProcess.constants.componentBalsamiq => {
-        val src = recuperationDesAttributsEtendus(elementXML).getOrElse(CommonObjectForMockupProcess.constants.src, "").toString()
+      case `cstComponentBalsamiq` => {
+        val src = recuperationDesAttributsEtendus(elementXML).getOrElse(cstSrc, "").toString()
         if (src.contains("#")) {
           val tab1 = src.split("#")
           componentName = tab1.last // nom du composant : tb_bagde
         }
         // rajouter à cet endroit pour des composants spécifiques
-        if (componentName == CommonObjectForMockupProcess.constants.dhtmlxgrid) new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
-        else if (componentName == CommonObjectForMockupProcess.constants.customsteps) new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
+        if (componentName == cstDhtmlxgrid) new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
+        else if (componentName == cstCustomsteps) new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
         else new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true) {}
 
       }
-      case CommonObjectForMockupProcess.constants.roundButton => new RoundButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.datagrid => new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.checkBoxGroup => new CheckBoxRadioButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.radioButtonGroup => new CheckBoxRadioButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.breadCrumbs => new BreadCrumbsOrButtonBarEnrichissementParametres(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.buttonBar => new BreadCrumbsOrButtonBarEnrichissementParametres(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.tabbar => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.verticalTabbar => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.listHTML => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case CommonObjectForMockupProcess.constants.comboBox => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstRoundButton` => new RoundButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstDatagrid` => new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstCheckBoxGroup` => new CheckBoxRadioButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstRadioButtonGroup` => new CheckBoxRadioButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstBreadCrumbs` => new BreadCrumbsOrButtonBarEnrichissementParametres(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstButtonBar` => new BreadCrumbsOrButtonBarEnrichissementParametres(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstTabbar` => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstVerticalTabbar` => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstListHTML` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstComboBox` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
 
       case _ => new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
     }
@@ -103,7 +103,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
   private def recuperationDesAttributsEtendus(e: Element): scala.collection.mutable.Map[String, Object] = {
     var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {

@@ -22,6 +22,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // -----------------------------------------------
 // fragmentName : nom du fragment 
 // ficName : Nom du fichier 

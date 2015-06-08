@@ -33,7 +33,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class Utilitaire {
   val logBack = LoggerFactory.getLogger(this.getClass());
   val propsMessages = new Properties();
@@ -621,7 +621,7 @@ class Utilitaire {
       }
     }
     val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
-    if (filename.endsWith(CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript)) { // se termine par .js ??
+    if (filename.endsWith(cstSuffixDesFichiersJavaScript)) { // se termine par .js ??
       bufferFormate = traitementFormatageSourceJava.indentSourceCodeJavaScript(bufferFormate, 5)
     } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.languageSource)) {
       bufferFormate = traitementFormatageSourceJava.indentSourceCodeJava(bufferFormate)
@@ -629,7 +629,7 @@ class Utilitaire {
 
     try {
       val fileWriter =
-        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename.replace("\\", "/").trim), CommonObjectForMockupProcess.constants.utf8));
+        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename.replace("\\", "/").trim), cstUtf8));
       fileWriter.write(bufferFormate)
       fileWriter.close
       true
@@ -662,7 +662,7 @@ class Utilitaire {
   
   // methode appelée depuis freemarker pour récupérer l'objet fragment
   def getFragmentFromWidget(widget:WidgetDeBase): Fragment = {
-    val fragment= widget.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.fragment,null)
+    val fragment= widget.mapExtendedAttribut.getOrElse(cstFragment,null)
     if (fragment != null ){
       return fragment.asInstanceOf[Fragment]}
     else {null}

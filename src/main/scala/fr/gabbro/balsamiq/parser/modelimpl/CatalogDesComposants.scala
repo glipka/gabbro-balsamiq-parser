@@ -17,6 +17,7 @@ import javax.xml.bind.DatatypeConverter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
@@ -52,7 +53,7 @@ class CatalogDesComposants {
   def chargementDesCatalogues(repertoireDesComposantsBootstrap: String): Boolean = {
     val catalogues = new File(repertoireDesComposantsBootstrap).listFiles.toList
     catalogues.foreach(fichierCatalog => {
-      if (fichierCatalog.getName().endsWith(CommonObjectForMockupProcess.constants.balsamiqFileSuffix)) {
+      if (fichierCatalog.getName().endsWith(cstBalsamiqFileSuffix)) {
         val (ret1, catalogRetour) = chargementCatalogBootstrap(fichierCatalog.getPath())
         if (ret1) {
           val catalogName = fichierCatalog.getName().trim.replace(".", ":") // bug dans split(,)
@@ -85,7 +86,7 @@ class CatalogDesComposants {
         return (false, null)
     }
 
-    var catalog = traitementWidgetCatalogue(mockup.getChild(CommonObjectForMockupProcess.constants.controls))
+    var catalog = traitementWidgetCatalogue(mockup.getChild(cstControls))
     catalog.foreach(entry => {
       logBack.debug("entry={}", entry.componentName)
       entry.mapExtendedAttribut.foreach(x => logBack.debug("catalog:{} key:{} value:{}", entry.componentName, x._1, x._2))
@@ -117,12 +118,12 @@ class CatalogDesComposants {
    * @return ArrayBuffer[ComponentBalsamiq]  on retourne le catalogue des composants
    */
   private def traitementWidgetCatalogue(controlsXML: Element): ArrayBuffer[ComponentBalsamiq] = {
-    val controlXML = controlsXML.getChildren(CommonObjectForMockupProcess.constants.control).toList
+    val controlXML = controlsXML.getChildren(cstControl).toList
     var traitement_groupe = false
     var catalog = new ArrayBuffer[ComponentBalsamiq]
     controlXML.foreach(elementXML => {
-      var controlTypeID: String = elementXML.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
-      if (controlTypeID == CommonObjectForMockupProcess.constants.groupConstante) {
+      var controlTypeID: String = elementXML.getAttributeValue(cstControlTypeID)
+      if (controlTypeID == cstGroupConstante) {
         val groupeEnCours = new ComponentBalsamiq(elementXML) // traitement du contrôle en cours
         catalog = catalog += traitementGroupeCatalogue(elementXML, groupeEnCours)
       }
@@ -143,12 +144,12 @@ class CatalogDesComposants {
    * @return ComponentBalsamiq
    */
   private def traitementGroupeCatalogue(elementXML: Element, groupeEnCours: ComponentBalsamiq): ComponentBalsamiq = {
-    val groupChildrenDescriptor = elementXML.getChild(CommonObjectForMockupProcess.constants.groupChildrenDescriptors);
-    val nombreEnfants = groupChildrenDescriptor.getChildren(CommonObjectForMockupProcess.constants.control).size
-    val enfants = groupChildrenDescriptor.getChildren(CommonObjectForMockupProcess.constants.control)
+    val groupChildrenDescriptor = elementXML.getChild(cstGroupChildrenDescriptors);
+    val nombreEnfants = groupChildrenDescriptor.getChildren(cstControl).size
+    val enfants = groupChildrenDescriptor.getChildren(cstControl)
     enfants.foreach(enfant => {
-      var controlTypeID: String = enfant.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID)
-      var controleID: String = enfant.getAttributeValue(CommonObjectForMockupProcess.constants.controlID).trim // n°enfant
+      var controlTypeID: String = enfant.getAttributeValue(cstControlTypeID)
+      var controleID: String = enfant.getAttributeValue(cstControlID).trim // n°enfant
       var (attributsDeLEnfant, customID) = recuperationDesAttributsEtendus(enfant, controleID)
       groupeEnCours.mapExtendedAttribut = groupeEnCours.mapExtendedAttribut ++ attributsDeLEnfant
       // on met en table le n° d'enfant et L'ID du widget du composant  
@@ -175,17 +176,17 @@ class CatalogDesComposants {
     var customID = ""
     //FIXME ne pas stocker les propriétés des enfants markés en tant que markup
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           val elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
           // *** le markup n'est pas mis en table ***
-          if (elementName != CommonObjectForMockupProcess.constants.markup) {
+          if (elementName != cstMarkup) {
             mapExtendedAttributDuWidgetDuComposant += (elementName -> elementValue)
           }
-          if (elementName == CommonObjectForMockupProcess.constants.customID && elementValue.trim() != "") { customID = elementValue }
+          if (elementName == cstCustomID && elementValue.trim() != "") { customID = elementValue }
         }) // fin de cp.foreach
       }
     } // fin de if 
@@ -195,7 +196,7 @@ class CatalogDesComposants {
     if (customID == "") { (mapExtendedAttributDuWidgetDuComposant, "") }
     else {
       val map1 = mapExtendedAttributDuWidgetDuComposant.map(x => {
-        if ((x._1.toLowerCase() == CommonObjectForMockupProcess.constants.customData.toLowerCase()) || (x._1.toLowerCase() == CommonObjectForMockupProcess.constants.customID.toLowerCase())) { (x) }
+        if ((x._1.toLowerCase() == cstCustomData.toLowerCase()) || (x._1.toLowerCase() == cstCustomID.toLowerCase())) { (x) }
         else {
           (customID + x._1.capitalize, x._2)
         }

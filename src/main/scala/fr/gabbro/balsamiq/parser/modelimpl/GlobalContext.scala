@@ -8,7 +8,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJa
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import scala.collection.JavaConversions._
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le menu par exemple.  
 //  
@@ -108,13 +108,13 @@ class GlobalContext() {
     //FIXME deduire isAFragment  coté scala ?
     // clef= (usecase,nom de fichier,section)
     val key =
-      if (isAfragment == CommonObjectForMockupProcess.constants.trueString) {
+      if (isAfragment == cstTrueString) {
         (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, section)
       } else {
         (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, section)
       }
     // on met le code source du fichier avant le code source des fragments
-    val codeDuFichier = if (isAfragment != CommonObjectForMockupProcess.constants.trueString) codeJavascript + mapSourcesJavascript.getOrElse(key, "")
+    val codeDuFichier = if (isAfragment != cstTrueString) codeJavascript + mapSourcesJavascript.getOrElse(key, "")
     else mapSourcesJavascript.getOrElse(key, "") + codeJavascript
     mapSourcesJavascript.update(key, codeDuFichier)
 
@@ -145,8 +145,8 @@ class GlobalContext() {
       val fileName = useCaseFileNameSection._2
       val section = useCaseFileNameSection._2
 
-      val path = if (useCase != "") { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + fileName + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript }
-      else { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + fileName + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript }
+      val path = if (useCase != "") { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
+      else { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
       // verification qu'il n'y a pas des doublons (nom du fichier et useCase) du fait de l'ajout de la notion de sections 
       if (!tableauDesNomsDesFichiersJavascript.exists(nomDesFichiersJavascript => ((nomDesFichiersJavascript.fileName == fileName) && (nomDesFichiersJavascript.useCase == useCase)))) {
         tableauDesNomsDesFichiersJavascript.add(new NomDesFichiersJavascript(path, useCase, fileName))
@@ -164,9 +164,9 @@ class GlobalContext() {
    */
   def getNomduFichierJavascript(outputFileName: String, useCase: String): String = {
     val ficPropertyName = if (useCase != "") {
-      CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDir + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + outputFileName + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript
+      CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDir + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + outputFileName + cstSuffixDesFichiersJavaScript
     } else {
-      CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDir + System.getProperty("file.separator") + outputFileName + CommonObjectForMockupProcess.constants.suffixDesFichiersJavaScript
+      CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDir + System.getProperty("file.separator") + outputFileName + cstSuffixDesFichiersJavaScript
     }
     ficPropertyName
   }
@@ -276,8 +276,8 @@ class GlobalContext() {
     liste_fichiers_javascript.foreach(useCasefileName => {
       val useCase = useCasefileName._1
       val fileName = useCasefileName._2
-      val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
-      val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.javascriptUseCase, useCase), (CommonObjectForMockupProcess.constants.javascriptFileName, fileName))
+      val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
+      val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
       val codeJavaScript = source6 + source7 // le code source est formaté par section
       ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire)
     })

@@ -9,6 +9,7 @@ import fr.gabbro.balsamiq.parser.model.TCatalogBalsamiq
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.IconInWidget
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
@@ -138,18 +139,18 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // on met àjout la table iconNameList (widget.iconNameList) et on supprime le widget Icone de la table des fils (widget.tableau_des_fils)
 
       if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.engineProperties.widgetsAcceptingIcon).size > 0) &&
-        (widget.tableau_des_fils.exists(widgetFils => widgetFils.getWidgetNameOrComponentName() == CommonObjectForMockupProcess.constants.icon))) {
+        (widget.tableau_des_fils.exists(widgetFils => widgetFils.getWidgetNameOrComponentName() == cstIcon))) {
         val tableauDesFilsSansIcone = new ArrayBuffer[WidgetDeBase]()
 
         widget.tableau_des_fils.foreach(widgetFils => {
           // on vérifie si le widget est une icône. On récupère alors le nom de l'icone ainsi que le fragment
           // et on met à jour la table des icons du widget. Puis on supprime le composant icone de la table des fils du widget en cours
-          if (CommonObjectForMockupProcess.constants.icon == widgetFils.getWidgetNameOrComponentName()) {
-            val iconAvecSize = widgetFils.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.iconShort, "").toString
+          if (cstIcon == widgetFils.getWidgetNameOrComponentName()) {
+            val iconAvecSize = widgetFils.mapExtendedAttribut.getOrElse(cstIconShort, "").toString
             val iconName = if (iconAvecSize.contains("|")) { iconAvecSize.split("\\|").head.trim } else iconAvecSize // on supprime la taille
             // l'objet fragment est déjà calculé lors du traitement du widgetIcon (l'attribut href génère un fragment) et mis dans la table mapExTendedAttribute.
             // on met à jour la table iconNameList
-            val fragment = widgetFils.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.fragment, null)
+            val fragment = widgetFils.mapExtendedAttribut.getOrElse(cstFragment, null)
             if (fragment != null) widget.iconNameList.add(new IconInWidget(iconName, fragment.asInstanceOf[Fragment]))
             else widget.iconNameList.add(new IconInWidget(iconName, null))
           } else { tableauDesFilsSansIcone += widgetFils } // on ne supprime que les fils de type icon

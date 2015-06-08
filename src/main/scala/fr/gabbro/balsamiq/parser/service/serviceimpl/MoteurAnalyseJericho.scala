@@ -23,6 +23,7 @@ import net.htmlparser.jericho.Attribute
 import net.htmlparser.jericho.Element
 import net.htmlparser.jericho.OutputDocument
 import net.htmlparser.jericho.Source
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
@@ -46,7 +47,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     try {
       val props = new Properties();
       val ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
-      props.load(new InputStreamReader(new FileInputStream(ficPropertyName), CommonObjectForMockupProcess.constants.utf8));
+      props.load(new InputStreamReader(new FileInputStream(ficPropertyName), cstUtf8));
       // on récupère l'ensemble des clefs
       val enuKeys = props.keys().toList
       enuKeys.foreach(clef => {
@@ -98,7 +99,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     val propsLocal = new Properties();
     val ficPropertyLocal = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
 
-    propsLocal.load(new InputStreamReader(new FileInputStream(ficPropertyLocal), CommonObjectForMockupProcess.constants.utf8));
+    propsLocal.load(new InputStreamReader(new FileInputStream(ficPropertyLocal), cstUtf8));
     val listeDesclefDusFichierDeProprietesNonLocalise = propsLocal.keys().toList
 
     // pour chaque langue à traiter
@@ -106,7 +107,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       val ficPropertyPays = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").head + "_" + country + "." + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").last
       val propsPays = new java.util.Properties();
       val filePays = new File(ficPropertyPays)
-      if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), CommonObjectForMockupProcess.constants.utf8)); }
+      if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), cstUtf8)); }
       val sbuf = new StringBuilder
       val propsPaysMap = propsPays.toMap[String, String] // on récupère les clefs du fichier properties du pays en cours
 
@@ -119,7 +120,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         }
       })
       // écriture du fichier properties de la langue en cours
-      val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), CommonObjectForMockupProcess.constants.utf8)
+      val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), cstUtf8)
       filewriter.write(sbuf.toString())
       filewriter.close
     })
@@ -134,7 +135,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * <p>pour chaque élément, on récupère le texte à traduire.</p>
    * <p>On utilise la hashMap (valeur, clef) pour vérifier si cette valeur est déjà en table</p>
    * <p>Si oui => on récupère la valeur, sinon, on crée cette valeur dans les 2 hashmap (valeur clef et clef valeur)</p>
-   * <p>la clef de traduction est recupérée par le template Freemarker CommonObjectForMockupProcess.constants.templateClefDeTraduction</p>
+   * <p>la clef de traduction est recupérée par le template Freemarker templateClefDeTraduction</p>
    * <p>puis on un replace du segment à modifier</p>
    * <p>pour chaque valeur à traduire on détermine la hiérarchie de l'élément.</p>
    * <p>si l'2lément à traduire est dans un formulaire, on l'indique dans la clef de tradution.</p>
@@ -167,8 +168,8 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         var key = traduction_valeur(valeurATraduire, element, "")
         if (key != "") {
           val segment = element.getContent()
-          val (ret1, source1, sourcejavsacript1, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.key, key))
-          val (ret2, source2, sourcejavascript2, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.key, key))
+          val (ret1, source1, sourcejavsacript1, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstKey, key))
+          val (ret2, source2, sourcejavascript2, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstKey, key))
           val clefDeTraduction = source1 + source2
           outputDocument.replace(segment, clefDeTraduction);
         }
@@ -197,8 +198,8 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         modifAttribut = true
         val key = traduction_valeur(replaceSpecialCharKey(attribute.getValue), element, attribute.getName)
         if (key != "") {
-          val (_, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
-          val (_, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.key, key), (CommonObjectForMockupProcess.constants.isAttribute, "true"))
+          val (_, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstKey, key), (cstIsAttribute, "true"))
+          val (_, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClefDeTraduction, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstKey, key), (cstIsAttribute, "true"))
           val clefDeTraduction = source1 + source2
           mapAttributes += (attribute.getName -> clefDeTraduction.trim)
         } else { mapAttributes += (attribute.getName -> replaceSpecialCharValue(attribute.getValue)) }
@@ -240,15 +241,15 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
           var container = ""
           // pour chaque élement de la table des formulaires, on récupère l'attribut id de l'élément dans le code html
           table_formulaire.foreach(formulaire => {
-            val id = formulaire.getAttributeValue(CommonObjectForMockupProcess.constants.id)
+            val id = formulaire.getAttributeValue(cstId)
             if (id != null && id != "") { container = container + id + "." }
             else { container = container + formulaire.getStartTag().getName + "." }
           })
           if (container.endsWith(".")) { container = container.substring(0, container.size - 1) } // on supprime le .
-          // on appelle le template CommonObjectForMockupProcess.constants.templateBuildTraductionKey afin de générer la clef du fichier properties
+          // on appelle le template templateBuildTraductionKey afin de générer la clef du fichier properties
           var isAttribute = if (attributeName != "") { true } else { false }
-          val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
-          val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.container, container), (CommonObjectForMockupProcess.constants.isAttribute, isAttribute.toString), (CommonObjectForMockupProcess.constants.currentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (CommonObjectForMockupProcess.constants.index, counterClef.toString), (CommonObjectForMockupProcess.constants.attributName, attributeName))
+          val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstContainer, container), (cstIsAttribute, isAttribute.toString), (cstCurrentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (cstIndex, counterClef.toString), (cstAttributName, attributeName))
+          val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstContainer, container), (cstIsAttribute, isAttribute.toString), (cstCurrentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (cstIndex, counterClef.toString), (cstAttributName, attributeName))
           var key = replaceSpecialCharKey(source6.trim + source7.trim)  // la clef de la propriété est fournie par le template  templateBuildTraductionKey
           tableDesClefsValeursDeTraduction += (key -> valeurATraduire);
           tableDesValeursClefsDeTraduction += ((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement) -> key)
@@ -303,7 +304,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     var directoryName = templateDirOut
     val sourceHTML = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
     val fileHTML = new File(sourceHTML)
-    val source = new Source(new InputStreamReader(new FileInputStream(fileHTML), CommonObjectForMockupProcess.constants.utf8));
+    val source = new Source(new InputStreamReader(new FileInputStream(fileHTML), cstUtf8));
     source.fullSequentialParse();
     val outputDocument = new OutputDocument(source);
     val childElements = source.getChildElements().toList

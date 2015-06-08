@@ -34,7 +34,7 @@ import java.io.IOException
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.service.TMoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 /**
  * @author Georges Lipka
  * <p>-----------------------------------------------------------------------------------------------------------------------</p>
@@ -64,7 +64,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
       // on utilise classTemplateLoader pour chercher l'URL des templates dans les sous répertoires
       cfgFreeMarker.setTemplateLoader(classTemplateLoader)
       cfgFreeMarker.setIncompatibleImprovements(new Version(2, 3, 20));
-      cfgFreeMarker.setDefaultEncoding(CommonObjectForMockupProcess.constants.utf_8);
+      cfgFreeMarker.setDefaultEncoding(cstUtf_8);
       // cfgFreeMarker.setLocale(Locale.FRANCE);
       cfgFreeMarker.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
       if (CommonObjectForMockupProcess.templatingProperties.freemarkerAutoIncludeFile != null && CommonObjectForMockupProcess.templatingProperties.freemarkerAutoIncludeFile != "") {
@@ -111,7 +111,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @return : name of template
    */
   def determinationNomDuTemplate(widgetName: String, phase: String): (Option[String], Option[String], Option[String]) = {
-    val templateName = tableDesTemplates.getOrElse(widgetName, Some(CommonObjectForMockupProcess.constants.templateUndefined))
+    val templateName = tableDesTemplates.getOrElse(widgetName, Some(cstTemplateUndefined))
 
     templateName match {
       case None => (None, None, None)
@@ -119,19 +119,19 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
         val templateHTML = Some(templateName.get +
           CommonObjectForMockupProcess.templatingProperties.separator_template_file +
           phase +
-          CommonObjectForMockupProcess.constants.suffixTemplateFreeMarkerFile)
+          cstSuffixTemplateFreeMarkerFile)
         val templateJavascript = Some(CommonObjectForMockupProcess.templatingProperties.prefix_template_javascript +
           templateName.get +
           CommonObjectForMockupProcess.templatingProperties.separator_template_file +
           phase +
           CommonObjectForMockupProcess.templatingProperties.suffix_template_javascript +
-          CommonObjectForMockupProcess.constants.suffixTemplateFreeMarkerFile)
+          cstSuffixTemplateFreeMarkerFile)
         val templateCode = Some(CommonObjectForMockupProcess.templatingProperties.prefix_template_code +
           templateName.get +
           CommonObjectForMockupProcess.templatingProperties.separator_template_file +
           phase +
           CommonObjectForMockupProcess.templatingProperties.suffix_template_code +
-          CommonObjectForMockupProcess.constants.suffixTemplateFreeMarkerFile)
+          cstSuffixTemplateFreeMarkerFile)
         (templateHTML, templateJavascript, templateCode)
       }
     }
@@ -160,8 +160,8 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
         tableDesTemplates += (clef.toString().trim -> Some(valeur))
         templateEncours = valeur
         // on verifie que les fichiers template début et template fin existent.
-        val templateDebut = classTemplateLoader.getURL(valeur + CommonObjectForMockupProcess.templatingProperties.separator_template_file + CommonObjectForMockupProcess.templatingProperties.phase_debut + CommonObjectForMockupProcess.constants.suffixTemplateFreeMarkerFile)
-        val templateFin = classTemplateLoader.getURL(valeur + CommonObjectForMockupProcess.templatingProperties.separator_template_file + CommonObjectForMockupProcess.templatingProperties.phase_fin + CommonObjectForMockupProcess.constants.suffixTemplateFreeMarkerFile)
+        val templateDebut = classTemplateLoader.getURL(valeur + CommonObjectForMockupProcess.templatingProperties.separator_template_file + CommonObjectForMockupProcess.templatingProperties.phase_debut + cstSuffixTemplateFreeMarkerFile)
+        val templateFin = classTemplateLoader.getURL(valeur + CommonObjectForMockupProcess.templatingProperties.separator_template_file + CommonObjectForMockupProcess.templatingProperties.phase_fin + cstSuffixTemplateFreeMarkerFile)
         if (templateDebut == null || templateFin == null) {
           ok = false
         }
@@ -246,7 +246,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
           }
           val templateName = templateHtml.get
           mapParametre = mapParametre ++ enrichissementDesParametresPourFreeMarker(widgetPere, widget, templateName)
-          val traitementPreserveNotPresentInAdditionalParameters = parametresAdditionnels.forall(param => param._1 != CommonObjectForMockupProcess.constants.traitementPreserveSection)
+          val traitementPreserveNotPresentInAdditionalParameters = parametresAdditionnels.forall(param => param._1 != cstTraitementPreserveSection)
           // traitement du template html
           val mapParametreHtml = mapParametre
           val (ok1, sourceHtml) = processExecuteFreeMarkerTemplate(templateHtml.get, widgetPere, mapParametreHtml)
@@ -322,13 +322,13 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     var pack1 = ""
 
     if (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement != "") {
-      val (_, packageSource1, _, _) = generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, (dtoDir + "." + CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
-      val (_, packageSource2, _, _) = generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, (dtoDir + "." + CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
+      val (_, packageSource1, _, _) = generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, (dtoDir + "." + CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
+      val (_, packageSource2, _, _) = generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, (dtoDir + "." + CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
       pack1 = packageSource1 + packageSource2
       ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath + System.getProperty("file.separator") + CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias + System.getProperty("file.separator") + ficName + "." + CommonObjectForMockupProcess.generationProperties.languageSource
     } else {
-      val (_, packageSource1, _, _) = generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, (dtoDir + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
-      val (_, packageSource2, _, _) = generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, (dtoDir + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
+      val (_, packageSource1, _, _) = generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, (dtoDir + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
+      val (_, packageSource2, _, _) = generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, (dtoDir + "." + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias).replace("\\", "/").replace("/", ".")), ("classname", ficName))
       pack1 = packageSource1 + packageSource2
       ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedControllerAlias + System.getProperty("file.separator") + ficName.capitalize + "." + CommonObjectForMockupProcess.generationProperties.languageSource
     }
@@ -345,28 +345,28 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    */
   def enrichissementDesParametresPourFreeMarker(container: WidgetDeBase, widget: WidgetDeBase, templateName: String): scala.collection.mutable.Map[String, Object] = {
     val mapParametre = scala.collection.mutable.Map[String, Object]()
-    mapParametre += (CommonObjectForMockupProcess.constants.usecaseName -> CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)
-    mapParametre += (CommonObjectForMockupProcess.constants.projectName -> CommonObjectForMockupProcess.generationProperties.projectName)
-    mapParametre += (CommonObjectForMockupProcess.constants.engineProperties -> CommonObjectForMockupProcess.engineProperties)
-    mapParametre += (CommonObjectForMockupProcess.constants.generationProperties -> CommonObjectForMockupProcess.generationProperties)
-    mapParametre += (CommonObjectForMockupProcess.constants.templatingProperties -> CommonObjectForMockupProcess.templatingProperties)
-    mapParametre += (CommonObjectForMockupProcess.constants.isAFragment -> CommonObjectForMockupProcess.isAfragment.toString())
+    mapParametre += (cstUsecaseName -> CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)
+    mapParametre += (cstProjectName -> CommonObjectForMockupProcess.generationProperties.projectName)
+    mapParametre += (cstEngineProperties -> CommonObjectForMockupProcess.engineProperties)
+    mapParametre += (cstGenerationProperties -> CommonObjectForMockupProcess.generationProperties)
+    mapParametre += (cstTemplatingProperties -> CommonObjectForMockupProcess.templatingProperties)
+    mapParametre += (cstIsAFragment -> CommonObjectForMockupProcess.isAfragment.toString())
     if (widget != null) {
-      mapParametre += (CommonObjectForMockupProcess.constants.widget -> widget)
+      mapParametre += (cstWidget -> widget)
       if (widget.isFormulaireHTML) {
-        mapParametre += (CommonObjectForMockupProcess.constants.isForm -> CommonObjectForMockupProcess.constants.trueString)
+        mapParametre += (cstIsForm -> cstTrueString)
       }
     }
-    mapParametre += (CommonObjectForMockupProcess.constants.widgetContainer -> container)
-    mapParametre += (CommonObjectForMockupProcess.constants.mockupContext -> CommonObjectForMockupProcess.mockupContext)
-    mapParametre += (CommonObjectForMockupProcess.constants.generateController -> CommonObjectForMockupProcess.generateController.toString)
-    mapParametre += (CommonObjectForMockupProcess.constants.globalContext -> IBalsamiqFreeMarker.globalContext)
-    mapParametre += (CommonObjectForMockupProcess.constants.generatedFileName -> CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement)
-    mapParametre += (CommonObjectForMockupProcess.constants.mainMockupName -> CommonObjectForMockupProcess.ecranContenantLeSegment)
-    mapParametre += (CommonObjectForMockupProcess.constants.utility -> utilitaire)
-    mapParametre += (CommonObjectForMockupProcess.constants.templateName -> templateName)
-    mapParametre += (CommonObjectForMockupProcess.constants.commonObject -> CommonObjectForMockupProcess)
-    mapParametre += (CommonObjectForMockupProcess.constants.constants -> CommonObjectForMockupProcess.constants)
+    mapParametre += (cstWidgetContainer -> container)
+    mapParametre += (cstMockupContext -> CommonObjectForMockupProcess.mockupContext)
+    mapParametre += (cstGenerateController -> CommonObjectForMockupProcess.generateController.toString)
+    mapParametre += (cstGlobalContext -> IBalsamiqFreeMarker.globalContext)
+    mapParametre += (cstGeneratedFileName -> CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement)
+    mapParametre += (cstMainMockupName -> CommonObjectForMockupProcess.ecranContenantLeSegment)
+    mapParametre += (cstUtility -> utilitaire)
+    mapParametre += (cstTemplateName -> templateName)
+    mapParametre += (cstCommonObject -> CommonObjectForMockupProcess)
+    mapParametre += (cstConstants -> CommonObjectForMockupProcess.constants)
     return mapParametre
 
   }

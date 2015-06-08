@@ -26,7 +26,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.modelimpl.FormulaireCode
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.service.TTraitementBinding
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 /**
  *  cette classe est instanciée dans le module principal IbalsamiqFreeMarker
  *  la tables des champs tableauDesVariables stockera l'ensemble des champs référencés la méthode bind=
@@ -64,7 +64,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * @return StructureMap(mapName, key1, value1))
    */
   def traitementMap(bind: String): (Boolean, StructureMap) = {
-    val input = bind.substring(CommonObjectForMockupProcess.constants.bind.size + 1) // +1 car il faut rajouter le caractere =      bind=
+    val input = bind.substring(cstBind.size + 1) // +1 car il faut rajouter le caractere =      bind=
     val regExp1 = "(.)*\\((.)*,(.)*\\)".r
     val regExp10 = "\\((.)*,".r
     val regExp10b = "([^,])*".r // qd le bug sera corrigé : "([^\\(,])*"
@@ -202,8 +202,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   // ---------------------------------------------------------
   def getArrayNameOrFieldName(variableName: String): (String, String) = {
     if (variableName.contains("(")) {
-      (variableName.substring(0, variableName.indexOf("(")), CommonObjectForMockupProcess.constants.trueString) // on prend caractères avant le caractère (      
-    } else { (variableName, CommonObjectForMockupProcess.constants.falseString) } // ce n'est pas un tableau
+      (variableName.substring(0, variableName.indexOf("(")), cstTrueString) // on prend caractères avant le caractère (      
+    } else { (variableName, cstFalseString) } // ce n'est pas un tableau
 
   }
 
@@ -219,8 +219,8 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   private def generation_code_source_classes(classes: ArrayBuffer[Field]): Unit = {
     classes.foreach(classe => {
       // on vérifie si le widget doit être bindé à un tableau
-      val (ret8, instanceCodeBegin, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateInstance, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.tabulation, ""), (CommonObjectForMockupProcess.constants.templateInstance, classe.instanceName), (CommonObjectForMockupProcess.constants.hierarchiePere, ""), (CommonObjectForMockupProcess.constants.className, classe.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.widgetName, classe.controlTypeID))
-      val (ret9, instanceCodeEnd, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateInstance, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.tabulation, ""), (CommonObjectForMockupProcess.constants.templateInstance, classe.instanceName), (CommonObjectForMockupProcess.constants.hierarchiePere, ""), (CommonObjectForMockupProcess.constants.className, classe.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.widgetName, classe.controlTypeID))
+      val (ret8, instanceCodeBegin, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateInstance, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstTabulation, ""), (cstTemplateInstance, classe.instanceName), (cstHierarchiePere, ""), (cstClassName, classe.fieldNameOrClassName.capitalize), (cstWidgetName, classe.controlTypeID))
+      val (ret9, instanceCodeEnd, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateInstance, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstTabulation, ""), (cstTemplateInstance, classe.instanceName), (cstHierarchiePere, ""), (cstClassName, classe.fieldNameOrClassName.capitalize), (cstWidgetName, classe.controlTypeID))
       val shortPath = if (classe.instanceName.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
         classe.instanceName.substring(0, classe.instanceName.size - CommonObjectForMockupProcess.generationProperties.generatedFormAlias.size).toUpperCase() + "_" + CommonObjectForMockupProcess.generationProperties.generatedFormAlias.toUpperCase()
       } else {
@@ -259,7 +259,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
   private def generation_code_source_classe(classeEnCours: Field, niveau: Int, pere: Field, hierarchiePere: String): Unit = {
     var codeDeLaClasse = new StringBuilder
     val tabulation = "\t" * niveau
-    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName.capitalize), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
+    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClass, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstClassName, classeEnCours.fieldNameOrClassName.capitalize), (cstTabulation, tabulation), (cstWidgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source1)
     // traitement de chaque champ de la classe      
     classeEnCours.children.foreach(field => {
@@ -271,45 +271,45 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       if (field.children.size > 0) {
         val hierarchie = if (hierarchiePere == "") { classeEnCours.fieldNameOrClassName }
         else { hierarchiePere + "." + classeEnCours.fieldNameOrClassName }
-        // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)(CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID)
-        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, 
-          (CommonObjectForMockupProcess.constants.fieldName, field.instanceName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize), // on force comme tyoe le type de la classe
-          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray),
-           (CommonObjectForMockupProcess.constants.tabulation, tabulation),
-          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
-        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+        // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)(widgetName, field.controlTypeID)
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, 
+          (cstFieldName, field.instanceName),
+          (cstFieldType, field.fieldNameOrClassName.capitalize), // on force comme tyoe le type de la classe
+          (cstIsAnArray, field.isAnArray),
+           (cstTabulation, tabulation),
+          (cstWidgetName, field.controlTypeID))
+        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField,
           CommonObjectForMockupProcess.templatingProperties.phase_fin, null,
-          (CommonObjectForMockupProcess.constants.fieldName, field.instanceName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.fieldNameOrClassName.capitalize),
-           (CommonObjectForMockupProcess.constants.tabulation, tabulation),
-          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray),
-          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID))
+          (cstFieldName, field.instanceName),
+          (cstFieldType, field.fieldNameOrClassName.capitalize),
+           (cstTabulation, tabulation),
+          (cstIsAnArray, field.isAnArray),
+          (cstWidgetName, field.controlTypeID))
         codeDeLaClasse.append(source6 + source7)
         if (hierarchiePere == "") { generation_code_source_classe(field, niveau + 1, field, classeEnCours.fieldNameOrClassName) }
         else { generation_code_source_classe(field, niveau + 1, classeEnCours, hierarchiePere + "." + classeEnCours.fieldNameOrClassName) }
       } else {
         // **** c'est un champ ****  
-        val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+        val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField,
           CommonObjectForMockupProcess.templatingProperties.phase_debut, null,
-          (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp),
-          (CommonObjectForMockupProcess.constants.tabulation, tabulation),
-          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),
-          (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray))
+          (cstFieldName, field.fieldNameOrClassName),
+          (cstFieldType, field.typeDuChamp),
+          (cstTabulation, tabulation),
+          (cstWidgetName, field.controlTypeID),
+          (cstIsAnArray, field.isAnArray))
 
-        val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateField,
+        val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField,
           CommonObjectForMockupProcess.templatingProperties.phase_fin, null,
-          (CommonObjectForMockupProcess.constants.fieldName, field.fieldNameOrClassName),
-          (CommonObjectForMockupProcess.constants.fieldType, field.typeDuChamp),
-          (CommonObjectForMockupProcess.constants.tabulation, tabulation),
-          (CommonObjectForMockupProcess.constants.widgetName, field.controlTypeID),
-            (CommonObjectForMockupProcess.constants.isAnArray, field.isAnArray))
+          (cstFieldName, field.fieldNameOrClassName),
+          (cstFieldType, field.typeDuChamp),
+          (cstTabulation, tabulation),
+          (cstWidgetName, field.controlTypeID),
+            (cstIsAnArray, field.isAnArray))
         codeDeLaClasse.append(source3 + source4)
       }
     })
     // generation fin de classe et mise en cache du code de la classe 
-    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.className, classeEnCours.fieldNameOrClassName), (CommonObjectForMockupProcess.constants.tabulation, tabulation), (CommonObjectForMockupProcess.constants.widgetName, classeEnCours.controlTypeID))
+    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateClass, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstClassName, classeEnCours.fieldNameOrClassName), (cstTabulation, tabulation), (cstWidgetName, classeEnCours.controlTypeID))
     codeDeLaClasse.append(source2)
     mapCodeClasse.put(classeEnCours, codeDeLaClasse.toString())
   }
@@ -374,35 +374,35 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
       val generatedFileDir = replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.srcDtoFilesDir)
       if (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement != "") {
         if (className.endsWith(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias.capitalize)) {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         } else if (className.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         } else {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement + "." + CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         }
       } else { // *** pas de useCase renseigné ***
         if (className.endsWith(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias.capitalize)) {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedDtoAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         } else if (className.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFormAlias.capitalize)) {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedFormAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         } else {
-          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
-          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(CommonObjectForMockupProcess.constants.templatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (CommonObjectForMockupProcess.constants.packageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
+          val (_, packageSource1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
+          val (_, packageSource2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplatePackage, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstPackageName, generatedFileDir + "." + replaceSystemFileSeparatoirByPoint(CommonObjectForMockupProcess.generationProperties.generatedOtherAlias)))
           packageSourceDebut = packageSource1
           packageSourceFin = packageSource2
         }

@@ -22,7 +22,7 @@ import scala.beans.BeanProperty
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
-
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 class CheckBoxOrRadioButton(@BeanProperty var text: String, @BeanProperty var state: String, @BeanProperty var id_interne: String)
 
 class CheckBoxRadioButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
@@ -34,10 +34,10 @@ class CheckBoxRadioButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elemen
  */
   override def enrichissementParametres(param1: String): (String, Object) = {
     val checkboxOrRadioButton =
-      if (this.controlTypeID == CommonObjectForMockupProcess.constants.checkBoxGroup) { CommonObjectForMockupProcess.constants.checkboxShort }
-      else if (this.controlTypeID == CommonObjectForMockupProcess.constants.radioButtonGroup) { CommonObjectForMockupProcess.constants.radio }
-      else { CommonObjectForMockupProcess.constants.unknown }
-    val parts: List[String] = this.mapExtendedAttribut.getOrElse(CommonObjectForMockupProcess.constants.text, "").toString().split("\\n").toList
+      if (this.controlTypeID == cstCheckBoxGroup) { cstCheckboxShort }
+      else if (this.controlTypeID == cstRadioButtonGroup) { cstRadio }
+      else { cstUnknown }
+    val parts: List[String] = this.mapExtendedAttribut.getOrElse(cstText, "").toString().split("\\n").toList
     val tableauDesCheckBox = new java.util.ArrayList[CheckBoxOrRadioButton]()
 
     var checkboxName: String = "????"
@@ -49,21 +49,21 @@ class CheckBoxRadioButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elemen
       if (part.contains("-[x") || part.contains("-(o)")) {
         checkboxName = part.substring(4);
         checkboxName = checkboxName.substring(0, checkboxName.indexOf("-"));
-        state = CommonObjectForMockupProcess.constants.disabledSelected
+        state = cstDisabledSelected
       } else if (part.contains("[x") || part.contains("(o)")) {
         checkboxName = part.substring(3);
-        state = CommonObjectForMockupProcess.constants.selected
+        state = cstSelected
       } else if (part.contains("-[") || part.contains("-( )") || part.contains("-(-)")) {
         checkboxName = part.substring(4);
         checkboxName = checkboxName.substring(0, checkboxName.indexOf("-"));
-        state = CommonObjectForMockupProcess.constants.disabled
+        state = cstDisabled
       } else if (part.contains("[") || part.contains("( )") || part.contains("(-)")) {
         checkboxName = part.substring(3);
-        state = CommonObjectForMockupProcess.constants.up
+        state = cstUp
       } else {
         // boxes = boxes + part + "<br>";
       }
-      var id_interne_component = this.id_interne + CommonObjectForMockupProcess.constants.cptString + i.toString
+      var id_interne_component = this.id_interne + cstCptString + i.toString
       val checkBoxOrRadioButton = new CheckBoxOrRadioButton(this.formatText(checkboxName), state, id_interne_component)
       tableauDesCheckBox.add(checkBoxOrRadioButton)
 
@@ -72,7 +72,7 @@ class CheckBoxRadioButton(id_interne: Int, groupe_en_cours: WidgetDeBase, elemen
 
     })
 
-    (CommonObjectForMockupProcess.constants.items, tableauDesCheckBox)
+    (cstItems, tableauDesCheckBox)
 
   }
 

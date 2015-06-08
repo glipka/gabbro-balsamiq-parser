@@ -28,6 +28,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.modelimpl.Fragment
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 // ----------------------------------------------------------
 //  controlID="6"
 // controlTypeID="com.balsamiq.mockups::Label"
@@ -152,40 +153,40 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   def generationTableauDeParametresPourTemplates(): java.util.Map[String, Object] = {
     val tableau = scala.collection.mutable.Map[String, Object]()
     tableau += (
-      CommonObjectForMockupProcess.constants.internalId -> id_interne.toString,
-      CommonObjectForMockupProcess.constants.controlTypeID -> controlTypeID.toString(),
-      CommonObjectForMockupProcess.constants.controlID -> controlID.toString,
-      CommonObjectForMockupProcess.constants.xAbsolute -> xAbsolute.toString,
-      CommonObjectForMockupProcess.constants.yAbsolute -> yAbsolute.toString,
-      CommonObjectForMockupProcess.constants.z -> z.toString,
-      CommonObjectForMockupProcess.constants.w -> w.toString,
-      CommonObjectForMockupProcess.constants.h -> h.toString,
-      CommonObjectForMockupProcess.constants.xRelative -> xRelative.toString,
-      CommonObjectForMockupProcess.constants.yRelative -> yRelative.toString,
-      CommonObjectForMockupProcess.constants.positionInContainer -> positionDansLeConteneur.toString,
-      CommonObjectForMockupProcess.constants.percentageHeightWithRespectToTotalHeight -> percentageparRapportHauteurTotale.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageWidthWithRespectToTotalWidth -> percentageparRapportLargeurTotale.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageHeightWithRespectToContainerHeight -> percentageHauteurparRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageWidhtWithRespectToContainerWidth -> percentageLargeurParRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageTopBannerWithRespectToContainerHeight -> percentageBandeauHautParRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageBottomBannerWithRespectToContainerHeight -> percentageBandeauBasParRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageRightBannerWithRespectToContainerWidth -> percentageBandeauDroiteParRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.percentageLeftBannerWithRespectToContainerWidth -> percentageBandeauGaucheParRapportPere.toInt.toString,
-      CommonObjectForMockupProcess.constants.estimatedHeightInChar -> hauteurEstimeeEnCaractere.toString,
-      CommonObjectForMockupProcess.constants.estimatedWidthInChar -> largeurEstimeeEnCaractere.toString,
-      CommonObjectForMockupProcess.constants.measuredW -> measuredW.toString,
-      CommonObjectForMockupProcess.constants.measuredH -> measuredH.toString,
-      CommonObjectForMockupProcess.constants.zOrder -> zOrder.toString,
-      CommonObjectForMockupProcess.constants.locked -> locked.toString,
-      CommonObjectForMockupProcess.constants.isInGroup -> isInGroup.toString,
-      CommonObjectForMockupProcess.constants.positionIn12th -> positionEnDouzieme.toString,
-      CommonObjectForMockupProcess.constants.rowNumber -> rowNumber.toString,
-      CommonObjectForMockupProcess.constants.formularAction -> actionDuFomulaire,
-      CommonObjectForMockupProcess.constants.columnNumber -> columnNumber.toString)
+      cstInternalId -> id_interne.toString,
+      cstControlTypeID -> controlTypeID.toString(),
+      cstControlID -> controlID.toString,
+      cstXAbsolute -> xAbsolute.toString,
+      cstYAbsolute -> yAbsolute.toString,
+      cstZ -> z.toString,
+      cstW -> w.toString,
+      cstH -> h.toString,
+      cstXRelative -> xRelative.toString,
+      cstYRelative -> yRelative.toString,
+      cstPositionInContainer -> positionDansLeConteneur.toString,
+      cstPercentageHeightWithRespectToTotalHeight -> percentageparRapportHauteurTotale.toInt.toString,
+      cstPercentageWidthWithRespectToTotalWidth -> percentageparRapportLargeurTotale.toInt.toString,
+      cstPercentageHeightWithRespectToContainerHeight -> percentageHauteurparRapportPere.toInt.toString,
+      cstPercentageWidhtWithRespectToContainerWidth -> percentageLargeurParRapportPere.toInt.toString,
+      cstPercentageTopBannerWithRespectToContainerHeight -> percentageBandeauHautParRapportPere.toInt.toString,
+      cstPercentageBottomBannerWithRespectToContainerHeight -> percentageBandeauBasParRapportPere.toInt.toString,
+      cstPercentageRightBannerWithRespectToContainerWidth -> percentageBandeauDroiteParRapportPere.toInt.toString,
+      cstPercentageLeftBannerWithRespectToContainerWidth -> percentageBandeauGaucheParRapportPere.toInt.toString,
+      cstEstimatedHeightInChar -> hauteurEstimeeEnCaractere.toString,
+      cstEstimatedWidthInChar -> largeurEstimeeEnCaractere.toString,
+      cstMeasuredW -> measuredW.toString,
+      cstMeasuredH -> measuredH.toString,
+      cstZOrder -> zOrder.toString,
+      cstLocked -> locked.toString,
+      cstIsInGroup -> isInGroup.toString,
+      cstPositionIn12th -> positionEnDouzieme.toString,
+      cstRowNumber -> rowNumber.toString,
+      cstFormularAction -> actionDuFomulaire,
+      cstColumnNumber -> columnNumber.toString)
 
-    if (iconNameList.size > 0) { tableau += (CommonObjectForMockupProcess.constants.icons -> iconNameList) }
-    if (variableBinding != "") { tableau += (CommonObjectForMockupProcess.constants.variableBinding -> variableBinding) }
-    if (variableBindingTail != "") { tableau += (CommonObjectForMockupProcess.constants.variableBindingTail -> variableBindingTail) }
+    if (iconNameList.size > 0) { tableau += (cstIcons -> iconNameList) }
+    if (variableBinding != "") { tableau += (cstVariableBinding -> variableBinding) }
+    if (variableBindingTail != "") { tableau += (cstVariableBindingTail -> variableBindingTail) }
 
     mapExtendedAttribut.foreach {
       case (x, y) => tableau += (x -> y)
@@ -246,24 +247,24 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @param e : Element
    */
   protected def recuperationAttributsDeBase(e: Element) {
-    this.controlTypeID = e.getAttributeValue(CommonObjectForMockupProcess.constants.controlTypeID) //.substring(22);
+    this.controlTypeID = e.getAttributeValue(cstControlTypeID) //.substring(22);
     if (this.controlTypeID.contains("::")) {
       this.shortWidgetName = this.controlTypeID.split("::").last
     } else {
       this.shortWidgetName = this.controlTypeID
     }
     //  if (controlTypeID == CommonObjectForMockupProcess .componentBalsamiq) isAComponent = true
-    this.w = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.w));
-    this.measuredW = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.measuredW));
+    this.w = utilitaire.toInt(e.getAttributeValue(cstW));
+    this.measuredW = utilitaire.toInt(e.getAttributeValue(cstMeasuredW));
     if (this.w < 1) { this.w = this.measuredW; }
-    this.h = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.h));
-    this.measuredH = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.measuredH));
+    this.h = utilitaire.toInt(e.getAttributeValue(cstH));
+    this.measuredH = utilitaire.toInt(e.getAttributeValue(cstMeasuredH));
     if (this.h < 1) { this.h = this.measuredH }
-    this.xAbsolute = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.x));
-    this.yAbsolute = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.y));
-    this.z = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.zOrder));
-    this.controlID = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.controlID));
-    this.isInGroup = utilitaire.toInt(e.getAttributeValue(CommonObjectForMockupProcess.constants.isInGroup));
+    this.xAbsolute = utilitaire.toInt(e.getAttributeValue(cstX));
+    this.yAbsolute = utilitaire.toInt(e.getAttributeValue(cstY));
+    this.z = utilitaire.toInt(e.getAttributeValue(cstZOrder));
+    this.controlID = utilitaire.toInt(e.getAttributeValue(cstControlID));
+    this.isInGroup = utilitaire.toInt(e.getAttributeValue(cstIsInGroup));
     if (CommonObjectForMockupProcess.engineProperties.viewportPxFontSizeInBalsamiqMockup.forall(_.isDigit) && CommonObjectForMockupProcess.engineProperties.viewportPxFontSizeInBalsamiqMockup.toInt != 0) {
       this.hauteurEstimeeEnCaractere = this.h / CommonObjectForMockupProcess.engineProperties.viewportPxFontSizeInBalsamiqMockup.toInt
       this.largeurEstimeeEnCaractere = this.w / CommonObjectForMockupProcess.engineProperties.viewportPxFontSizeInBalsamiqMockup.toInt
@@ -312,52 +313,52 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    */
   private def recuperationDesAttributsEtendus(e: Element): Unit = {
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           var elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
           mapExtendedAttribut += (elementName -> elementValue)
-          if (elementName == CommonObjectForMockupProcess.constants.href) { // c'est un lien ? si oui on génère un attribut fragment
+          if (elementName == cstHref) { // c'est un lien ? si oui on génère un attribut fragment
             mapExtendedAttribut ++= traitementHref(elementValue)
           } // traitement de la propriété binding
           // 2 cas possibles :
           //   bind=map(key,value)
           //   bind=class1.classe2.var1:Int
           // plusieurs possibilités : validate=xxx;id=toto 
-          else if (elementName == CommonObjectForMockupProcess.constants.customID) {
+          else if (elementName == cstCustomID) {
             val id = if (elementValue != "") elementValue.trim else ""
             this.customId = id
             if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets  += this.customId } // on met en table le nom des formulaires
 
-          } else if (elementName == CommonObjectForMockupProcess.constants.customData) {
+          } else if (elementName == cstCustomData) {
             val tableValue = elementValue.split(";").map(_.trim)
 
             tableValue.foreach(value => {
               // id ne doit être renseigné que pour un container.
-              if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(") && value.contains(",")) {
+              if (value.startsWith(cstBind) && value.contains("(") && value.contains(",")) {
                 val (retCode, structureMap) = traitementBinding.traitementMap(value)
-                if (retCode) { mapExtendedAttribut += (CommonObjectForMockupProcess.constants.mapBinding -> structureMap) }
+                if (retCode) { mapExtendedAttribut += (cstMapBinding -> structureMap) }
 
               } // --------------------------------------------------------------------------------------------
               // binding sur un champ. 
               // L'attribut customId d'un champ est déduit du binding de champ (on prend le nom du champ
               // Le template freemaker met en oeuvre cette norme. 
               // --------------------------------------------------------------------------------------------
-              else if (value.startsWith(CommonObjectForMockupProcess.constants.bind + "=")) {
+              else if (value.startsWith(cstBind + "=")) {
                 //  val (retCode, variableBinding) = traitementBinding.mise_en_table_classes_binding(value)
-                this.bind = value.substring(CommonObjectForMockupProcess.constants.bind.size + 1) // le bind sera retraité après constitution du catalogue pour concatener le bind du pere.    
+                this.bind = value.substring(cstBind.size + 1) // le bind sera retraité après constitution du catalogue pour concatener le bind du pere.    
               } // Traitement de la validation des données
-              else if (value.startsWith((CommonObjectForMockupProcess.constants.itemsVar + "="))) {
+              else if (value.startsWith((cstItemsVar + "="))) {
                 //  val (retCode, variableBinding) = traitementBinding.mise_en_table_classes_binding(value)
-                this.itemsVar = value.substring(CommonObjectForMockupProcess.constants.itemsVar.size + 1) // itemsVar sera retraité après constitution du catalogue pour concatener le bind du pere.    
+                this.itemsVar = value.substring(cstItemsVar.size + 1) // itemsVar sera retraité après constitution du catalogue pour concatener le bind du pere.    
                 val tab2 = value.split("=")
                 if (tab2.size > 1) { mapExtendedAttribut += (tab2.head -> tab2.last) }
               } // Traitement de la validation des données
-              else if (value.startsWith(CommonObjectForMockupProcess.constants.validate + "=")) {
+              else if (value.startsWith(cstValidate + "=")) {
                 val (retCode, variablesValidate) = mise_en_table_validation_du_champ(value)
-                if (retCode) { mapExtendedAttribut += (CommonObjectForMockupProcess.constants.variablesValidate -> variablesValidate) }
+                if (retCode) { mapExtendedAttribut += (cstVariablesValidate -> variablesValidate) }
               } // hint a servir à l'infoBulle
               else { // on stocke la clef valeur directement
                 val tab2 = value.split("=")
@@ -422,7 +423,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   private def recuperationDesAttributsEtendusDuComposant(e: Element): scala.collection.mutable.Map[String, Object] = {
     var mapExtendedAttributDuComposant = scala.collection.mutable.Map[String, Object]()
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
@@ -441,8 +442,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           //  </controlProperties>
           // ------------------------------------------------------------------------------------
 
-          if (elementName == CommonObjectForMockupProcess.constants.src) this.componentSrc = elementValue
-          else if (elementName == CommonObjectForMockupProcess.constants.overrideString) {
+          if (elementName == cstSrc) this.componentSrc = elementValue
+          else if (elementName == cstOverrideString) {
             val (idParam, overrideX, overrideY, overrideW, overrideH) = getOverrideProperties(propertie)
             // la tableOverrideParam contient les parametres overridé pour chaque widget du composant (pour les composants traités localement)
             tableOverrideParams += (idParam -> (overrideX, overrideY, overrideW, overrideH))
@@ -450,9 +451,9 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
             parametresOverrides.foreach(param => {
               val paramName = utilitaire.remplaceHexa(param.getName().trim())
               val paramValue = utilitaire.remplaceHexa(param.getValue().trim())
-              if (paramName == CommonObjectForMockupProcess.constants.href) { // c'est un lien ? si oui on génère un attribut fragment
+              if (paramName == cstHref) { // c'est un lien ? si oui on génère un attribut fragment
                 mapExtendedAttributDuComposant ++= traitementHref(paramValue)
-              } else if (paramName == CommonObjectForMockupProcess.constants.customID) {
+              } else if (paramName == cstCustomID) {
                 val id = if (paramValue != "") {
                   paramValue.trim
                 } else {
@@ -462,27 +463,27 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
                
                 if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets+= this.customId } // on met en table le nom des formulaires
 
-                mapExtendedAttributDuComposant += (CommonObjectForMockupProcess.constants.customID -> id)
-              } else if (paramName == CommonObjectForMockupProcess.constants.customData) {
+                mapExtendedAttributDuComposant += (cstCustomID -> id)
+              } else if (paramName == cstCustomData) {
                 val tableValue = paramValue.split(";").map(_.trim)
                 tableValue.foreach(value => {
                   // id ne doit être renseigné que pour un container.
-                  if (value.startsWith(CommonObjectForMockupProcess.constants.bind) && value.contains("(") && value.contains(",")) {
+                  if (value.startsWith(cstBind) && value.contains("(") && value.contains(",")) {
                     val (retCode, structureMap) = traitementBinding.traitementMap(value)
-                    if (retCode) { mapExtendedAttributDuComposant += (CommonObjectForMockupProcess.constants.mapBinding -> structureMap) }
+                    if (retCode) { mapExtendedAttributDuComposant += (cstMapBinding -> structureMap) }
 
                   } // --------------------------------------------------------------------------------------------
                   // binding sur un champ. 
                   // L'attribut customId d'un champ est déduit du binding de champ (on prend le nom du champ
                   // Le template freemaker met en oeuvre cette norme. 
                   // --------------------------------------------------------------------------------------------
-                  else if (value.startsWith(CommonObjectForMockupProcess.constants.bind)) {
+                  else if (value.startsWith(cstBind)) {
                     this.bind = value.substring(5) // le bind sera retraité après constitution du catalogue pour concatener le bind du pere.
 
                   } // Traitement de la validation des données
-                  else if (value.startsWith(CommonObjectForMockupProcess.constants.validate)) {
+                  else if (value.startsWith(cstValidate)) {
                     val (retCode, variablesValidate) = mise_en_table_validation_du_champ(value)
-                    if (retCode) { mapExtendedAttributDuComposant += (CommonObjectForMockupProcess.constants.variablesValidate -> variablesValidate) }
+                    if (retCode) { mapExtendedAttributDuComposant += (cstVariablesValidate -> variablesValidate) }
                   } // Les autres valeurs sont passées par défaut.
                   else { // on stocke la clef valeur directement
                     val tab2 = value.split("=")
@@ -547,10 +548,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
     val bookmark = paramValue.split("&").head
     val fragment = IBalsamiqFreeMarker.globalContext.createFragment(bookmark)
 
-    if (fragment != null) { mapFragment += (CommonObjectForMockupProcess.constants.fragment -> fragment) }
+    if (fragment != null) { mapFragment += (cstFragment -> fragment) }
     else {
       val location = IBalsamiqFreeMarker.globalContext.retrieveLocation(bookmark)
-      mapFragment += (CommonObjectForMockupProcess.constants.location -> location)
+      mapFragment += (cstLocation -> location)
     }
     return mapFragment
   }
@@ -570,11 +571,11 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    */
   protected def getOverrideProperties(e: Element): (String, String, String, String, String) = {
     // <override controlID="1" x="96" y="0" w="61" h="27">
-    val controlID = e.getAttributeValue(CommonObjectForMockupProcess.constants.controlID)
-    val overrideX = e.getAttributeValue(CommonObjectForMockupProcess.constants.x)
-    val overrideY = e.getAttributeValue(CommonObjectForMockupProcess.constants.y)
-    val overrideW = e.getAttributeValue(CommonObjectForMockupProcess.constants.w)
-    val overrideH = e.getAttributeValue(CommonObjectForMockupProcess.constants.h)
+    val controlID = e.getAttributeValue(cstControlID)
+    val overrideX = e.getAttributeValue(cstX)
+    val overrideY = e.getAttributeValue(cstY)
+    val overrideW = e.getAttributeValue(cstW)
+    val overrideH = e.getAttributeValue(cstH)
 
     (controlID, overrideX, overrideY, overrideW, overrideH)
 
@@ -588,17 +589,17 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    */
   private def remplacementControlIDparCustomIdDuWidgetDuComponent(e: Element): Unit = {
     if (e.getChildren().size() != 0) {
-      val controlProperties = e.getChild(CommonObjectForMockupProcess.constants.controlProperties);
+      val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
         val cp = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           var elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
-          if (elementName == CommonObjectForMockupProcess.constants.overrideString) {
+          if (elementName == cstOverrideString) {
             val (idParam, overrideX, overrideY, overrideW, overrideH) = getOverrideProperties(propertie)
             val params = propertie.getChildren().toList
             params.foreach(param => {
-              if (param.getName.trim.toLowerCase() != CommonObjectForMockupProcess.constants.customID.toLowerCase() && param.getName.trim.toLowerCase() != CommonObjectForMockupProcess.constants.customData.toLowerCase()) {
+              if (param.getName.trim.toLowerCase() != cstCustomID.toLowerCase() && param.getName.trim.toLowerCase() != cstCustomData.toLowerCase()) {
                 val idDuWidgetDuComposant = mapIndice.getOrElse(idParam.trim, "")
                 val paramName = if (idDuWidgetDuComposant != "") idDuWidgetDuComposant + param.getName().trim().capitalize
                 else param.getName().trim()
@@ -623,7 +624,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @return (true or false, Array of Token
    */
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
-    val validate = CommonObjectForMockupProcess.constants.validate + "="
+    val validate = cstValidate + "="
     val value = input.trim
     if (value.toLowerCase().startsWith(validate)) {
       val tokenDeValidation = value.substring(validate.length()).split(",")
