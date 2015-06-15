@@ -49,7 +49,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   }
 
   /**
-   *  initialiation des properties du programme
+   *  initialiation des properties du programmexx
    *  globalContext un objet scala accessible pendant le traitement de l'ensemble des mockups
    *  MoteurTemplateFreeMarker est instancié une seule fois en début de traitement
    *  MoteurAnalyseJericho est instancié une seule fois en début de traitement.
