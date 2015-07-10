@@ -47,7 +47,7 @@ class TraitementPreserveSection extends TTraitementCommun {
     // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
     // rajout le 5/6/14 par gl d'un test sur la liste generatedOtherConfFilesSuffix n'est pas vide
      if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
-      ((!CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.isEmpty) && (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => {println("sufix="+suffix);fichierEnCoursDeTraitement.endsWith(suffix)})))) {
+      ((!CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.isEmpty) && (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => {fichierEnCoursDeTraitement.endsWith(suffix)})))) {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
       //   println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
