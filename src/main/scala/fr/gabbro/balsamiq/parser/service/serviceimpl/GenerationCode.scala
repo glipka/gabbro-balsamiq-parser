@@ -93,14 +93,14 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
           if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
             // generation du template widget début
-            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString))
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString),(cstContainerName, containerName))
             else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container))
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
             traitementDesFilsDuWidgetDeLaColonneEnCours(widget) // traitement des fils du widget en cours 
             // génération du  template widget fin
-            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container))
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container),(cstContainerName, containerName))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
@@ -168,13 +168,13 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // on traite chaque widget dans le div
           var positionWidget = 0
           brancheFiltreeParColonneEnDouzieme.foreach(widget => {
-            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString))
-            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container))
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString),(cstContainerName, containerName))
+            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container),(cstContainerName, containerName))
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
             traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
-            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container))
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container),(cstContainerName, containerName))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
