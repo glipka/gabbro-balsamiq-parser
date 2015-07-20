@@ -134,9 +134,9 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       // taille de colonne en douzieme : pour la dernière colonne c'est le complément de 12 à la largeur totale en douzieme des précédentes colonnes
       var tailleColonneEnDouzieme = if (numeroColonneEnCours < (tableauDesNomsDesColonnes.size - 1)) { calculTailleColonneEnDouzieme(width.toInt) } else { CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns - largeurTotaleinDouzieme }
       // on vérifie que la taille totale en douzieme ne depasse pas 12, si c'est le cas, on fait un complément à 12 de la largeur de colonne.  
-      if ((largeurTotaleinDouzieme + tailleColonneEnDouzieme) > CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {tailleColonneEnDouzieme= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-largeurTotaleinDouzieme}
+      if ((largeurTotaleinDouzieme + tailleColonneEnDouzieme) > CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) { tailleColonneEnDouzieme = CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns - largeurTotaleinDouzieme }
       largeurTotaleinDouzieme += tailleColonneEnDouzieme
-      logBack.debug("traitementcolonne n°:" + numeroColonneEnCours+1 + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
+      logBack.debug("traitementcolonne n°:" + numeroColonneEnCours + 1 + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
       val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, tailleColonneEnDouzieme.toString, alignment, new java.util.ArrayList[WidgetInThisColumn], positionDepart, positionFin, null, null, null)
       tableauDesColonnes.add(columnDefinition)
       numeroColonneEnCours += 1
@@ -152,7 +152,10 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
    * @return
    */
   private def calculTailleColonneEnDouzieme(widthInPercentage: Int): Int = {
-    var tailleCelluleEnDouzieme = if ((widthInPercentage % CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) < CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 2) { widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100 } else { (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100) + 1 }
+    //    val x=  (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) % 100
+    //   println("valeur de x = %s   widht %s".format(x,widthInPercentage))
+    var tailleCelluleEnDouzieme = if (((widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) % 100) < 50) { widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100 } else { (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100) + 1 }
+    if (tailleCelluleEnDouzieme == 0)  {tailleCelluleEnDouzieme=1}
     tailleCelluleEnDouzieme
   }
   /**
