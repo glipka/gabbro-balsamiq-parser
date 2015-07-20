@@ -25,7 +25,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants //class ColumnDefinitionNewVersion(@BeanProperty var columnName: String, @BeanProperty var sort: String, @BeanProperty var width: String, @BeanProperty var alignment: String, @BeanProperty var columnType: String, @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase, var beginningPositionRelativeToContainer: Int, var endPositionRelativeToContainer: Int)
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
-class WidgetInThisColumn (@BeanProperty var widgetType: String,
+class WidgetInThisColumn(@BeanProperty var widgetType: String,
   @BeanProperty var readonly: String, @BeanProperty var widget: WidgetDeBase)
 
 // pour simplification sur le traitement de dhmlxgrid, on garde les champs alignment,columntype,readonly,widget.
@@ -35,8 +35,9 @@ class ColumnDefinition(
   @BeanProperty var columnName: String,
   @BeanProperty var sort: String,
   @BeanProperty var width: String,
+  @BeanProperty var widthIn12Th: String,
   @BeanProperty var alignment: String,
-  @BeanProperty var widgetList: java.util.ArrayList[WidgetInThisColumn ],
+  @BeanProperty var widgetList: java.util.ArrayList[WidgetInThisColumn],
   var beginningPositionRelativeToContainer: Int, // mémorisation offset début de la colonne utilisé pour détecter les widgets inclus dans cette colonne
   var endPositionRelativeToContainer: Int,
   @BeanProperty var columnType: String, // utilisé seulement pour compatibilité dhtmlxgrid
@@ -78,6 +79,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     var numeroColonneEnCours = 0
     val tableauDesColonnes = new java.util.ArrayList[ColumnDefinition]
     var largeurTotaleEnpourcentage = 0
+    var largeurTotaleinDouzieme = 0
 
     // -----------------------------------------------------------------------------------
     // Name\r(job title) ^, Age ^v, Nickname, Employee v
@@ -119,7 +121,6 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       } else {
         width = largeurEtAlignement.substring(0, largeurEtAlignement.length()).trim
       }
-      numeroColonneEnCours += 1
 
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
       if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
@@ -129,15 +130,32 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       var positionDepart = positionEnCoursDeLaColonne
       var positionFin = positionDepart + (this.w.toInt * width.toInt) / 100 - 1
       positionEnCoursDeLaColonne = positionFin + 1
-      // met en table la colonne 
-      logBack.debug("traitementcolonne n°:" + numeroColonneEnCours + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
-      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, alignment, new java.util.ArrayList[WidgetInThisColumn ], positionDepart, positionFin,null,null,null)
+      // met en table la colonne  
+      // taille de colonne en douzieme : pour la dernière colonne c'est le complément de 12 à la largeur totale en douzieme des précédentes colonnes
+      var tailleColonneEnDouzieme = if (numeroColonneEnCours < (tableauDesNomsDesColonnes.size - 1)) { calculTailleColonneEnDouzieme(width.toInt) } else { CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns - largeurTotaleinDouzieme }
+      // on vérifie que la taille totale en douzieme ne depasse pas 12, si c'est le cas, on fait un complément à 12 de la largeur de colonne.  
+      if ((largeurTotaleinDouzieme + tailleColonneEnDouzieme) > CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {tailleColonneEnDouzieme= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-largeurTotaleinDouzieme}
+      largeurTotaleinDouzieme += tailleColonneEnDouzieme
+      
+      logBack.debug("traitementcolonne n°:" + numeroColonneEnCours+1 + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
+      val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, tailleColonneEnDouzieme.toString, alignment, new java.util.ArrayList[WidgetInThisColumn], positionDepart, positionFin, null, null, null)
       tableauDesColonnes.add(columnDefinition)
+      numeroColonneEnCours += 1
 
     })
     (cstColumns, enrichissementDuTableau(tableauDesColonnes))
 
-  } // fin de la methode 
+  } // fin de la methode  
+  /**
+   * *** conversion du pourcentage en douzieme pour la largeur des colonnes de la table ***
+   * taille colonne en douzieme = largeur en pourcentage * 12 /100 ( on fait + 1 si le reste est supérieur à 12/2)
+   * Exposition de la liste des objets
+   * @return
+   */
+  private def calculTailleColonneEnDouzieme(widthInPercentage: Int): Int = {
+    var tailleCelluleEnDouzieme = if ((widthInPercentage % CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) < CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 2) { widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100 } else { (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100) + 1 }
+    tailleCelluleEnDouzieme
+  }
   /**
    * *** table des colonnes pour un datagrid qui sera utilisée directement dans les templates ***
    * Exposition de la liste des objets
@@ -161,15 +179,15 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     // on récupère la table des fils du widget en cours 
     val tableau_des_widgets_fils = this.tableau_des_fils.sortWith((x, y) => x.positionDansLeConteneur < y.positionDansLeConteneur) // tableau des widgets Fils
     var position = 0
-    tableau_des_colonnes.foreach(colonne => {    
+    tableau_des_colonnes.foreach(colonne => {
       // traitement spécifique à dhtmxgrid, qui ne sait générer nativement qu'un widget par colonne 
       if (position < tableau_des_widgets_fils.size) {
         colonne.widget = tableau_des_widgets_fils(position)
-         val (typeDeWidget, readOnly) = getTypeAndReadOnly(colonne.widget)
-   //      println("numero de colonne %s, columnType: %s, readonly :%s".format(colonne,typeDeWidget,readOnly))
-         colonne.columnType = typeDeWidget
-         colonne.readonly=readOnly
-      }  
+        val (typeDeWidget, readOnly) = getTypeAndReadOnly(colonne.widget)
+        //      println("numero de colonne %s, columnType: %s, readonly :%s".format(colonne,typeDeWidget,readOnly))
+        colonne.columnType = typeDeWidget
+        colonne.readonly = readOnly
+      }
       // ---------------------------------------------------------------------------------------------------------
       // pour chaque colonne, on récupère l'ensemble des widgets qui sont positionnés dans la colonne. 
       // on se sert pour chaque des positions relatives des widgets par rapport au container (donc la table)
@@ -181,8 +199,8 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
         // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
         if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
           val (typeDeWidget, readOnly) = getTypeAndReadOnly(widget)
-          colonne.widgetList.add(new WidgetInThisColumn (typeDeWidget, readOnly, widget))
-         // println("n°de colonne %s ajout widget %s %s".format(position,typeDeWidget,readOnly))
+          colonne.widgetList.add(new WidgetInThisColumn(typeDeWidget, readOnly, widget))
+          // println("n°de colonne %s ajout widget %s %s".format(position,typeDeWidget,readOnly))
         }
       }) // fin de tableau_des_widgets_fils.foreach(widge
 
