@@ -136,7 +136,6 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       // on vérifie que la taille totale en douzieme ne depasse pas 12, si c'est le cas, on fait un complément à 12 de la largeur de colonne.  
       if ((largeurTotaleinDouzieme + tailleColonneEnDouzieme) > CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {tailleColonneEnDouzieme= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-largeurTotaleinDouzieme}
       largeurTotaleinDouzieme += tailleColonneEnDouzieme
-      
       logBack.debug("traitementcolonne n°:" + numeroColonneEnCours+1 + " positionDepart=" + positionDepart + "px positionFin=" + positionFin + "px width en pixels" + this.w + "px")
       val columnDefinition = new ColumnDefinition(this.formatText(columnName), sort, width, tailleColonneEnDouzieme.toString, alignment, new java.util.ArrayList[WidgetInThisColumn], positionDepart, positionFin, null, null, null)
       tableauDesColonnes.add(columnDefinition)
