@@ -35,7 +35,7 @@ class ColumnDefinition(
   @BeanProperty var columnName: String,
   @BeanProperty var sort: String,
   @BeanProperty var width: String,
-  @BeanProperty var widthIn12Th: String,
+  @BeanProperty var bootstrapWidth: String,
   @BeanProperty var alignment: String,
   @BeanProperty var widgetList: java.util.ArrayList[WidgetInThisColumn],
   var beginningPositionRelativeToContainer: Int, // mémorisation offset début de la colonne utilisé pour détecter les widgets inclus dans cette colonne
