@@ -142,6 +142,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       numeroColonneEnCours += 1
 
     })
+    if (largeurTotaleEnpourcentage != 100  ) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
     (cstColumns, enrichissementDuTableau(tableauDesColonnes))
 
   } // fin de la methode  

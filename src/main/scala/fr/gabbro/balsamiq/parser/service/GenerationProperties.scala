@@ -66,6 +66,7 @@ class GenerationProperties {
   @BeanProperty var srcWebFilesDir = "" // repertoire des fichiers html   
   @BeanProperty var generatedOtherConfFilesSuffix = List[String]()
   @BeanProperty var listDataTableWidget = List[String]()
+  @BeanProperty var bypassDtoGeneration = false;// conditionne la generation des fichiers DTOs
 
   // 
   /**
@@ -110,7 +111,8 @@ class GenerationProperties {
     localExecutionFilePath3 = propsMap.getOrElse("config.generation.localExecutionFilePath3", "").trim.replace("%project%", projectName).replace("%controller%", generatedControllerAlias).replace("%controller?capitalize%", generatedControllerAlias.capitalize)
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     bypassProcessI18nTagHierachy = propsMap.getOrElse("config.generation.bypassProcessI18nTagHierachy", "").split(",").toList.map(_.trim)
-    generatedOtherConfFilesSuffix = if (propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").trim !="" )propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim) else List.empty
+    bypassDtoGeneration = if (propsMap.getOrElse("config.generation.bypassDtoGeneration", "false").trim == "true") { true } else { false }
+    generatedOtherConfFilesSuffix = if (propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").trim != "") propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim) else List.empty
     listDataTableWidget = propsMap.getOrElse("config.generation.listDataTableWidget", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
     //  generatedFolderForFragmentType.foreach { println(_)}

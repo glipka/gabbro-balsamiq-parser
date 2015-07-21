@@ -38,7 +38,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  *   datetime, date, Int, long,double, string
  *     Toute variable contenant un indice prefixé par ( et suffixé par ) est considérée comme une liste
  *     Exemple1 bind=personne.adresse:Int   // adresse est ici un entier
- *     Exemple2 bind=personne.adresse(1).rue   // adresse est tableau de type Adresse contenant le champ rue 
+ *     Exemple2 bind=personne.adresse(1).rue   // adresse est tableau de type Adresse contenant le champ rue
  *
  *
  * le champ CustomControl ID peut être aussi du type : bind=map1("nom","adresse")
@@ -272,17 +272,17 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
         val hierarchie = if (hierarchiePere == "") { classeEnCours.fieldNameOrClassName }
         else { hierarchiePere + "." + classeEnCours.fieldNameOrClassName }
         // on génère l'instanciation de la classe dans le code source. Le contenu de la classe sera généré lors de l'appel generation_code_source_classe(field)(widgetName, field.controlTypeID)
-        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, 
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField, CommonObjectForMockupProcess.templatingProperties.phase_debut, null,
           (cstFieldName, field.instanceName),
           (cstFieldType, field.fieldNameOrClassName.capitalize), // on force comme tyoe le type de la classe
           (cstIsAnArray, field.isAnArray),
-           (cstTabulation, tabulation),
+          (cstTabulation, tabulation),
           (cstWidgetName, field.controlTypeID))
         val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateField,
           CommonObjectForMockupProcess.templatingProperties.phase_fin, null,
           (cstFieldName, field.instanceName),
           (cstFieldType, field.fieldNameOrClassName.capitalize),
-           (cstTabulation, tabulation),
+          (cstTabulation, tabulation),
           (cstIsAnArray, field.isAnArray),
           (cstWidgetName, field.controlTypeID))
         codeDeLaClasse.append(source6 + source7)
@@ -304,7 +304,7 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
           (cstFieldType, field.typeDuChamp),
           (cstTabulation, tabulation),
           (cstWidgetName, field.controlTypeID),
-            (cstIsAnArray, field.isAnArray))
+          (cstIsAnArray, field.isAnArray))
         codeDeLaClasse.append(source3 + source4)
       }
     })
@@ -348,10 +348,13 @@ class TraitementBinding(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, 
    * <p>on rajoute le nom du package en début de classe : Le nom du package est déduit du repertoire DTO</p>
    */
   def generationDuSourceDesClassesEtCreationDuFichier: Unit = {
-    generation_code_source_classes(tableauDesVariables)
-    mapCodeClasse.foreach(classe => {
-      ecriture_fichier(classe._1.fieldNameOrClassName, classe._2)
-    })
+    // on conditionne la generation des dtos 
+    if (!CommonObjectForMockupProcess.generationProperties.bypassDtoGeneration) {
+      generation_code_source_classes(tableauDesVariables)
+      mapCodeClasse.foreach(classe => {
+        ecriture_fichier(classe._1.fieldNameOrClassName, classe._2)
+      })
+    }
 
     /**
      * @param repositoryName : name of directory
