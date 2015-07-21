@@ -494,14 +494,15 @@ class Utilitaire {
     // <p>Si fragment, récupération nom de l'écran contenant le fragment </p>
     // <p>Détermination s'il faut générer ou pas le contrôleur</p>
     val directoryName = ""
-    val isAfragment = if (filename.toLowerCase().startsWith(CommonObjectForMockupProcess.generationProperties.generateControllerForPrefix.toLowerCase()) && filename.contains(CommonObjectForMockupProcess.engineProperties.fragmentSeparator)) true else false
+    val isAfragment = if (filename.contains(CommonObjectForMockupProcess.engineProperties.fragmentSeparator)) { true } else { false }
     val fragmentAvecType = if (isAfragment) {
       filename.replace(CommonObjectForMockupProcess.engineProperties.fragmentSeparator, "/").split("/").last
-    } else ""
+    } else { "" }
     val ecranContenantLefragment = if (isAfragment) {
       filename.replace(CommonObjectForMockupProcess.engineProperties.fragmentSeparator, "/").split("/").head
-    } else ""
-    if (filename.toLowerCase().startsWith(CommonObjectForMockupProcess.generationProperties.generateControllerForPrefix.toLowerCase()) && !filename.contains(CommonObjectForMockupProcess.engineProperties.fragmentSeparator)) {
+    } else { "" }
+
+    if (!filename.contains(CommonObjectForMockupProcess.engineProperties.fragmentSeparator)) {
       generateController = true
     } else {
       generateController = false
@@ -658,20 +659,20 @@ class Utilitaire {
     val v9 = v8.replace("%customProperty3%", CommonObjectForMockupProcess.templatingProperties.customProperty3)
     val v10 = v9.replace("%mainScreen%", CommonObjectForMockupProcess.ecranContenantLeSegment)
     v10
-  } 
-  
+  }
+
   // methode appelée depuis freemarker pour récupérer l'objet fragment
-  def getFragmentFromWidget(widget:WidgetDeBase): Fragment = {
-    val fragment= widget.mapExtendedAttribut.getOrElse(cstFragment,null)
-    if (fragment != null ){
-      return fragment.asInstanceOf[Fragment]}
-    else {null}
-    
+  def getFragmentFromWidget(widget: WidgetDeBase): Fragment = {
+    val fragment = widget.mapExtendedAttribut.getOrElse(cstFragment, null)
+    if (fragment != null) {
+      return fragment.asInstanceOf[Fragment]
+    } else { null }
+
   }
   // utilisé en debug par freeMarker
-  def printTrace(x:String) : Unit = {
-    
-    println("freeMarker:"+ x)
+  def printTrace(x: String): Unit = {
+
+    println("freeMarker:" + x)
   }
   // -------------------------------------------------------------------------------
 
