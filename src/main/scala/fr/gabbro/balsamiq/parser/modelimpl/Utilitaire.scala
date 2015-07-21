@@ -640,6 +640,17 @@ class Utilitaire {
         false
     }
   }
+  
+  /**
+   * <p>test existence fichier</p>
+   * @param filename
+   * @return true or false
+   */
+  def existFile(fileName: String): Boolean = {
+    val file = new File(fileName)
+    if (file.exists()) { true } else { false }
+  }
+
   /**
    * <p>remplacement des mots clefs par leur contenu</p>
    * <p>mots clefs supportés :</p>

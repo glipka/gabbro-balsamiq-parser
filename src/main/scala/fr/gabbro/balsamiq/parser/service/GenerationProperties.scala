@@ -25,7 +25,7 @@ class GenerationProperties {
   @BeanProperty var balsamiqMockupsDir = "" // répertoire source des mockups
   @BeanProperty var concatenateContainerIdToWidgetId = true // ajout automatique to nom du formulaire dans le binding
   @BeanProperty var configProperties = "" // localisation du fichier properties
-//  @BeanProperty var generateControllerForPrefix = "" // prefix des écrans pour lequel il faut générer le controleur
+  //  @BeanProperty var generateControllerForPrefix = "" // prefix des écrans pour lequel il faut générer le controleur
   @BeanProperty var generatePreserveSection = true // generation des preserves section ?
   @BeanProperty var generateLabelForAttributeForTheseWidgets = List[String]() // liste des widgets pour lesquels on va générer l'attribut labelfor
   @BeanProperty var generatedControllerAlias = "" // alias du controleur
@@ -66,9 +66,10 @@ class GenerationProperties {
   @BeanProperty var srcWebFilesDir = "" // repertoire des fichiers html   
   @BeanProperty var generatedOtherConfFilesSuffix = List[String]()
   @BeanProperty var listDataTableWidget = List[String]()
-  @BeanProperty var bypassDtoGeneration = false;// conditionne la generation des fichiers DTOs
+  @BeanProperty var bypassDtoGeneration = false; // conditionne la generation des fichiers DTOs
+  @BeanProperty var overwriteJspOrHtmlFile = true; // conditionne la generation des fichiers DTOs
 
-  // 
+  // config.generation.overwriteJspOrHtmlFile
   /**
    * load generation properties
    * @param propsMap
@@ -84,7 +85,7 @@ class GenerationProperties {
     generatedFormAlias = propsMap.getOrElse("config.generation.generatedFormAlias", "").trim
     generatedDtoAlias = propsMap.getOrElse("config.generation.generatedDtoAlias", "").trim
     generatedControllerAlias = propsMap.getOrElse("config.generation.generatedControllerAlias", "").trim
-  //  generateControllerForPrefix = propsMap.getOrElse("config.generation.generateControllerForPrefix", "ec").trim
+    //  generateControllerForPrefix = propsMap.getOrElse("config.generation.generateControllerForPrefix", "ec").trim
     generatedOtherAlias = propsMap.getOrElse("config.generation.generatedOtherAlias", "").trim
     generatedSubPackage1 = propsMap.getOrElse("config.generation.generatedSubPackage1", "").trim
     generatedSubPackage2 = propsMap.getOrElse("config.generation.generatedSubPackage2", "").trim
@@ -112,6 +113,7 @@ class GenerationProperties {
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     bypassProcessI18nTagHierachy = propsMap.getOrElse("config.generation.bypassProcessI18nTagHierachy", "").split(",").toList.map(_.trim)
     bypassDtoGeneration = if (propsMap.getOrElse("config.generation.bypassDtoGeneration", "false").trim == "true") { true } else { false }
+    overwriteJspOrHtmlFile = if (propsMap.getOrElse("config.generation.overwriteJspOrHtmlFile", "true").trim == "true") { true } else { false }    
     generatedOtherConfFilesSuffix = if (propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").trim != "") propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim) else List.empty
     listDataTableWidget = propsMap.getOrElse("config.generation.listDataTableWidget", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)

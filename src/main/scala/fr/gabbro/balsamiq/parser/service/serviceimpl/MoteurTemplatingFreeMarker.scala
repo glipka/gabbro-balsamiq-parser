@@ -187,14 +187,19 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @param sourceEcran : buffer to write
    * @return : true or false
    * modif le 28 avril 2015 : replace preserve
+   * modif 21 juillet 2015 : conditionnement utilisation overwriteJspOrHtmlFile
    */
   def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
-    val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
-    val source = new Source(sourceEcran);
-    // Utilisation du parser Jericho pour formater le généré HTML.
-    val sourceFormat = new SourceFormatter(source).setIndentString("\t").setCollapseWhiteSpace(true);
-    utilitaire.ecrire_fichier(fileName, sourceFormat.toString())
-    true
+    val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)   
+    if (!CommonObjectForMockupProcess.generationProperties.overwriteJspOrHtmlFile && utilitaire.existFile(fileName)) {
+      return true
+    } else {
+      val source = new Source(sourceEcran);
+      // Utilisation du parser Jericho pour formater le généré HTML.
+      val sourceFormat = new SourceFormatter(source).setIndentString("\t").setCollapseWhiteSpace(true);
+      utilitaire.ecrire_fichier(fileName, sourceFormat.toString())
+      return true
+    }
   }
 
   /**
