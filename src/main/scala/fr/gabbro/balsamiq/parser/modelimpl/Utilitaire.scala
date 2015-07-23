@@ -611,9 +611,10 @@ class Utilitaire {
 
   /**
    * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
+   * mise en cache des preserve sections. 
    * @param filename : nom du fichier
    * @param buffer : buffer à écrire
-   * @return
+   * @return true or false
    */
   def ecrire_fichier(filename: String, buffer: String, traitementPreserve: Boolean = true): Boolean = {
     val rep1 = filename.replace(System.getProperty("file.separator"), "/").split("/").init.mkString(System.getProperty("file.separator"))
@@ -630,7 +631,13 @@ class Utilitaire {
     return (fileWrite(filename, bufferFormate))
 
   }
-
+/**
+   * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
+   * formatage du fichier en fonction de son type.
+   * @param filename : nom du fichier
+   * @param buffer : buffer à écrire
+   * @return true or false
+   */
   private def fileWrite(filename: String, buffer: String): Boolean = {
     var bufferFormate = buffer
     val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
@@ -688,7 +695,7 @@ class Utilitaire {
     createRepostoriesIfNecessary(CommonObjectForMockupProcess.generationProperties.temporaryDir)
     val timeStampDate = new Timestamp(new Date().getTime());
     val formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-    val target = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + formatter.format(timeStampDate) + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
+    val target = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + cstOld +  "_" + formatter.format(timeStampDate) + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
     try {
       Files.copy(new File(fileNameComplet).toPath(), new File(target).toPath(), REPLACE_EXISTING);
       (true, target)
@@ -697,7 +704,7 @@ class Utilitaire {
     }
   }
   /**
-   * <p>création du fichier généré dans un répertoir de travail et dans le répertoire de génération du projet</p>
+   * <p>création du fichier généré dans un répertoire de travail et dans le répertoire de génération du projet</p>
    * @param name of file
    * @param buffer to write
    * @param filename complet
@@ -705,7 +712,7 @@ class Utilitaire {
    */
   def createNewHtmlFileInTemporaryDir(fileNameShort: String, buffer: String, nameOfFileInDirectoryProject: String): (Boolean, String) = {
     createRepostoriesIfNecessary(CommonObjectForMockupProcess.generationProperties.temporaryDir)
-    val tempFilename = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
+    val tempFilename = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + cstNew + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
     fileWrite(nameOfFileInDirectoryProject, buffer) // ecrasement du fichier généré dans le repertoire de generation du projet
     return (fileWrite(tempFilename, buffer), tempFilename) // création du fichier généré dans un repertoire temporaire
 
@@ -734,8 +741,6 @@ class Utilitaire {
 
   /**
    * <p>Récupération de l'objet fragment depuis le widget</p>
-   * <p>mots clefs supportés :</p>
-   *  <p>               %usecase% %ficname% %project% %controller% %controller?capitalize% ficname?capitalize%" %customProperty2% %customProperty3% %mainScreen%</p>
    * @param widget : WidgetDeBase
    * @return instance Of Fragment
    */

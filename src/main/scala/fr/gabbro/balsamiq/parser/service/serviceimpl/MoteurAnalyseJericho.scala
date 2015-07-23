@@ -300,7 +300,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param subDirectory
    * @param templateDirOut
    */
-  def traductHtmlFile(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
+  def traductHtmlFileASupprimer(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
     var directoryName = templateDirOut
     val sourceHTML = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
     val fileHTML = new File(sourceHTML)
@@ -316,7 +316,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
   /*
    * <p>Lecture du fichier html extraction de l'ensemble des elements de la page. (fonction extractMessages)</p>
    * <p> les preserve sectios ont déjà été récupérées lors de la creation du fichier html
-   * <p>et réécriture du fichier html.</p>
+   * <p></p>
    * @param fileName
    * @param subDirectory
    * @param templateDirOut

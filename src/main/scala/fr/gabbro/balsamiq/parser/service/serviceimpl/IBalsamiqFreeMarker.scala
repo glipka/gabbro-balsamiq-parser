@@ -262,11 +262,6 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       CommonObjectForMockupProcess.mockupContext.ecritureDuCodeJaveOuScala // ecriture des fichiers contenant les classes java ou scala
       moteurTemplateFreeMarker.ecritureDuFichierHTML(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, sourceEcran.toString) // generation du fichier HTML et extraction des libelles à traduire
 
-      // internationalisation du fichier ??
-  //    if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == "true") {
-  //      logBack.info(utilitaire.getContenuMessage("mes46"))
-  //      moteurJericho.traductHtmlFile(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuRepertoirerEnCoursDeTraitement, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir) // extraction des clefs de traduction
-  //    }
       // génération des classes java ou scala qui sont définies dans le binding
       logBack.info(utilitaire.getContenuMessage("mes47"))
       traitementBinding.generationDuSourceDesClassesEtCreationDuFichier
