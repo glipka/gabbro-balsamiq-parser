@@ -1,7 +1,6 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
 
 import scala.collection.mutable.ArrayBuffer
-
 import fr.gabbro.balsamiq.parser.model.composantsetendus.Datagrid
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
@@ -265,7 +264,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
    */
   def ajustementTailleDeLaColonne(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], numeroDeColonne: Int, tailleDeLaColonne: Int): Int = {
     val branche = brancheFiltreeParLigne.filter(widget => widget.positionEnDouzieme == numeroDeColonne + tailleDeLaColonne)
-
     if (tailleDeLaColonne <= 1) { tailleDeLaColonne }
     else {
 

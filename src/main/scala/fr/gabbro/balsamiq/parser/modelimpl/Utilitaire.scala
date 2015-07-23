@@ -34,6 +34,12 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.text.SimpleDateFormat
+import java.sql.Timestamp
+import java.util.Date
+import org.apache.commons.io.FileUtils
 class Utilitaire {
   val logBack = LoggerFactory.getLogger(this.getClass());
   val propsMessages = new Properties();
@@ -621,6 +627,12 @@ class Utilitaire {
         bufferFormate = preserveSection.replacePreserveSection(buffer)
       }
     }
+    return (fileWrite(filename, bufferFormate))
+
+  }
+
+  private def fileWrite(filename: String, buffer: String): Boolean = {
+    var bufferFormate = buffer
     val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
     if (filename.endsWith(cstSuffixDesFichiersJavaScript)) { // se termine par .js ??
       bufferFormate = traitementFormatageSourceJava.indentSourceCodeJavaScript(bufferFormate, 5)
@@ -639,8 +651,8 @@ class Utilitaire {
         logBack.error(getContenuMessage("mes49"), filename.toString, ex.getMessage().toString(), "x")
         false
     }
+
   }
-  
   /**
    * <p>test existence fichier</p>
    * @param filename
@@ -649,6 +661,54 @@ class Utilitaire {
   def existFile(fileName: String): Boolean = {
     val file = new File(fileName)
     if (file.exists()) { true } else { false }
+  }
+  /**
+   * <p>compare contenu fichier avec un buffer</p>
+   * @param filename
+   * @return true (contenu identique) or false (contenu différent)
+   */
+  def compareContentFile(fileName1: String, fileName2: String): Boolean = {
+    try {
+      val file1 = new File(fileName1)
+      val file2 = new File(fileName2)
+      val ret = FileUtils.contentEqualsIgnoreEOL(file1, file2, null);
+      return ret
+
+    } catch {
+      case ex: Exception => println(ex.getMessage()); return false
+    }
+  }
+  /**
+   * <p>copie de l'ancien fichier html dans un répertoire temporaire</p>
+   * @param filename complet
+   * @param filename short
+   * @return (true or false, name of file in temporary directory)
+   */
+  def copyOldHtmlFiletoTemporaryDir(fileNameComplet: String, fileNameShort: String): (Boolean, String) = {
+    createRepostoriesIfNecessary(CommonObjectForMockupProcess.generationProperties.temporaryDir)
+    val timeStampDate = new Timestamp(new Date().getTime());
+    val formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+    val target = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + formatter.format(timeStampDate) + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
+    try {
+      Files.copy(new File(fileNameComplet).toPath(), new File(target).toPath(), REPLACE_EXISTING);
+      (true, target)
+    } catch {
+      case ex: Exception => println(ex.getMessage); (false, target)
+    }
+  }
+  /**
+   * <p>création du fichier généré dans un répertoir de travail et dans le répertoire de génération du projet</p>
+   * @param name of file
+   * @param buffer to write
+   * @param filename complet
+   * @return (true or false, name of file in temporary directory)
+   */
+  def createNewHtmlFileInTemporaryDir(fileNameShort: String, buffer: String, nameOfFileInDirectoryProject: String): (Boolean, String) = {
+    createRepostoriesIfNecessary(CommonObjectForMockupProcess.generationProperties.temporaryDir)
+    val tempFilename = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
+    fileWrite(nameOfFileInDirectoryProject, buffer) // ecrasement du fichier généré dans le repertoire de generation du projet
+    return (fileWrite(tempFilename, buffer), tempFilename) // création du fichier généré dans un repertoire temporaire
+
   }
 
   /**
@@ -672,7 +732,13 @@ class Utilitaire {
     v10
   }
 
-  // methode appelée depuis freemarker pour récupérer l'objet fragment
+  /**
+   * <p>Récupération de l'objet fragment depuis le widget</p>
+   * <p>mots clefs supportés :</p>
+   *  <p>               %usecase% %ficname% %project% %controller% %controller?capitalize% ficname?capitalize%" %customProperty2% %customProperty3% %mainScreen%</p>
+   * @param widget : WidgetDeBase
+   * @return instance Of Fragment
+   */
   def getFragmentFromWidget(widget: WidgetDeBase): Fragment = {
     val fragment = widget.mapExtendedAttribut.getOrElse(cstFragment, null)
     if (fragment != null) {
@@ -680,9 +746,14 @@ class Utilitaire {
     } else { null }
 
   }
-  // utilisé en debug par freeMarker
-  def printTrace(x: String): Unit = {
 
+  /**
+   * <p>impression de la trace depuis freeMarket</p>
+   * @param trace to print
+   * @return
+   */
+
+  def printTrace(x: String): Unit = {
     println("freeMarker:" + x)
   }
   // -------------------------------------------------------------------------------

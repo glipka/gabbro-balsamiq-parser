@@ -188,17 +188,39 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @return : true or false
    * modif le 28 avril 2015 : replace preserve
    * modif 21 juillet 2015 : conditionnement utilisation overwriteJspOrHtmlFile
+   * modif le 22 juillet 2015 : merge des fichiers à générer (ancienne version et nouvelle version)
    */
-  def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceEcran: String): Boolean = {
-    val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)   
+  def ecritureDuFichierHTML(NomDuFichierSourceJavaOuScala: String, sourceASauvegarder: String): Boolean = {
+    var sourceEcran = sourceASauvegarder
+    val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
+    // internationalisation du fichier ??
+    if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == "true") {
+      logBack.info(utilitaire.getContenuMessage("mes46"))
+      sourceEcran = new MoteurAnalyseJericho(this, utilitaire).traductHtmlFile(sourceASauvegarder) // extraction des clefs de traduction
+    }
+    val sourceFormat = new SourceFormatter(new Source(sourceEcran)).setIndentString("\t").setCollapseWhiteSpace(true).toString;
+
+    // si le fichier à générer existe et que l'on ne peut pas overrider le fichier existant:
+    //       on copie le fichier existant sur un répertoire de travail ainsi que le nouveau fichier à générer
+    //       si les fichiers ne sont pas identiques, on appelle le process de génération de commandes pour exécuter le merge des 2 fichiers.
+    //       le résultat du merge sera stocké dans le fichier original. 
     if (!CommonObjectForMockupProcess.generationProperties.overwriteJspOrHtmlFile && utilitaire.existFile(fileName)) {
+      val (ret1, fichierAvantGeneration) = utilitaire.copyOldHtmlFiletoTemporaryDir(fileName, NomDuFichierSourceJavaOuScala) // copie du fichier initial sur le repertoire temporaire
+      if (ret1) {
+        val (ret2, fichierApresGeneration) = utilitaire.createNewHtmlFileInTemporaryDir(NomDuFichierSourceJavaOuScala, sourceEcran,fileName) // copie du fichier après generation sur le repertoire temporaire
+        if (ret2) {
+          if (!utilitaire.compareContentFile(fichierAvantGeneration, fichierApresGeneration)) { // le source a été modifié ?
+            val cmd = CommonObjectForMockupProcess.generationProperties.mergeFileCommand.replace("%1", fichierAvantGeneration).replace("%2", fichierApresGeneration).replace("%3", fileName)
+            val executeCommand = new ExecuteCommand
+            val ret3 = executeCommand.execute(cmd)
+
+          }
+        }
+      }
       return true
+
     } else {
-      val source = new Source(sourceEcran);
-      // Utilisation du parser Jericho pour formater le généré HTML.
-      val sourceFormat = new SourceFormatter(source).setIndentString("\t").setCollapseWhiteSpace(true);
-      utilitaire.ecrire_fichier(fileName, sourceFormat.toString())
-      return true
+      return (utilitaire.ecrire_fichier(fileName, sourceFormat))
     }
   }
 

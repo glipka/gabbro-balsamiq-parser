@@ -250,7 +250,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
           var isAttribute = if (attributeName != "") { true } else { false }
           val (_, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstContainer, container), (cstIsAttribute, isAttribute.toString), (cstCurrentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (cstIndex, counterClef.toString), (cstAttributName, attributeName))
           val (_, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateBuildTraductionKey, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstContainer, container), (cstIsAttribute, isAttribute.toString), (cstCurrentTag, table_hierachie.head.getStartTag.getName.toLowerCase()), (cstIndex, counterClef.toString), (cstAttributName, attributeName))
-          var key = replaceSpecialCharKey(source6.trim + source7.trim)  // la clef de la propriété est fournie par le template  templateBuildTraductionKey
+          var key = replaceSpecialCharKey(source6.trim + source7.trim) // la clef de la propriété est fournie par le template  templateBuildTraductionKey
           tableDesClefsValeursDeTraduction += (key -> valeurATraduire);
           tableDesValeursClefsDeTraduction += ((valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement) -> key)
           return key
@@ -310,7 +310,24 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     val childElements = source.getChildElements().toList
     extractMessages(childElements, outputDocument); // on met à jour le fichier HTML
     val fichierHtmlTraduit = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
-    utilitaire.ecrire_fichier(fichierHtmlTraduit,outputDocument.toString(), false) // écriture du fichier sans traitement des preserve sections
+    utilitaire.ecrire_fichier(fichierHtmlTraduit, outputDocument.toString(), false) // écriture du fichier sans traitement des preserve sections
+  }
+
+  /*
+   * <p>Lecture du fichier html extraction de l'ensemble des elements de la page. (fonction extractMessages)</p>
+   * <p> les preserve sectios ont déjà été récupérées lors de la creation du fichier html
+   * <p>et réécriture du fichier html.</p>
+   * @param fileName
+   * @param subDirectory
+   * @param templateDirOut
+   */
+  def traductHtmlFile(sourceEcran: String): String = {
+    val source  = new Source(sourceEcran);
+    source.fullSequentialParse();
+    val outputDocument = new OutputDocument(source);
+    val childElements = source.getChildElements().toList
+    extractMessages(childElements, outputDocument); // on met à jour le fichier HTML
+    return outputDocument.toString()
   }
 
 } // fin de la classe

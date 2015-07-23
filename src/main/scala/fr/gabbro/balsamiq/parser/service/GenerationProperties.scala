@@ -68,6 +68,8 @@ class GenerationProperties {
   @BeanProperty var listDataTableWidget = List[String]()
   @BeanProperty var bypassDtoGeneration = false; // conditionne la generation des fichiers DTOs
   @BeanProperty var overwriteJspOrHtmlFile = true; // conditionne la generation des fichiers DTOs
+  @BeanProperty var mergeFileCommand = ""; // commande utilisée pour le merge.
+  @BeanProperty var temporaryDir = ""; // repertoire temporaire pour copier les fichiers pour effectuer le merge des fichiers html
 
   // config.generation.overwriteJspOrHtmlFile
   /**
@@ -113,8 +115,10 @@ class GenerationProperties {
     attributesToProcessI18n = propsMap.getOrElse("config.generation.attributesToProcessI18n", "").split(",").toList.map(_.trim)
     bypassProcessI18nTagHierachy = propsMap.getOrElse("config.generation.bypassProcessI18nTagHierachy", "").split(",").toList.map(_.trim)
     bypassDtoGeneration = if (propsMap.getOrElse("config.generation.bypassDtoGeneration", "false").trim == "true") { true } else { false }
-    overwriteJspOrHtmlFile = if (propsMap.getOrElse("config.generation.overwriteJspOrHtmlFile", "true").trim == "true") { true } else { false }    
+    overwriteJspOrHtmlFile = if (propsMap.getOrElse("config.generation.overwriteJspOrHtmlFile", "true").trim == "true") { true } else { false }
     generatedOtherConfFilesSuffix = if (propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").trim != "") propsMap.getOrElse("config.generation.generatedOtherConfFilesSuffix", "").split(",").toList.map(_.trim) else List.empty
+    mergeFileCommand = propsMap.getOrElse("config.generation.mergeFileCommand", "").trim
+    temporaryDir = propsMap.getOrElse("config.generation.temporaryDir", "").trim
     listDataTableWidget = propsMap.getOrElse("config.generation.listDataTableWidget", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
     //  generatedFolderForFragmentType.foreach { println(_)}
