@@ -164,7 +164,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // 
           val childrenInContainer = new java.util.ArrayList[WidgetDeBase] 
           brancheFiltreeParColonneEnDouzieme.foreach(widget => childrenInContainer.add(widget))
-          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstChildrenInContainer, childrenInContainer))
+          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container))
           sourceHtml = sourceHtml.append(source7)
           sourceJavascript = sourceJavascript.append(sourceJavaScript7)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
@@ -186,6 +186,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
             positionWidget += 1
           }) // fin de calcul du widget  
           // Appel template col fin
+          
           val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInContainer, childrenInContainer))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
