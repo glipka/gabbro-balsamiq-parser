@@ -162,9 +162,9 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // childrenContainer est un liste java pour faciliter l'accessibilité  depuis les templates javascript 
           // cette liste java va servir principalement à faire des sélections de génération en fonction du container et des enfants contenus dans le container 
           // 
-          val childrenInContainer = new java.util.ArrayList[WidgetDeBase] 
-          brancheFiltreeParColonneEnDouzieme.foreach(widget => childrenInContainer.add(widget))
-          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container))
+          val childrenInCurrentColumn = new java.util.ArrayList[WidgetDeBase] 
+          brancheFiltreeParColonneEnDouzieme.foreach(widget => childrenInCurrentColumn.add(widget))
+          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
           sourceHtml = sourceHtml.append(source7)
           sourceJavascript = sourceJavascript.append(sourceJavaScript7)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
@@ -172,13 +172,13 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // on traite chaque widget dans le div
           var positionWidget = 0
           brancheFiltreeParColonneEnDouzieme.foreach(widget => {
-            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString))
-            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString))
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
+            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
             traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
-            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString))
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
@@ -187,7 +187,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           }) // fin de calcul du widget  
           // Appel template col fin
           
-          val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInContainer, childrenInContainer))
+          val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
