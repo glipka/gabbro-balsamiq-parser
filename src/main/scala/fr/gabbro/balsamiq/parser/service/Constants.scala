@@ -36,6 +36,7 @@ class Constants {
   final val cstCheckBox = "com.balsamiq.mockups::CheckBox"
   final val cstCheckBoxGroup = "com.balsamiq.mockups::CheckBoxGroup"
   final val cstCheckboxShort = "checkbox"
+  final val cstChildrenInContainer="childrenInContainer"
   final val cstClassName = "className"
   final val cstCode = "code"
   final val cstColNumber = "colNumber"
