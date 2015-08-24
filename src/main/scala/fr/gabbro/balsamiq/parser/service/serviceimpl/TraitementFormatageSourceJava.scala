@@ -16,6 +16,7 @@ import org.mozilla.javascript.Context
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 import net.htmlparser.jericho.SourceFormatter
 import net.htmlparser.jericho.Source
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 
 /**
  * @author Georges Lipka
@@ -30,7 +31,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * @return formated buffer
    */
   def indentSourceCodeJava(bufferAformater: String): String = {
-     // take default Eclipse formatting options
+    // take default Eclipse formatting options
     val options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
     val settings = new HashMap[String, String]();
     settings.put(JavaCore.COMPILER_SOURCE, "1.7");
@@ -50,7 +51,33 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
     } catch {
       case ex: Exception =>
-        logBack.error(utilitaire.getContenuMessage("mes8"))
+        logBack.error(utilitaire.getContenuMessage("mes8"),ex.getMessage)
+        return bufferAformater
+    }
+
+  }
+
+  /**
+   * le formatage javascript se fait à l'aide d'un utilitaire externe à l'application.
+   * l'utilitaire à appeler est indiqué dans la propriété formatJavaScriptCommand
+   * le fichier javascript est généré dans un repertoire temporaire
+   * @param bufferAformater
+   * @return formated buffer
+   */
+  def indentSourceCodeJavaScript(bufferAformater: String, indentSize: Int): String = {
+    val fichierJavaScriptTemporaireNonformate = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + cstFichierJavaScriptNonformate
+    utilitaire.fileWrite(fichierJavaScriptTemporaireNonformate, bufferAformater, false)
+    val fichierJavaScriptTemporaireFormate = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + cstFichierJavaScriptformate
+    utilitaire.eraseContentFile(fichierJavaScriptTemporaireFormate)
+    val cmd = CommonObjectForMockupProcess.generationProperties.formatJavaScriptCommand.replace("%1", fichierJavaScriptTemporaireNonformate).replace("%2", fichierJavaScriptTemporaireFormate)
+    try {
+      new ExecuteCommand().execute(cmd) // appel de la commande de formatage javascriot
+      val bufferFormate=utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate)
+      if ( bufferFormate == "") {return bufferAformater}
+      else { return utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate)}
+    } catch {
+      case ex: Exception =>
+        logBack.error(utilitaire.getContenuMessage("mes8"),ex.getMessage)
         return bufferAformater
     }
 
@@ -61,7 +88,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * @param indentSize
    * @return formated buffer
    */
-  def indentSourceCodeJavaScript(jsCode: String, indentSize: Int): String = {
+  def indentSourceCodeJavaScriptOld(jsCode: String, indentSize: Int): String = {
     return jsCode // en attentant de corriger le bug
     val BEAUTIFY_JS = System.getProperty("user.dir") + "/" + "beautify.js"
     try {
@@ -76,7 +103,7 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
     } catch {
       case ex: Exception =>
-        logBack.error(utilitaire.getContenuMessage("mes34"))
+        logBack.error(utilitaire.getContenuMessage("mes34"),ex.getMessage)
         return jsCode
     }
 
@@ -87,13 +114,12 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
    * @param html file location
    * @return source formated
    */
-   
-   def indentSourceHtml(sourceMockup:String): String = {
+
+  def indentSourceHtml(sourceMockup: String): String = {
     val source = new Source(sourceMockup);
     // Utilisation du parser Jericho pour formater le généré HTML.
     val sourceFormat = new SourceFormatter(source).setIndentString("\t").setCollapseWhiteSpace(true);
-    return  sourceFormat.toString()
-   }
-
+    return sourceFormat.toString()
+  }
 
 }

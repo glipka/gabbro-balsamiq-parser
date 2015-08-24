@@ -74,6 +74,8 @@ class Constants {
   final val cstEstimatedHeightInChar = "estimatedHeightInChar"
   final val cstEstimatedWidthInChar = "estimatedWidthInChar"
   final val cstFalseString = "false"
+  final val cstFichierJavaScriptformate="FichierJavaScriptformate.js"
+  final val cstFichierJavaScriptNonformate="FichierJavaScriptNonformate.js"
   final val cstFieldName = "fieldName"
   final val cstFieldType = "fieldType"
   final val cstFormularAction = "formularAction"

@@ -2,19 +2,22 @@ package fr.gabbro.balsamiq.parser.service.serviceimpl
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import scala.collection.JavaConversions._
+import fr.gabbro.balsamiq.parser.service.TTraitementCommun
 
 /**
  * @author FRA9972467
  */
-class ExecuteCommand {
+class ExecuteCommand extends TTraitementCommun {
 
-  
-   /**
+  // val path=System.getenv("PATH").split(";") 
+
+  /**
    * execution d'une commande via  RunTime
- * @param command : String
- * @return (result of command:string)
- */
-  
+   * @param command : String
+   * @return (result of command:string)
+   */
+
   def execute(command: String): String = {
     var output = "";
     try {
@@ -22,7 +25,6 @@ class ExecuteCommand {
       p.waitFor();
       var reader =
         new BufferedReader(new InputStreamReader(p.getInputStream()));
-
       var line = "";
       do {
         line = reader.readLine();
@@ -32,7 +34,7 @@ class ExecuteCommand {
       } while (line != "" && line != null)
 
     } catch {
-      case ex: Exception => println(ex.getMessage)
+      case ex: Exception => logBack.error(utilitaire.getContenuMessage("mes62"),ex.getMessage)
     }
 
     return output.toString();

@@ -194,15 +194,15 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     var sourceEcran = sourceASauvegarder
     val fileName = utilitaire.getEmplacementFichierHtml(NomDuFichierSourceJavaOuScala, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir)
     // internationalisation du fichier ??
-    if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == "true") {
+    if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == cstTrueString) {
       logBack.info(utilitaire.getContenuMessage("mes46"))
       sourceEcran = new MoteurAnalyseJericho(this, utilitaire).traductHtmlFile(sourceASauvegarder) // extraction des clefs de traduction
     }
     val sourceFormat = new SourceFormatter(new Source(sourceEcran)).setIndentString("\t").setCollapseWhiteSpace(true).toString;
-
+    // ajout par gl le 22 juillet 2015. (rq:La solution de merge retenue est windiff)
     // si le fichier à générer existe et que l'on ne peut pas overrider le fichier existant:
     //       on copie le fichier existant sur un répertoire de travail ainsi que le nouveau fichier à générer
-    //       si les fichiers ne sont pas identiques, on appelle le process de génération de commandes pour exécuter le merge des 2 fichiers.
+    //       si les fichiers ne sont pas identiques, on appelle le process d'exécution de commandes externes pour exécuter le merge des 2 fichiers.
     //       le résultat du merge sera stocké dans le fichier original. 
     if (!CommonObjectForMockupProcess.generationProperties.overwriteJspOrHtmlFile && utilitaire.existFile(fileName)) {
       val (ret1, fichierAvantGeneration) = utilitaire.copyOldHtmlFiletoTemporaryDir(fileName, NomDuFichierSourceJavaOuScala) // copie du fichier initial sur le repertoire temporaire

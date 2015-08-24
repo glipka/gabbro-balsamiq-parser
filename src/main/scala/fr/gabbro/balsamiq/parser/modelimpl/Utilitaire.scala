@@ -611,7 +611,7 @@ class Utilitaire {
 
   /**
    * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
-   * mise en cache des preserve sections. 
+   * mise en cache des preserve sections.
    * @param filename : nom du fichier
    * @param buffer : buffer à écrire
    * @return true or false
@@ -631,22 +631,23 @@ class Utilitaire {
     return (fileWrite(filename, bufferFormate))
 
   }
-/**
+  /**
    * écriture d'un fichier sur disque (création du répertoire s'il n'existe pas).
    * formatage du fichier en fonction de son type.
    * @param filename : nom du fichier
    * @param buffer : buffer à écrire
    * @return true or false
    */
-  private def fileWrite(filename: String, buffer: String): Boolean = {
+   def fileWrite(filename: String, buffer: String, traitemementFormatage: Boolean = true): Boolean = {
     var bufferFormate = buffer
-    val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
-    if (filename.endsWith(cstSuffixDesFichiersJavaScript)) { // se termine par .js ??
-      bufferFormate = traitementFormatageSourceJava.indentSourceCodeJavaScript(bufferFormate, 5)
-    } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.languageSource)) {
-      bufferFormate = traitementFormatageSourceJava.indentSourceCodeJava(bufferFormate)
-    } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) { bufferFormate = traitementFormatageSourceJava.indentSourceHtml(bufferFormate) }
-
+    if (traitemementFormatage) {
+      val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
+      if (filename.endsWith(cstSuffixDesFichiersJavaScript)) { // se termine par .js ??
+        bufferFormate = traitementFormatageSourceJava.indentSourceCodeJavaScript(bufferFormate, 5)
+      } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.languageSource)) {
+        bufferFormate = traitementFormatageSourceJava.indentSourceCodeJava(bufferFormate)
+      } else if (filename.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) { bufferFormate = traitementFormatageSourceJava.indentSourceHtml(bufferFormate) }
+    }
     try {
       val fileWriter =
         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename.replace("\\", "/").trim), cstUtf8));
@@ -682,7 +683,37 @@ class Utilitaire {
       return ret
 
     } catch {
-      case ex: Exception => println(ex.getMessage()); return false
+      case ex: Exception => logBack.error(ex.getMessage()); return false
+    }
+  }
+  /**
+   * <p>recuperation  contenu fichierr</p>
+   * @param filename
+   * @return content of file
+   */
+  def recupContentFile(fileName1: String): String = {
+    try {
+      val file1 = new File(fileName1)
+      val buffer = FileUtils.readFileToString(file1)
+      return buffer
+
+    } catch {
+      case ex: Exception => logBack.error(ex.getMessage()); return ""
+    }
+  }
+  /**
+   * <p>delete content of File</p>
+   * @param filename
+   * @return content of file
+   */
+  def eraseContentFile(fileName1: String): Boolean = {
+    try {
+      val file1 = new File(fileName1)
+      val buffer = FileUtils.deleteQuietly(file1)
+      return true
+
+    } catch {
+      case ex: Exception => logBack.error(ex.getMessage()); false
     }
   }
   /**
@@ -695,12 +726,12 @@ class Utilitaire {
     createRepostoriesIfNecessary(CommonObjectForMockupProcess.generationProperties.temporaryDir)
     val timeStampDate = new Timestamp(new Date().getTime());
     val formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-    val target = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + cstOld +  "_" + formatter.format(timeStampDate) + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
+    val target = CommonObjectForMockupProcess.generationProperties.temporaryDir + "/" + fileNameShort + "_" + cstOld + "_" + formatter.format(timeStampDate) + "." + CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix;
     try {
       Files.copy(new File(fileNameComplet).toPath(), new File(target).toPath(), REPLACE_EXISTING);
       (true, target)
     } catch {
-      case ex: Exception => println(ex.getMessage); (false, target)
+      case ex: Exception => logBack.error(ex.getMessage); (false, target)
     }
   }
   /**
