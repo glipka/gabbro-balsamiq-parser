@@ -303,8 +303,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     val niveau1 = niveau + 4
     var etoile = "*" * niveau1
     branche.foreach(controle => {
-      println(etoile + "noeud branche: " + controle.controlID + " composant" + controle.getWidgetNameOrComponentName() + " colBootStrap:" + controle.positionEnDouzieme + " rowNumber: " + controle.rowNumber)
-      println(etoile + " ++++ extendedAttributes:");
+      logBack.debug(etoile + "noeud branche: " + controle.controlID + " composant" + controle.getWidgetNameOrComponentName() + " colBootStrap:" + controle.positionEnDouzieme + " rowNumber: " + controle.rowNumber)
+      logBack.debug(etoile + " ++++ extendedAttributes:");
       controle.mapExtendedAttribut.foreach(x => logBack.debug(" clef:" + x._1 + " value:" + x._2) + " "); logBack.debug("")
       if (controle.tableau_des_fils.size > 0) { impression_branche(controle.tableau_des_fils, niveau1) }
 
