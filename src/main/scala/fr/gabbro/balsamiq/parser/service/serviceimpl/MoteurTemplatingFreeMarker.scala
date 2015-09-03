@@ -1,5 +1,5 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //
@@ -207,7 +207,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     if (!CommonObjectForMockupProcess.generationProperties.overwriteJspOrHtmlFile && utilitaire.existFile(fileName)) {
       val (ret1, fichierAvantGeneration) = utilitaire.copyOldHtmlFiletoTemporaryDir(fileName, NomDuFichierSourceJavaOuScala) // copie du fichier initial sur le repertoire temporaire
       if (ret1) {
-        val (ret2, fichierApresGeneration) = utilitaire.createNewHtmlFileInTemporaryDir(NomDuFichierSourceJavaOuScala, sourceEcran,fileName) // copie du fichier après generation sur le repertoire temporaire
+        val (ret2, fichierApresGeneration) = utilitaire.createNewHtmlFileInTemporaryDir(NomDuFichierSourceJavaOuScala, sourceEcran, fileName) // copie du fichier après generation sur le repertoire temporaire
         if (ret2) {
           if (!utilitaire.compareContentFile(fichierAvantGeneration, fichierApresGeneration)) { // le source a été modifié ?
             val cmd = CommonObjectForMockupProcess.generationProperties.mergeFileCommand.replace("%1", fichierAvantGeneration).replace("%2", fichierApresGeneration).replace("%3", fileName)
@@ -225,14 +225,36 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
   }
 
   /**
+   * @param widget
+   * @return true or false
+   * test si le widget est dans la liste des containers qui génèrent leur propre fragment
+   */
+  def testSiWidgetDansLaListeDesContainersGenerantLeursFragments(widget: WidgetDeBase): Boolean = {
+    if (widget != null) {
+      // 
+      // le bmml n'est pas un fragment et le widget est dans la listegenerateFragmentFromTheseContainers
+      if (!CommonObjectForMockupProcess.isAfragment && CommonObjectForMockupProcess.generationProperties.generateFragmentFromTheseContainers.map(keyValue => keyValue._1).intersect(List(widget.getWidgetNameOrComponentName)).size > 0) { return true }
+      else { return false }
+    } else { return false }
+
+  }
+  /**
    * si le template est dans la liste des templates pour lesquels il n'y a pas de génération
-   * on ne genere pas de code pour les fils (cas de DHTMLxgrid par exemple)
+   * on ne genere pas de code pour les fils (cas de DHTMLxgrid par exemple). La propriété bypassGenerationTemplateForChildren gère ce cas
+   * on ne génère pas de code pour les widgets inclus dans les containers générant leur propre fragment  : proprité generateFragmentFromTheseContainers
+   * si le
    * @param widget :instance of WidgetDeBase
    * @return : true or false
    */
   def templateAGenerer(widget: WidgetDeBase): Boolean = {
-    if (widget != null) { !CommonObjectForMockupProcess.engineProperties.bypassGenerationTemplateForChildren.exists(token => (token == widget.controlTypeID || token == widget.componentName)) }
-    else { true }
+    if (widget != null) {
+      // 
+      if (CommonObjectForMockupProcess.engineProperties.bypassGenerationTemplateForChildren.exists(token => (token == widget.getWidgetNameOrComponentName))) { return false }
+      else {
+        // si le widget est dans la liste des containers générant leur propre fragment on ne génère pas le template du widget en cours
+        return !testSiWidgetDansLaListeDesContainersGenerantLeursFragments(widget)
+      }
+    } else { true }
   }
 
   /**
@@ -259,7 +281,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @return
    */
   def generationDuTemplate(widgetName: String, phase: String, widget: WidgetDeBase, widgetPere: WidgetDeBase, parametresDuWidget: Map[String, Object], parametresAdditionnels: List[(String, Object)]): (Boolean, String, String, String) = {
-    if (!templateAGenerer(widgetPere)) { (false, "", "", "") } // pas de génération de fils ?
+    if (!templateAGenerer(widgetPere) || testSiWidgetDansLaListeDesContainersGenerantLeursFragments(widget)) { (false, "", "", "") } // pas de génération de fils pour les widgets dont le pere est dans la liste xx1 ou dans la liste des container generant leur propre fragment ou pour les widgets contenu dans liste des containers generant leur propre fragment
     else {
       var (templateHtml, templateJavascript, templateCode) = determinationNomDuTemplate(widgetName.trim, phase.trim)
       templateHtml match {
@@ -296,21 +318,18 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
    * @return
    */
   def processExecuteFreeMarkerTemplate(templateName: String, widgetPere: WidgetDeBase, templateParameter: java.util.Map[String, Object]): (Boolean, String) = {
-    if (!templateAGenerer(widgetPere)) { (false, "") } // pas de génération de fils ?
-    else {
-      try {
-        val template = cfgFreeMarker.getTemplate(templateName)
-        if (template != null) {
-          val out = new StringWriter();
-          if (CommonObjectForMockupProcess.engineProperties.freemarkerVariablePrefix != "") { template.process(templateParameter.map(keyvalue => (CommonObjectForMockupProcess.engineProperties.freemarkerVariablePrefix + keyvalue._1, keyvalue._2)), out) };
-          else { template.process(mutableMapAsJavaMap(templateParameter), out) };
+    try {
+      val template = cfgFreeMarker.getTemplate(templateName)
+      if (template != null) {
+        val out = new StringWriter();
+        if (CommonObjectForMockupProcess.engineProperties.freemarkerVariablePrefix != "") { template.process(templateParameter.map(keyvalue => (CommonObjectForMockupProcess.engineProperties.freemarkerVariablePrefix + keyvalue._1, keyvalue._2)), out) };
+        else { template.process(mutableMapAsJavaMap(templateParameter), out) };
 
-          // template.process(templateParameter, out);
-          (true, out.toString())
-        } else { (false, "") }
-      } catch {
-        case ex: Exception => (false, "")
-      }
+        // template.process(templateParameter, out);
+        (true, out.toString())
+      } else { (false, "") }
+    } catch {
+      case ex: Exception => (false, "")
     }
 
   }

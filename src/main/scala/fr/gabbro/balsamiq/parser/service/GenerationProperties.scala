@@ -1,7 +1,8 @@
 package fr.gabbro.balsamiq.parser.service
 
 import scala.beans.BeanProperty
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //
@@ -44,7 +45,7 @@ class GenerationProperties {
   @BeanProperty var globalExecutionTemplate1 = "" // nom du template à exécuter après le traitment de tous les mockups
   @BeanProperty var globalExecutionTemplate2 = "" // nom du template à exécuter après le traitment de tous les mockups
   @BeanProperty var globalExecutionTemplate3 = "" // nom du template à exécuter après le traitment de tous les mockups
-  @BeanProperty var htmlContainerListForI18nGeneration = List[String]() // tag html pouvant être un container
+  @BeanProperty var htmlContainerListForI18nGeneration = List[String]() // tag html pouvant être un container pour la generation i18N
   @BeanProperty var i18nLocales = List[String]() // liste des langues à générer lors de l'internationalisation
   @BeanProperty var languageSource = "" // language java ou scala
   @BeanProperty var localExecutionFilePath1 = "" // localistion du fichier généré par le template local
@@ -71,7 +72,10 @@ class GenerationProperties {
   @BeanProperty var mergeFileCommand = ""; // commande utilisée pour le merge.
   @BeanProperty var temporaryDir = ""; // repertoire temporaire pour copier les fichiers pour effectuer le merge des fichiers html
   @BeanProperty var formatJavaScriptCommand = ""; // commande utilisée pour le merge.
-
+  @BeanProperty var generateFragmentFromTheseContainers = List[(String, String)]() // Le contenu est sous forme de tuple : nom du container et type de container
+  @BeanProperty var headerXMLInGeneratedFragmentBegin = ""; // begin header in generated fragment 
+  @BeanProperty var headerXMLInGeneratedFragmentEnd = ""; // end header in generated fragment
+  @BeanProperty var processExtractFragments = true; // process extraction des fragments depuis le mockup principal true of false
   // config.generation.overwriteJspOrHtmlFile
   /**
    * load generation properties
@@ -123,6 +127,7 @@ class GenerationProperties {
     temporaryDir = propsMap.getOrElse("config.generation.temporaryDir", "").trim
     listDataTableWidget = propsMap.getOrElse("config.generation.listDataTableWidget", "").split(",").toList.map(_.trim)
     val generatedFolderForFragmentType = propsMap.getOrElse("config.generation.generatedFolderForFragmentType", "").split(",").toList.map(_.trim)
+
     //  generatedFolderForFragmentType.foreach { println(_)}
     // à partir de la liste des fragments on crée un map en splittant le contenu du fragment par ":"
     generatedFolderForFragmentType.foreach(typeFragment_subDirectory => {
@@ -132,10 +137,21 @@ class GenerationProperties {
         fragmentTypesList += (typeFragment -> subDirectoryDuFragment)
       }
     })
-
+    // les valeurs sont sous la forme nomducontainer§typeDeContainer 
+    // on met en table le tuple (nom du container, type de container)
+    generateFragmentFromTheseContainers = propsMap.getOrElse("config.generation.generateFragmentFromTheseContainers", "").split(",").toList.map(_.trim).map(containerType => {
+      // le séparateur de type est le même que le séprateur de type utilisé dans le nom des fragments. 
+      val tableauDesContainerType = containerType.split(CommonObjectForMockupProcess.engineProperties.fragmentTypeSeparator)
+      // on doit avoir 2 elements : le nom du container et son type
+      if (tableauDesContainerType.size == 2) { (tableauDesContainerType.head, tableauDesContainerType.last) }
+      else { (tableauDesContainerType.mkString(""), "") }
+    })
     i18nLocales = propsMap.getOrElse("config.generation.i18nLocales", "").split(",").toList.map(_.trim)
     srcDtoFilesFullPath = generatedProjectDir + System.getProperty("file.separator") + srcBuildPathDir + System.getProperty("file.separator") + propsMap.getOrElse("config.generation.srcDtoFilesDir", "").trim.replace("%project%", projectName)
-
+    headerXMLInGeneratedFragmentBegin = propsMap.getOrElse("config.generation.headerXMLInGeneratedFragmentBegin", "").trim
+    headerXMLInGeneratedFragmentEnd = propsMap.getOrElse("config.generation.headerXMLInGeneratedFragmentEnd", "").trim
+    processExtractFragments = if (propsMap.getOrElse("config.generation.processExtractFragments", "false").trim =="true") { true } else { false }
+ 
   }
 
 }

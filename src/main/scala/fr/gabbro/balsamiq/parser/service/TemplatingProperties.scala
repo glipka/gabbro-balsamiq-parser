@@ -1,7 +1,7 @@
 package fr.gabbro.balsamiq.parser.service
 
 import scala.beans.BeanProperty
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //

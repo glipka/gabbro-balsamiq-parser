@@ -2,7 +2,7 @@ package fr.gabbro.balsamiq.parser.service
 
 import org.mozilla.javascript.BeanProperty
 import scala.beans.BeanProperty
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //
@@ -83,12 +83,14 @@ class Constants {
   final val cstFragment = "fragment"
   final val cstGenerateController = "generateController"
   final val cstGeneratedFileName = "generatedFileName"
+  final val cstGeneratedFragment = "generatedFragment"
   final val cstGenerationProperties = "generationProperties"
   final val cstGlobalContext = "globalContext"
   final val cstGroupChildrenDescriptors = "groupChildrenDescriptors"
   final val cstGroupConstante = "__group__"
   final val cstH = "h"
   final val cstHeaderHttp = "http://"
+  final val cstHeight = "%height%"
   final val cstHierarchiePere = "hierarchiePere"
   final val cstHorizontal = "horizontal"
   final val cstHref = "href"
@@ -202,6 +204,7 @@ class Constants {
   final val cstWidget = "widget"
   final val cstWidgetContainer = "widgetContainer"
   final val cstWidgetName = "widgetName"
+  final val cstWidth = "%width%"
   final val cstX = "x"
   final val cstXAbsolute = "xAbsolute"
   final val cstXRelative = "xRelative"
@@ -209,6 +212,7 @@ class Constants {
   final val cstYAbsolute = "yAbsolute"
   final val cstYRelative = "yRelative"
   final val cstZ = "z"
+  final val cstZip = ".zip"
   final val cstZOrder = "zOrder"
 
 }

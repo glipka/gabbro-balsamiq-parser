@@ -1,4 +1,21 @@
 package fr.gabbro.balsamiq.parser.service.serviceimpl
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Version 1.0
+// Copyright (C) 2014 Georges Lipka
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of either one of the following licences:
+//
+// 1. The Eclipse Public License (EPL) version 1.0,
+//   available at http://www.eclipse.org/legal/epl-v10.html
+//
+// 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
+//    available at http://www.gnu.org/licenses/lgpl.txt
+//
+// This program is distributed on an "AS IS" basis,
+// WITHOUT WARRANTY OF ANY KIND, either express or implied.
+// See the individual licence texts for more details.
+
 import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
@@ -41,6 +58,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  * ==============================================================================================================================</p>
  */
 object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
+
   if (!init()) { System.exit(99) }
   else {
     process() // process du batch
@@ -82,6 +100,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   /**
    * -------------------------------------------------------------------------------------------------------------------
    * process de l'ensemble des fichiers du repertoire balsamiq
+   * on extrait d'abord les fragments des fichiers mockups principaux
    * En fin de traitement de l'ensemble des fichiers, on sauvegarde les clefs de traduction dans un fichier commun
    * --------------------------------------------------------------------------------------------------------------------
    *
@@ -90,6 +109,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     logBack.info(utilitaire.getContenuMessage("mes40"))
     if (catalogDesComposantsCommuns.chargementDesCatalogues(CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir)) { // chargement du catalog BootStrap  
       logBack.info(utilitaire.getContenuMessage("mes41"))
+      // generation des fragments depuis les mockups principaux. l'instance de GlobalContext et traitementBinding est temporaire.
+      if (CommonObjectForMockupProcess.generationProperties.processExtractFragments) { // on extrait les fragments du bmml principal ?
+        new ExternalisationContenuDesFragments(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir, catalogDesComposantsCommuns, moteurTemplateFreeMarker, new TraitementBinding(moteurTemplateFreeMarker, new GlobalContext)).process()   // extraction des fragments
+      }
       traitementDesFichiersDuRepertoireBalsamiq(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir) // traitement ensemble des fichiers
 
       logBack.info(utilitaire.getContenuMessage("mes42"))
@@ -128,6 +151,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     logBack.info(utilitaire.getContenuMessage("mes60"), directory1)
     // on traite d'abord les fragments pour mettre en globalSection toutes les références
     val fichiersBalsamiqATraiter = new File(directory1).listFiles.toList
+    val utilZip = new UtilZip() // utilitaire winzip pour extraction des fichiers bmml despuis l'archive générée par l'export balsamiq3
+    utilZip.scanRepositoryToExtractBmmlFile(fichiersBalsamiqATraiter)
+
     traitementDesFichiers(fichiersBalsamiqATraiter, true) // on traite d'abord les fragments 
     traitementDesFichiers(fichiersBalsamiqATraiter, false) // puis on traite les autres fichiers (ecrans principaux).
 
@@ -231,9 +257,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       logBack.info(utilitaire.getContenuMessage("mes56"), fichierBalsamiq.getName())
       CommonObjectForMockupProcess.mockupContext.global_max_width = w
       CommonObjectForMockupProcess.mockupContext.global_max_height = h
-      catalogBalsamiq.creation_catalog(catalogAPlat.catalog) // creation et enrichissemebt du catalogue balamiq
+      catalogBalsamiq.creation_catalog(catalogAPlat.catalog, w, h) // creation et enrichissemebt du catalogue balamiq
       val controleValiditeProcess = new ControleValidite(catalogBalsamiq.catalog, traitementBinding, globalContext).process
-      val generationDeCode = new ModuleGenerationCode(moteurTemplateFreeMarker)
+      val generationDeCode = new ModuleGenerationCode(moteurTemplateFreeMarker) // module qui genère le coode
       // traitement de l'ensemble des composants
       val (source2, sourceJavascript2, code2) = generationDeCode.traitement_widget_par_ligne_colonne(catalogBalsamiq.catalog(0).tableau_des_fils, 0, 0, null, catalogBalsamiq.catalog(0), false)
       // catalogBalsamiq.catalog(0) contient le widget gabarit de la pagel

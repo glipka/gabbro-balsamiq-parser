@@ -1,5 +1,5 @@
 package fr.gabbro.balsamiq.parser.model.composantsetendus
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //
@@ -18,6 +18,7 @@ package fr.gabbro.balsamiq.parser.model.composantsetendus
 
 import scala.collection.immutable.List
 import org.jdom2.Element
+import org.jdom2.output._
 import scala.collection.mutable.ArrayBuffer
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConversions._
@@ -29,6 +30,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.modelimpl.Fragment
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import java.io.StringWriter
 // ----------------------------------------------------------
 //  controlID="6"
 // controlTypeID="com.balsamiq.mockups::Label"
@@ -47,12 +49,12 @@ class IconInWidget(@BeanProperty var iconName: String, @BeanProperty var fragmen
 
 abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, var isAComponent: Boolean) {
   val logBack = LoggerFactory.getLogger(this.getClass());
-
+  var sourceXmldDeLelement: String = ""
   var componentSrc = "" // source du composant
   var componentName = "" // nom du composant bootStrap
   var componentXML: Element = null;
   var repositoryName = "" // nom du repostory contenant le composant
-  var controlTypeID: String = "";
+  var controlTypeID: String = ""; // type de composant
   @BeanProperty var shortWidgetName: String = ""
   var controlID: Int = 0;
   @BeanProperty var isFormulaireHTML = false // variable renseignée dans fileConverter
@@ -128,6 +130,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
  */
   def process() {
     if (this.isAComponent) {
+      
       recuperationAttributsDeBase(elementXML)
       mapExtendedAttribut = mapExtendedAttribut ++ this.recuperationDesAttributsEtendusDuComposant(elementXML)
       // si c'est un composant, on réécrit les attributs en concatenant ID du composant
@@ -247,6 +250,11 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @param e : Element
    */
   protected def recuperationAttributsDeBase(e: Element) {
+    val xmloutputter= new XMLOutputter
+    val out=new StringWriter();
+    xmloutputter.output(e, out)
+    
+    this.sourceXmldDeLelement = out.toString // code xource xml de l'élément en cours
     this.controlTypeID = e.getAttributeValue(cstControlTypeID) //.substring(22);
     if (this.controlTypeID.contains("::")) {
       this.shortWidgetName = this.controlTypeID.split("::").last
@@ -330,7 +338,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           else if (elementName == cstCustomID) {
             val id = if (elementValue != "") elementValue.trim else ""
             this.customId = id
-            if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets  += this.customId } // on met en table le nom des formulaires
+            if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
 
           } else if (elementName == cstCustomData) {
             val tableValue = elementValue.split(";").map(_.trim)
@@ -460,8 +468,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
                   ""
                 }
                 this.customId = id // custom ID
-               
-                if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets+= this.customId } // on met en table le nom des formulaires
+
+                if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
 
                 mapExtendedAttributDuComposant += (cstCustomID -> id)
               } else if (paramName == cstCustomData) {

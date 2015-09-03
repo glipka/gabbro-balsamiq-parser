@@ -10,7 +10,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.IconInWidget
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
-// IbalsamiqFreeMarker - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
+// Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
 //
@@ -28,11 +28,15 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 // See the individual licence texts for more details.
 
 class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBalsamiq {
+  var global_max_width:Int=0
+  var global_max_heigth:Int=0
   /**
    * **** création et enrichissemnt du catalogue ****
    * @param catalogAPlat
    */
-  def creation_catalog(catalogAPlat: ArrayBuffer[WidgetDeBase]): Unit = {
+  def creation_catalog(catalogAPlat: ArrayBuffer[WidgetDeBase],global_max_width:Int,global_max_heigth:Int): Unit = {
+    this.global_max_width=global_max_width
+    this.global_max_heigth=global_max_heigth
     catalog = constitutionDuCatalog(catalogAPlat)
     catalog = enrichissement_widget_branche(catalog, null)
     logBack.info(utilitaire.getContenuMessage("mes28"), CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement)
@@ -60,13 +64,13 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   def enrichissement_widget_branche(branche: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): ArrayBuffer[WidgetDeBase] = {
     var positionDansLeConteneur = 0
     val tableau = branche.map(widget => {
-      if (CommonObjectForMockupProcess.mockupContext.global_max_width > 0) widget.percentageparRapportLargeurTotale = Math.ceil((widget.w.toDouble / CommonObjectForMockupProcess.mockupContext.global_max_width) * 100.0)
-      if (CommonObjectForMockupProcess.mockupContext.global_max_height > 0) widget.percentageparRapportHauteurTotale = Math.ceil((widget.h.toDouble / CommonObjectForMockupProcess.mockupContext.global_max_height) * 100.0)
+      if (global_max_width > 0) widget.percentageparRapportLargeurTotale = Math.ceil((widget.w.toDouble / global_max_width) * 100.0)
+      if (global_max_heigth > 0) widget.percentageparRapportHauteurTotale = Math.ceil((widget.h.toDouble / global_max_heigth) * 100.0)
       // on recalcule les ratios des coordonnées et hauteur et largeur en fonction d'une dimension cible.
       // cela va servir essentiellement aux templates utilisant les coordonnées absolues. 
       if (CommonObjectForMockupProcess.engineProperties.projectionOfWidthInPx > 0 && CommonObjectForMockupProcess.engineProperties.projectionOfHeightInPx > 0) {
-        val ratioW = (CommonObjectForMockupProcess.engineProperties.projectionOfWidthInPx / CommonObjectForMockupProcess.mockupContext.global_max_width).toInt
-        val ratioH = (CommonObjectForMockupProcess.engineProperties.projectionOfHeightInPx / CommonObjectForMockupProcess.mockupContext.global_max_height).toInt
+        val ratioW = (CommonObjectForMockupProcess.engineProperties.projectionOfWidthInPx / global_max_width).toInt
+        val ratioH = (CommonObjectForMockupProcess.engineProperties.projectionOfHeightInPx / global_max_heigth).toInt
         widget.projectionW = widget.w * ratioW
         widget.projectionH = widget.h * ratioH
         widget.projectionX = widget.xAbsolute * ratioW
@@ -86,12 +90,12 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
         widget.positionDansLeConteneur = positionDansLeConteneur
 
       } else { // il n'y a pas de container père
-        widget.percentageLargeurParRapportPere = Math.ceil((widget.w.toDouble / CommonObjectForMockupProcess.mockupContext.global_max_width.toDouble) * 100.0)
-        widget.percentageHauteurparRapportPere = Math.ceil((widget.h.toDouble / CommonObjectForMockupProcess.mockupContext.global_max_height) * 100.0)
-        widget.percentageBandeauHautParRapportPere = Math.ceil(((widget.yAbsolute.toDouble) / CommonObjectForMockupProcess.mockupContext.global_max_height.toDouble) * 100.0)
-        widget.percentageBandeauBasParRapportPere = Math.ceil((((CommonObjectForMockupProcess.mockupContext.global_max_height) - (widget.yAbsolute.toDouble + widget.h.toDouble)) / CommonObjectForMockupProcess.mockupContext.global_max_height.toDouble) * 100.0)
-        widget.percentageBandeauDroiteParRapportPere = Math.ceil((((CommonObjectForMockupProcess.mockupContext.global_max_width.toDouble) - (widget.xAbsolute.toDouble + widget.w.toDouble)) / CommonObjectForMockupProcess.mockupContext.global_max_width.toDouble) * 100.0)
-        widget.percentageBandeauGaucheParRapportPere = Math.ceil(((widget.xAbsolute.toDouble) / CommonObjectForMockupProcess.mockupContext.global_max_width.toDouble) * 100.0)
+        widget.percentageLargeurParRapportPere = Math.ceil((widget.w.toDouble / global_max_width.toDouble) * 100.0)
+        widget.percentageHauteurparRapportPere = Math.ceil((widget.h.toDouble / global_max_heigth) * 100.0)
+        widget.percentageBandeauHautParRapportPere = Math.ceil(((widget.yAbsolute.toDouble) / global_max_heigth.toDouble) * 100.0)
+        widget.percentageBandeauBasParRapportPere = Math.ceil((((global_max_heigth) - (widget.yAbsolute.toDouble + widget.h.toDouble)) / global_max_heigth.toDouble) * 100.0)
+        widget.percentageBandeauDroiteParRapportPere = Math.ceil((((global_max_width.toDouble) - (widget.xAbsolute.toDouble + widget.w.toDouble)) / global_max_width.toDouble) * 100.0)
+        widget.percentageBandeauGaucheParRapportPere = Math.ceil(((widget.xAbsolute.toDouble) / global_max_width.toDouble) * 100.0)
         widget.xRelative = widget.xAbsolute
         widget.yRelative = widget.yAbsolute
         widget.positionDansLeConteneur = positionDansLeConteneur
@@ -264,7 +268,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
    * @return taille de la cellule
    */
   private def calculTailleCelluleEnDouzieme(widget: WidgetDeBase): Int = {
-    var tailleCelluleEnDouzieme = if (widget != null) { widget.w / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns } else { (CommonObjectForMockupProcess.mockupContext.global_max_width / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns).toInt }
+    var tailleCelluleEnDouzieme = if (widget != null) { widget.w / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns } else { (global_max_width / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns).toInt }
     if (tailleCelluleEnDouzieme < CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) { tailleCelluleEnDouzieme = CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns }
     tailleCelluleEnDouzieme
   }
@@ -299,8 +303,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     val niveau1 = niveau + 4
     var etoile = "*" * niveau1
     branche.foreach(controle => {
-      logBack.debug(etoile + "noeud branche: " + controle.controlTypeID.split("::").last + " id_interne:" + controle.id_interne + " colBootStrap:" + controle.positionEnDouzieme + " rowNumber: " + controle.rowNumber)
-      logBack.debug(etoile + " ++++ extendedAttributes:");
+      println(etoile + "noeud branche: " + controle.controlID + " composant" + controle.getWidgetNameOrComponentName() + " colBootStrap:" + controle.positionEnDouzieme + " rowNumber: " + controle.rowNumber)
+      println(etoile + " ++++ extendedAttributes:");
       controle.mapExtendedAttribut.foreach(x => logBack.debug(" clef:" + x._1 + " value:" + x._2) + " "); logBack.debug("")
       if (controle.tableau_des_fils.size > 0) { impression_branche(controle.tableau_des_fils, niveau1) }
 
@@ -368,7 +372,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
    * @return
    */
   private def position_relative(widget: WidgetDeBase): Double = {
-    val ret = (widget.yAbsolute * CommonObjectForMockupProcess.mockupContext.global_max_width) + widget.xAbsolute
+    val ret = (widget.yAbsolute * global_max_width) + widget.xAbsolute
     ret
   }
 
