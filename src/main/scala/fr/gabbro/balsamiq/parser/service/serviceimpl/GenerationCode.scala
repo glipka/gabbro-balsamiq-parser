@@ -27,7 +27,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
   /**
    * dans le catalogue chaque container est matérialisé par une branche.
    * un container peut être lui même contenu dans un container.
-   * La 1ere branche du catalogue est le gabarit principal qui contient l'ensemble des wigets de l'écran
+   * La 1ere branche du catalogue est le gabarit principal qui contient l'ensemble des widgets de l'écran
    * On extrait dans chaque branche les widgets triés  par n° de ligne et par n° de colonne.
    * On chaque changement de branche => on appelle la genération du template "Canvas".
    * A chaque changement de ligne => on appelle le template row

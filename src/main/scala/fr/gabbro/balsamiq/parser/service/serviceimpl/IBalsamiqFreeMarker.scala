@@ -123,9 +123,12 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       logBack.info(utilitaire.getContenuMessage("mes44"))
       globalContext.generation_fichiers_javascript
       //globalContext.printBindedForms()
-      logBack.info(utilitaire.getContenuMessage("mes59"))
-      moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
-      moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
+     
+      if(CommonObjectForMockupProcess.generationProperties.processI18nInFiles == cstTrueString){
+        logBack.info(utilitaire.getContenuMessage("mes59"))
+        moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
+        moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
+      }
       return true
     } else { false }
 
