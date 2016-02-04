@@ -125,7 +125,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           widgetPrecedent= widget
         }) // fin de   brancheFiltreeParPositionWidget.foreach
         // template colonne fin
-        val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstContainer, container), (cstColNumber, numeroColonne.toString))
+        val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstContainer, container), (cstColNumber, numeroColonne.toString),(cstLeftSibling,widgetPrecedent))
         sourceHtml = sourceHtml.append(source10)
         sourceJavascript = sourceJavascript.append(sourceJavaScript10)
         sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
@@ -192,7 +192,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         
 
           brancheFiltreeParColonneEnDouzieme.foreach(widget => {
-           // val x=(cstLeftSibling,widgetPrecedent)
             val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
             else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
             sourceHtml = sourceHtml.append(source8)

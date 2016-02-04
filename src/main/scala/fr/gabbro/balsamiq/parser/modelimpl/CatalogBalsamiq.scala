@@ -246,7 +246,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   }
   /**
    * <p>pour chaque widget de la branche enrichit l'attribut labelFor</p>
-   * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui est sur la même ligne</p>
+   * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui n'est pas forcément la même ligne</p>
    * <p>on renseigne alors l'attribut labelFor du composant label ainsi que l'attribut labelForWidget</p>
    * @param branche
    * @param widgetPerep
@@ -260,7 +260,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           // on verifie que le widget suivant est un element de la liste des widgets formulaire
           val l1 = List(branche(i + 1).controlTypeID).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm)
           val l2 = List(branche(i + 1).componentName).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm)
-          if ((l1.size > 0 || l2.size > 0) && (branche(i).rowNumber == branche(i + 1).rowNumber)) {
+          if ((l1.size > 0 || l2.size > 0)  ) { // && (branche(i).rowNumber == branche(i + 1).rowNumber)
             //   val controlIdPere= if (widgetPere != null) widgetPere.customId else ""
             val composant_associe = branche(i + 1)
             branche(i).labelFor = if (composant_associe.isAComponent) branche(i + 1).componentName else branche(i + 1).controlTypeID.split("::").last.toLowerCase()
