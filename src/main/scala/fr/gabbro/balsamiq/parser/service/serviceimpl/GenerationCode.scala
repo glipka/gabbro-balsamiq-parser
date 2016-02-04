@@ -209,7 +209,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
             positionWidget += 1
           }) // fin de calcul du widget  
           // Appel template col fin
-          val avantDernierWidget = if ((queueDesWidgets.size-2) > 0) {queueDesWidgets(queueDesWidgets.size-2)} else {null}
+          val avantDernierWidget = if ((queueDesWidgets.size-2) >= 0) {queueDesWidgets(queueDesWidgets.size-2)} else {null}
           val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstChildrenInCurrentColumn, childrenInCurrentColumn), (cstLeftSibling, avantDernierWidget))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
