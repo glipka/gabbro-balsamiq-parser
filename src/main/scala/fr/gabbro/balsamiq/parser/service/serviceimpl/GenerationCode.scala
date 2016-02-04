@@ -138,6 +138,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       // Pour la ligne sélectionnée on balaie chaque colonne en douzieme 
       // Les colonnes vides sont gérées par offset.
       // -------------------------------------------------------------------- 
+         var widgetPrecedent: WidgetDeBase = null
        var numeroColonneEnDouziemeDeLecran = 0
       var numeroColonne = 0
       val tailleCelluleEnDouzieme = calculTailleCelluleEnDouzieme(container)
@@ -181,14 +182,14 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           // 
           val childrenInCurrentColumn = new java.util.ArrayList[WidgetDeBase] 
           brancheFiltreeParColonneEnDouzieme.foreach(widget => childrenInCurrentColumn.add(widget))
-          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
+          val (ret7, source7, sourceJavaScript7, codeEcran7) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
           sourceHtml = sourceHtml.append(source7)
           sourceJavascript = sourceJavascript.append(sourceJavaScript7)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
           colspan = 0 // on réinitalise le colspan après avoir généré md_offset
           // on traite chaque widget dans le div
           var positionWidget = 0
-           var widgetPrecedent: WidgetDeBase = null
+        
 
           brancheFiltreeParColonneEnDouzieme.foreach(widget => {
            // val x=(cstLeftSibling,widgetPrecedent)
@@ -207,7 +208,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           }) // fin de calcul du widget  
           // Appel template col fin
           
-          val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
+          val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
