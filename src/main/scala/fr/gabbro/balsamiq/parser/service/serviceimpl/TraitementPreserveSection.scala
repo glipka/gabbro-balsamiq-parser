@@ -48,9 +48,8 @@ class TraitementPreserveSection extends TTraitementCommun {
   @BeanProperty var fichierPresent = false
   var preserveSectionBegin = ""
   var preserveSectionEnd = ""
-     val l=CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix
-     val m=CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
-
+ // val l1 = CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix
+ // val m = CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
 
   /**
    * lecture du fichier pour extraire les preserve sections
@@ -62,8 +61,8 @@ class TraitementPreserveSection extends TTraitementCommun {
     fichierEnCoursDeTraitement = filename
     // la syntaxe des preserve section est différente selon le type de fichier (jsp ou java)
     // rajout le 5/6/14 par gl d'un test sur la liste generatedOtherConfFilesSuffix n'est pas vide
-     if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
-      ((!CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.isEmpty) && (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => {fichierEnCoursDeTraitement.endsWith(suffix)})))) {
+    if ((fichierEnCoursDeTraitement.endsWith(CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix)) ||
+      ((!CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.isEmpty) && (CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix.exists(suffix => { fichierEnCoursDeTraitement.endsWith(suffix) })))) {
       preserveSectionBegin = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontBegin
       preserveSectionEnd = CommonObjectForMockupProcess.templatingProperties.preserveSectionFrontEnd
       //   println("*****valeur de preserve section %s  %s".format(preserveSectionBegin,fichierEnCoursDeTraitement))
@@ -196,19 +195,15 @@ class TraitementPreserveSection extends TTraitementCommun {
 
     for (ind1 <- 0 until mapDesPreserveSectionDuFichierCible.size) {
       val preserveApres = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
-      val sceauApres = preserveApres._3
-      val contenuApres = preserveApres._2
-      val modifApres = preserveApres._1
+      val (modifApres, contenuApre, sceauApres) = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
+
       if (!modifApres) { // enrgt pas encore modifie dans la passe précédente
         var finRecherche = false
         for (ind2 <- 0 until mapDesPreserveSectionDuFichierAvantEcriture.size) {
           if (!finRecherche) { //pas de break en scala
-            val preserveAvant = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
-            val sceauAvant = preserveAvant._3
-            val contenuAvant = preserveAvant._2
-            val modifAvant = preserveAvant._1
+            val (modifAvant, contenuAvant, sceauAvant) = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
             // preserve pas déjà utilisé et même sceau avant et après
-            if (!modifAvant && sceauAvant == sceauApres) {
+            if (!modifAvant && (sceauAvant == sceauApres)) {
               mapDesPreserveSectionDuFichierCible(ind1) = (true, contenuAvant, sceauAvant)
               mapDesPreserveSectionDuFichierAvantEcriture(ind2) = (true, contenuAvant, sceauAvant) // on met l'indicateur de traitement à true
               finRecherche = true
@@ -225,19 +220,13 @@ class TraitementPreserveSection extends TTraitementCommun {
     // source et la cible. 
 
     for (ind1 <- 0 until mapDesPreserveSectionDuFichierCible.size) {
-      val preserveApres = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
-      val sceauApres = preserveApres._3
-      val contenuApres = preserveApres._2
-      val modifApres = preserveApres._1
-      if (!modifApres) { // enrgt pas encore modifie dans la passe précédente
+      val (modifApres,contenuApres,sceauApres) = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
+       if (!modifApres) { // enrgt pas encore modifie dans la passe précédente
         var finRecherche = false
         for (ind2 <- 0 until mapDesPreserveSectionDuFichierAvantEcriture.size) {
           if (!finRecherche) { //pas de break en scala
-            val preserveAvant = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
-            val sceauAvant = preserveAvant._3
-            val contenuAvant = preserveAvant._2
-            val modifAvant = preserveAvant._1
-            // preserve pas déjà utilisé et même sceau avant et après
+            val (modifAvant,contenuAvant,sceauAvant) = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
+              // preserve pas déjà utilisé et même sceau avant et après
             if (!modifAvant) {
               mapDesPreserveSectionDuFichierCible(ind1) = (true, contenuAvant, sceauAvant)
               mapDesPreserveSectionDuFichierAvantEcriture(ind2) = (true, contenuAvant, sceauAvant) // on met l'indicateur de traitement à true

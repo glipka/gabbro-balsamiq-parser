@@ -117,6 +117,7 @@ class Constants {
   final val cstKey = "key"
   final val cstLabel = "com.balsamiq.mockups::Label"
   final val cstLeft = "L"
+  final val cstLeftSibling = "leftSibling"
   final val cstLink = "com.balsamiq.mockups::Link"
   final val cstLinkShort = "link"
   final val cstList = "list"

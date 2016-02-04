@@ -85,6 +85,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
   }
   // -------------------------------------------------------------------------------------------------
   // catalogBalsamiq : pour chaque mockup traité, on constitue le catalogue hiérarchique des widgets à partir du fichier BMML 
+  // ce catalogue va servir a récupérer le 
   // -----------------------------------------------------------------------------------
   /**
    * @param fichierBalsamiq : File fichier bmml en cours de traitement

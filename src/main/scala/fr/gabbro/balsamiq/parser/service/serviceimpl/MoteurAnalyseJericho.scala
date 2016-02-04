@@ -45,6 +45,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
 
+  
   /**
    * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
    * <p>on recharge les clefs de traduction depuis ce fichier properties dans 2 hashTables :

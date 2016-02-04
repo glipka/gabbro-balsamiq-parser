@@ -102,25 +102,27 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         sourceHtml = sourceHtml.append(source7)
         sourceJavascript = sourceJavascript.append(sourceJavaScript7)
         sourceJavaOuScala = sourceJavaOuScala.append(codeEcran7)
+          var widgetPrecedent: WidgetDeBase = null
         // on balaie l'ensemble des widgets et on sélectionne les widgets dont la position début est incluse dans la position début et fin de la colonne
         brancheFiltreeParPositionWidget.foreach(widget => {
           // on ne s'occupe que des abscisses, il faut donc faire attention que les widgets soient bien alignés dans le container 
           // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
           if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
             // generation du template widget début
-            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName))
-            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container))
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName),(cstLeftSibling,widgetPrecedent))
+            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container),(cstLeftSibling,widgetPrecedent))
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
             traitementDesFilsDuWidgetDeLaColonneEnCours(widget) // traitement des fils du widget en cours 
             // génération du  template widget fin
-            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName))
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName),(cstLeftSibling,widgetPrecedent))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
 
           }
+          widgetPrecedent= widget
         }) // fin de   brancheFiltreeParPositionWidget.foreach
         // template colonne fin
         val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstContainer, container), (cstColNumber, numeroColonne.toString))
@@ -136,8 +138,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       // Pour la ligne sélectionnée on balaie chaque colonne en douzieme 
       // Les colonnes vides sont gérées par offset.
       // -------------------------------------------------------------------- 
-      var widgetPrecedent: WidgetDeBase = null
-      var numeroColonneEnDouziemeDeLecran = 0
+       var numeroColonneEnDouziemeDeLecran = 0
       var numeroColonne = 0
       val tailleCelluleEnDouzieme = calculTailleCelluleEnDouzieme(container)
       val demiTailleCelluleEnDouzieme = tailleCelluleEnDouzieme / 2
@@ -187,14 +188,17 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           colspan = 0 // on réinitalise le colspan après avoir généré md_offset
           // on traite chaque widget dans le div
           var positionWidget = 0
+           var widgetPrecedent: WidgetDeBase = null
+
           brancheFiltreeParColonneEnDouzieme.foreach(widget => {
-            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
-            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
+           // val x=(cstLeftSibling,widgetPrecedent)
+            val (ret8, source8, sourceJavaScript8, codeEcran8) = if ((container != null) && (container.isFormulaireHTML || forceFormulaire)) moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
+            else moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
             sourceHtml = sourceHtml.append(source8)
             sourceJavascript = sourceJavascript.append(sourceJavaScript8)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran8)
             traitementDesFilsDuWidgetDeLaColonneEnCours(widget)
-            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn))
+            val (ret9, source9, sourceJavaScript9, codeEcran9) = moteurTemplateFreeMarker.generationDuTemplate(widget, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainer, container), (cstContainerName, containerName), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString),(cstChildrenInCurrentColumn, childrenInCurrentColumn),(cstLeftSibling,widgetPrecedent))
             sourceHtml = sourceHtml.append(source9)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)

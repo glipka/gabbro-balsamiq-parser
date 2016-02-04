@@ -63,6 +63,7 @@ class GlobalContext() {
    * @param subPackageName
    */
   def setCodeClasse(usecaseName: String, mockupName: String, subPackageName: String, className: String, classCode: String): Unit = {
+    // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
     tableDesCodesDesClassesJavaouScala += (usecaseName, mockupName, subPackageName, className) -> classCode
   }
 
@@ -97,13 +98,12 @@ class GlobalContext() {
    * @param className
    * @return Array of String.
    */
-  def listOfSubPackageInJavaOrScalaCode(usecaseName: String, mockupName: String): java.util.ArrayList[String] = {
+  def listOfSubPackageInJavaOrScalaCode(usecaseNameAFiltrer: String, mockupNameAFiltrer: String): java.util.ArrayList[String] = {
     val tableDesPackages = new java.util.ArrayList[String]
-    val t1 = tableDesCodesDesClassesJavaouScala.map(clefValue => {
-      // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
-      if (clefValue._1._1 == usecaseName && clefValue._1._2 == mockupName) { tableDesPackages.add(clefValue._1._3) } //  recupération non du package
-      clefValue._1._3 // récupération nom du package
-    }).toList
+    tableDesCodesDesClassesJavaouScala.foreach{
+    case ((usecaseName, mockupName, subPackageName, className),code) =>      // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
+      if (usecaseName == usecaseNameAFiltrer &&  mockupName == mockupNameAFiltrer) { tableDesPackages.add( subPackageName) } //  recupération non du package
+    } 
     tableDesPackages
 
   }
@@ -148,31 +148,36 @@ class GlobalContext() {
   /**
    * Get a javascript section beforehand cached thanks to registerJavascriptSection function
    * @param section name of cached section
-     * @return code of the section
+   * @return code of the section
    * //TODO deduire du code scala ?
    */
   def getJavascriptSection(section: String): String = {
+    // clef de la Map = (usecase,nom de fichier,section)
     var sourceDeLaSection = ""
-    mapSourcesJavascript.foreach(keyValue => {
-      if (keyValue._1._3.trim == section.trim) {  // filtre sur la section en cours
-        sourceDeLaSection += keyValue._2 // on cumule le code de la section
+    mapSourcesJavascript.foreach {
+      case ((clefUsecaseName, clefFicname, clefSection), code) => {
+        if (clefSection.trim == section.trim) { // filtre sur la section en cours
+          sourceDeLaSection += code // on cumule le code de la section
+        }
       }
-    })
+    }
     sourceDeLaSection
   }
   /**
    * Get a javascript section beforehand cached thanks to registerJavascriptSection function
    * @param section name of cached section
-     * @return code of the section
+   * @return code of the section
    * //TODO deduire du code scala ?
    */
-  def getJavascriptSection(usecaseName:String,section: String): String = {
+  def getJavascriptSection(usecaseName: String, section: String): String = {
     var sourceDeLaSection = ""
-    mapSourcesJavascript.foreach(keyValue => {
-      if (keyValue._1._3.trim == section.trim && keyValue._1._1.trim == usecaseName.trim) {  // filtre sur la section en cours et le usecaseName
-        sourceDeLaSection += keyValue._2 // on cumule le code de la section
+    mapSourcesJavascript.foreach {
+      case ((clefUsecaseName, clefFicname, clefsection), code) => {
+        if (clefsection.trim == section.trim && clefUsecaseName.trim == usecaseName.trim) { // filtre sur la section en cours et le usecaseName
+          sourceDeLaSection += code // on cumule le code de la section
+        }
       }
-    })
+    }
     sourceDeLaSection
   }
 
@@ -182,20 +187,15 @@ class GlobalContext() {
    */
   def getJavascripts(): ArrayList[NomDesFichiersJavascript] = {
     val tableauDesNomsDesFichiersJavascript = new ArrayList[NomDesFichiersJavascript]()
-    mapSourcesJavascript.foreach(keyValue => {
-      val useCaseFileNameSection = keyValue._1
-      val codeJavascript = keyValue._2
-      val useCase = useCaseFileNameSection._1
-      val fileName = useCaseFileNameSection._2
-      val section = useCaseFileNameSection._2
-
-      val path = if (useCase != "") { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
-      else { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
-      // verification qu'il n'y a pas des doublons (nom du fichier et useCase) du fait de l'ajout de la notion de sections 
-      if (!tableauDesNomsDesFichiersJavascript.exists(nomDesFichiersJavascript => ((nomDesFichiersJavascript.fileName == fileName) && (nomDesFichiersJavascript.useCase == useCase)))) {
-        tableauDesNomsDesFichiersJavascript.add(new NomDesFichiersJavascript(path, useCase, fileName))
-      }
-    })
+    mapSourcesJavascript.foreach {
+      case ((useCase, fileName, section), code) =>
+        val path = if (useCase != "") { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + useCase + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
+        else { CommonObjectForMockupProcess.generationProperties.srcJavascriptFilesDirWithOutPrefix + System.getProperty("file.separator") + fileName + cstSuffixDesFichiersJavaScript }
+        // verification qu'il n'y a pas des doublons (nom du fichier et useCase) du fait de l'ajout de la notion de sections 
+        if (!tableauDesNomsDesFichiersJavascript.exists(nomDesFichiersJavascript => ((nomDesFichiersJavascript.fileName == fileName) && (nomDesFichiersJavascript.useCase == useCase)))) {
+          tableauDesNomsDesFichiersJavascript.add(new NomDesFichiersJavascript(path, useCase, fileName))
+        }
+    }
     tableauDesNomsDesFichiersJavascript
 
   }
@@ -221,7 +221,9 @@ class GlobalContext() {
    */
   def getBindedForms(): ArrayList[FormulaireCode] = {
     val array1 = new ArrayList[FormulaireCode]()
-    bindedForms.foreach(keyValue => { array1.add(keyValue._2) })
+    bindedForms.foreach {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) => array1.add(formulaireCode)
+    }
     //FIXME do bindedForms.values.toList ?
     array1
 
@@ -235,27 +237,38 @@ class GlobalContext() {
    *  @return Array of FormulaireCode
    */
   def getBindedForms(useCaseName: String, ecranPrincipal: String, fragmentName: String): ArrayList[FormulaireCode] = {
-    val listeDesFormulaires = bindedForms.filter(keyValue => {
-      (keyValue._1._1 == useCaseName && keyValue._1._2 == ecranPrincipal && keyValue._1._3 == fragmentName)
-    })
+    val listeDesFormulaires = bindedForms.filter {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
+        (useCaseDuFormulaire == useCaseName && ecranDuFormulaire == ecranPrincipal && fragmentDuFormulaire == fragmentName)
+    }
     val array1 = new ArrayList[FormulaireCode]()
-    listeDesFormulaires.foreach(keyValue => { array1.add(keyValue._2) })
+    listeDesFormulaires.foreach {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
+        array1.add(formulaireCode)
+    }
     array1
 
   }
   /**
    *  Récupération des formulaires bindés pour un écran principal et l'ensemble de ses fragments
+   *   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
+   *    // pour un écran principal, le nom du fragment est vide
+   *    // cette table va servir à lister des listes des formulaires pour un ecran et pour l'ensemble de ses fragments.
+   *
    *  @param useCaseName
    * @param EcranPrincipal name
    *
    *  @return Array of FormulaireCode
    */
   def getBindedForms(useCaseName: String, ecranPrincipal: String): ArrayList[FormulaireCode] = {
-    val listeDesFormulaires = bindedForms.filter(keyValue => {
-      (keyValue._1._1 == useCaseName && keyValue._1._2 == ecranPrincipal)
-    })
+    val listeDesFormulaires = bindedForms.filter {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) => (useCaseDuFormulaire == useCaseName && ecranDuFormulaire == ecranPrincipal)
+    }
     val array1 = new ArrayList[FormulaireCode]()
-    listeDesFormulaires.foreach(keyValue => { array1.add(keyValue._2) })
+    listeDesFormulaires.foreach {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
+        array1.add(formulaireCode)
+    }
     array1
 
   }
@@ -266,8 +279,11 @@ class GlobalContext() {
    *  @return Array of ItemVar
    */
   def getItemsVars(): ArrayList[ItemVar] = {
+    //Itemsvars est une Map dont la clef est le usecase,ecran principal, fragmentName, identifiabt unique et la valeur itemsVar
     val array1 = new ArrayList[ItemVar]()
-    itemsVars.foreach(keyValue => { array1.add(keyValue._2) }) // return an array containaing value of itemsvars
+    itemsVars.foreach {
+      case ((usecase, ecranPrincipal, fragmentNae, unqiueId), itemVar) => array1.add(itemVar)
+    } // return an array containaing value of itemsvars
     array1
   }
 
@@ -279,11 +295,15 @@ class GlobalContext() {
    *  @return Array of FormulaireCode
    */
   def getItemsVars(useCaseName: String, ecranPrincipal: String): ArrayList[ItemVar] = {
-    val listeDesFormulaires = itemsVars.filter(keyValue => {
-      (keyValue._1._1 == useCaseName && keyValue._1._2 == ecranPrincipal)
-    })
+    val listeDesFormulaires = itemsVars.filter {
+      case ((usecaseItemVar, ecranPrincipalItemVar, fragmentNameItemVar, uniqueIdItemVar), itemVar) =>
+        (usecaseItemVar == useCaseName && ecranPrincipalItemVar == ecranPrincipal)
+    }
     val array1 = new ArrayList[ItemVar]()
-    listeDesFormulaires.foreach(keyValue => { array1.add(keyValue._2) })
+    listeDesFormulaires.foreach {
+      case ((usecaseItemVar, ecranPrincipalItemVar, fragmentNameItemVar, uniqueIdItemVar), itemVar) =>
+        array1.add(itemVar)
+    }
     array1
 
   }
@@ -296,11 +316,15 @@ class GlobalContext() {
    *  @return Array of FormulaireCode
    */
   def getItemsVars(useCaseName: String, ecranPrincipal: String, fragmentName: String): ArrayList[ItemVar] = {
-    val listeDesFormulaires = itemsVars.filter(keyValue => {
-      (keyValue._1._1 == useCaseName && keyValue._1._2 == ecranPrincipal && keyValue._1._3 == fragmentName)
-    })
+    val listeDesFormulaires = itemsVars.filter {
+      case ((usecaseItemVar, ecranPrincipalItemVar, fragmentNameItemVar, uniqueIdItemVar), itemVar) =>
+        (usecaseItemVar == useCaseName && ecranPrincipalItemVar == ecranPrincipal && fragmentNameItemVar == fragmentName)
+    }
     val array1 = new ArrayList[ItemVar]()
-    listeDesFormulaires.foreach(keyValue => { array1.add(keyValue._2) })
+    listeDesFormulaires.foreach {
+      case ((usecaseItemVar, ecranPrincipalItemVar, fragmentNameItemVar, uniqueIdItemVar), itemVar) => array1.add(itemVar)
+
+    }
     array1
 
   }
@@ -314,17 +338,18 @@ class GlobalContext() {
    *
    */
   def generation_fichiers_javascript: Unit = {
+    // clef = (usecase,filename,section) 
     // regoupement des fichiers usecase  : on ne tient pas compte de la section 
-    val liste_fichiers_javascript = mapSourcesJavascript.keys.map(key => (key._1, key._2)).toList.distinct
+    val liste_fichiers_javascript = mapSourcesJavascript.keys.map { case (useCase, fileName, section) => (useCase, fileName) }.toList.distinct
     val utilitaire = new Utilitaire
-    liste_fichiers_javascript.foreach(useCasefileName => {
-      val useCase = useCasefileName._1
-      val fileName = useCasefileName._2
-      val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
-      val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
-      val codeJavaScript = source6 + source7 // le code source est formaté par section
-      ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire)
-    })
+    liste_fichiers_javascript.foreach {
+      case (useCase, fileName) => {
+        val (ret6, source6, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_debut, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
+        val (ret7, source7, _, _) = moteurTemplatingFreeMarker.generationDuTemplate(cstTemplateJavascript, CommonObjectForMockupProcess.templatingProperties.phase_fin, null, (cstJavascriptUseCase, useCase), (cstJavascriptFileName, fileName))
+        val codeJavaScript = source6 + source7 // le code source est formaté par section
+        ecritureDuCodeJavascript(fileName, codeJavaScript, useCase, utilitaire)
+      }
+    }
 
     /**
      * écriture du code javascript
@@ -422,61 +447,14 @@ class GlobalContext() {
   }
 
   def printBindedForms(): Unit = {
-
     // useCase, l'ecran principal et le nom du fragment 
-    bindedForms.foreach(f => {
-      println("usecase %s ecran %s fragment%s identifiant %s".format(f._1._1, f._1._2, f._1._3, f._1._4))
-    })
+    bindedForms.foreach{
+         case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
+      println("usecase %s ecran %s fragment%s identifiant %s".format(useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire))
+    } 
   }
-  /**
-   * on génération du Menu de l'application
-   * @return source of menu
-   */
-  def generation_code_source_menu(): String = {
-    globalSourceMenu = new StringBuilder // réinit du source du menu à blanc
-    val (_, source1_debut, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("header_menu", "debut", null)
-    globalSourceMenu.append(source1_debut)
-    // génération de chaque menu Item
-    tableauDesMenuItems.foreach(menuItem => {
-      globalSourceMenu.append(generation_code_source_menuItem(menuItem, 0, menuItem, ""))
-    })
-    val (_, source1_fin, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("header_menu", "fin", null)
-    globalSourceMenu.append(source1_fin)
-    globalSourceMenu.toString()
-  }
-
-  /**
-   * @param menuItemEnCours
-   * @param niveau
-   * @param pere
-   * @param hierarchiePere
-   * @return source menu Item
-   */
-  private def generation_code_source_menuItem(menuItemEnCours: MenuItem, niveau: Int, pere: MenuItem, hierarchiePere: String): StringBuilder = {
-    var codeDuMenu = new StringBuilder
-    val tabulation = "\t" * niveau
-    val (ret1, source1, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("branch_menu", "debut", null, ("itemname", menuItemEnCours.itemName.capitalize), ("tabulation", tabulation), ("url", menuItemEnCours.url), ("usecasename", menuItemEnCours.usecaseName))
-    codeDuMenu.append(source1)
-    // traitement de chaque champ de la classe      
-    menuItemEnCours.children.foreach(item => {
-      if (item.children.size > 0) {
-        // traitement des items su sous menu
-        codeDuMenu.append(generation_code_source_menuItem(item, niveau + 1, item, menuItemEnCours.itemName))
-      } else { // c'est un champ 
-        val (ret3, source3, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("item_menu", "debut", null, ("itemname", item.itemName),
-          ("tabulation", tabulation), ("url", item.url), ("usecasename", menuItemEnCours.usecaseName))
-
-        val (ret4, source4, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("item_menu", "fin", null, ("itemname", item.itemName),
-          ("itemname", item.itemName), ("tabulation", tabulation), ("url", item.url), ("usecasename", menuItemEnCours.usecaseName))
-        codeDuMenu.append(source3 + source4)
-
-      }
-    })
-    // generation fin de classe. 
-    val (ret2, source2, _, _) = moteurTemplatingFreeMarker.generationDuTemplate("branch_menu", "fin", null, ("classname", menuItemEnCours.itemName), ("tabulation", tabulation))
-    codeDuMenu.append(source2)
-    codeDuMenu
-
-  }
+  
+ 
+   
 
 }

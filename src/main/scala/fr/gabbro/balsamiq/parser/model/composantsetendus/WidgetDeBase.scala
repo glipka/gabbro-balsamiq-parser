@@ -58,6 +58,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   @BeanProperty var shortWidgetName: String = ""
   var controlID: Int = 0;
   @BeanProperty var isFormulaireHTML = false // variable renseignée dans fileConverter
+  @BeanProperty var typeDeFormulaire = "" // enrichi dans catalogBalsamiq  // types de formulaire :   inlineForm      basicForm     horizontalForm 
+
   var xAbsolute: Int = 0; // abscisse absolue du widget par rapport au début de la page
   var yAbsolute: Int = 0; // ordonnée absolue du widget par rapport au début de la page
   var z: Int = 0;
@@ -107,7 +109,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   var indice_des_fils = new ArrayBuffer[Int]()
 
   val utilitaire = new Utilitaire() // classe utilitaire de base
-  protected val tableauValidation = new java.util.ArrayList[Token]
+
   protected var mapIndice = scala.collection.mutable.Map[String, String]()
   var actionDuFomulaire = "" // action renseignée dans le traitement catalogue
   val tableOverrideParams = scala.collection.mutable.Map[String, (String, String, String, String)]()
@@ -130,13 +132,14 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
  */
   def process() {
     if (this.isAComponent) {
-      
+
       recuperationAttributsDeBase(elementXML)
       mapExtendedAttribut = mapExtendedAttribut ++ this.recuperationDesAttributsEtendusDuComposant(elementXML)
       // si c'est un composant, on réécrit les attributs en concatenant ID du composant
       remplacementControlIDparCustomIdDuWidgetDuComponent(elementXML)
 
-    } else {
+    } else { // ce n'est pas un composant 
+
       recuperationAttributsDeBase(elementXML)
       recuperationDesAttributsEtendus(elementXML)
     }
@@ -250,10 +253,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
    * @param e : Element
    */
   protected def recuperationAttributsDeBase(e: Element) {
-    val xmloutputter= new XMLOutputter
-    val out=new StringWriter();
+    val xmloutputter = new XMLOutputter
+    val out = new StringWriter();
     xmloutputter.output(e, out)
-    
+
     this.sourceXmldDeLelement = out.toString // code xource xml de l'élément en cours
     this.controlTypeID = e.getAttributeValue(cstControlTypeID) //.substring(22);
     if (this.controlTypeID.contains("::")) {
@@ -334,9 +337,10 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           // 2 cas possibles :
           //   bind=map(key,value)
           //   bind=class1.classe2.var1:Int
-          // plusieurs possibilités : validate=xxx;id=toto 
-          else if (elementName == cstCustomID) {
-            val id = if (elementValue != "") elementValue.trim else ""
+          // plusieurs possibilités : validate=xxx;id=toto  
+          // customId est standard par rapport 
+          else if (elementName == cstCustomID) { // customId=wwwww   sert essentiellement pour identifier les formulaires 
+            val id = if (elementValue != "") { elementValue.trim } else { "" }
             this.customId = id
             if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
 
@@ -344,8 +348,8 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
             val tableValue = elementValue.split(";").map(_.trim)
 
             tableValue.foreach(value => {
-              // id ne doit être renseigné que pour un container.
-              if (value.startsWith(cstBind) && value.contains("(") && value.contains(",")) {
+              // id ne doit être renseigné que pour un container. 
+              if (value.startsWith(cstBind) && value.contains("(") && value.contains(",")) { //   bind=map(key,value)
                 val (retCode, structureMap) = traitementBinding.traitementMap(value)
                 if (retCode) { mapExtendedAttribut += (cstMapBinding -> structureMap) }
 
@@ -450,7 +454,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           //  </controlProperties>
           // ------------------------------------------------------------------------------------
 
-          if (elementName == cstSrc) this.componentSrc = elementValue
+          if (elementName == cstSrc) { this.componentSrc = elementValue }
           else if (elementName == cstOverrideString) {
             val (idParam, overrideX, overrideY, overrideW, overrideH) = getOverrideProperties(propertie)
             // la tableOverrideParam contient les parametres overridé pour chaque widget du composant (pour les composants traités localement)
@@ -603,14 +607,16 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           var elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
+          // *** on ne remplace que les attributs overridés ***
           if (elementName == cstOverrideString) {
             val (idParam, overrideX, overrideY, overrideW, overrideH) = getOverrideProperties(propertie)
             val params = propertie.getChildren().toList
             params.foreach(param => {
               if (param.getName.trim.toLowerCase() != cstCustomID.toLowerCase() && param.getName.trim.toLowerCase() != cstCustomData.toLowerCase()) {
+                // mapIndice = (controleID -> customID) 
                 val idDuWidgetDuComposant = mapIndice.getOrElse(idParam.trim, "")
-                val paramName = if (idDuWidgetDuComposant != "") idDuWidgetDuComposant + param.getName().trim().capitalize
-                else param.getName().trim()
+                val paramName = if (idDuWidgetDuComposant != "") { idDuWidgetDuComposant + param.getName().trim().capitalize }
+                else { param.getName().trim() }
                 val paramValue = param.getValue().trim()
                 mapExtendedAttribut += (paramName -> utilitaire.remplaceHexa(paramValue))
               }
@@ -634,6 +640,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   def mise_en_table_validation_du_champ(input: String): (Boolean, java.util.ArrayList[Token]) = {
     val validate = cstValidate + "="
     val value = input.trim
+    val tableauValidation = new java.util.ArrayList[Token]
     if (value.toLowerCase().startsWith(validate)) {
       val tokenDeValidation = value.substring(validate.length()).split(",")
       tokenDeValidation.foreach(token => {

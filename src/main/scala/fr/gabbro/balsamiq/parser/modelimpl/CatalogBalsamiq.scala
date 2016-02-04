@@ -28,15 +28,15 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 // See the individual licence texts for more details.
 
 class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBalsamiq {
-  var global_max_width:Int=0
-  var global_max_heigth:Int=0
+  var global_max_width: Int = 0
+  var global_max_heigth: Int = 0
   /**
    * **** création et enrichissemnt du catalogue ****
    * @param catalogAPlat
    */
-  def creation_catalog(catalogAPlat: ArrayBuffer[WidgetDeBase],global_max_width:Int,global_max_heigth:Int): Unit = {
-    this.global_max_width=global_max_width
-    this.global_max_heigth=global_max_heigth
+  def creation_catalog(catalogAPlat: ArrayBuffer[WidgetDeBase], global_max_width: Int, global_max_heigth: Int): Unit = {
+    this.global_max_width = global_max_width
+    this.global_max_heigth = global_max_heigth
     catalog = constitutionDuCatalog(catalogAPlat)
     catalog = enrichissement_widget_branche(catalog, null)
     logBack.info(utilitaire.getContenuMessage("mes28"), CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement)
@@ -64,8 +64,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   def enrichissement_widget_branche(branche: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): ArrayBuffer[WidgetDeBase] = {
     var positionDansLeConteneur = 0
     val tableau = branche.map(widget => {
-      if (global_max_width > 0) widget.percentageparRapportLargeurTotale = Math.ceil((widget.w.toDouble / global_max_width) * 100.0)
-      if (global_max_heigth > 0) widget.percentageparRapportHauteurTotale = Math.ceil((widget.h.toDouble / global_max_heigth) * 100.0)
+      if (global_max_width > 0) { widget.percentageparRapportLargeurTotale = Math.ceil((widget.w.toDouble / global_max_width) * 100.0) }
+      if (global_max_heigth > 0) { widget.percentageparRapportHauteurTotale = Math.ceil((widget.h.toDouble / global_max_heigth) * 100.0) }
       // on recalcule les ratios des coordonnées et hauteur et largeur en fonction d'une dimension cible.
       // cela va servir essentiellement aux templates utilisant les coordonnées absolues. 
       if (CommonObjectForMockupProcess.engineProperties.projectionOfWidthInPx > 0 && CommonObjectForMockupProcess.engineProperties.projectionOfHeightInPx > 0) {
@@ -109,9 +109,9 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // seuls les containers de type canvas peuvent contenir un formulaire
       // modif le 22/5 un container n'est pas un formulaire s'il est déjà inclus dans un container de type formulaire
 
-      val containerIsAformulaire = if (container != null && container.isFormulaireHTML) true else false
+      val containerIsAformulaire = if (container != null && container.isFormulaireHTML) { true } else { false }
       if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0) &&
-        (!containerIsAformulaire ) && // un formulaire ne peut être inclus dans un autre formulaire    
+        (!containerIsAformulaire) && // un formulaire ne peut être inclus dans un autre formulaire    
         (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))) {
         widget.isFormulaireHTML = true
         var actionDuFormulaire = ListBuffer[String]()
@@ -155,7 +155,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
             // l'objet fragment est déjà calculé lors du traitement du widgetIcon (l'attribut href génère un fragment) et mis dans la table mapExTendedAttribute.
             // on met à jour la table iconNameList
             val fragment = widgetFils.mapExtendedAttribut.getOrElse(cstFragment, null)
-            if (fragment != null) widget.iconNameList.add(new IconInWidget(iconName, fragment.asInstanceOf[Fragment]))
+            if (fragment != null) { widget.iconNameList.add(new IconInWidget(iconName, fragment.asInstanceOf[Fragment])) }
             else widget.iconNameList.add(new IconInWidget(iconName, null))
           } else { tableauDesFilsSansIcone += widgetFils } // on ne supprime que les fils de type icon
         })
@@ -179,14 +179,77 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     // on enrichit les widgets en y mettant le nombre de colonnes
     val tableauEnrichi1 = calcul_numero_colonne_dans_la_branche(tableau, container)
     val tableauEnrichi2 = labelFor(tableauEnrichi1, null) // on reca
-    tableauEnrichi2
+    // atention l'appel du type de formulaire est obligatoirement après l'enrichissemnt sur les n° de colonnes
+    val tableauEnrichi3= determinationTypeDeFormulaire(tableauEnrichi2,null) // type de formulaire
+
+    tableauEnrichi3
+  }
+
+  /**
+   * <p>pour chaque widget de la branche enrichit l'attribut labelFor</p>
+   * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui est sur la même ligne</p>
+   * <p>on renseigne alors l'attribut labelFor du composant label ainsi que l'attribut labelForWidget</p>
+   * @param branche
+   * @param widgetPerep
+   * @return ArrayBuffer[WidgetDeBase]
+   */
+  def determinationTypeDeFormulaire(branche: ArrayBuffer[WidgetDeBase], widgetPere: WidgetDeBase): ArrayBuffer[WidgetDeBase] = {
+    for (i <- 0 until branche.size) {
+      // on ne traite que les widgets qui  sont des formulaires
+      val widget = branche(i)
+      if (widget.isFormulaireHTML) { 
+        widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
+      }
+      else {
+      // traitement itératif des fils,pour les widges qui ne sont pas des formulaires
+      if (widget.tableau_des_fils.size > 0) {widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget)}
+      }
+
+    } // fin du for
+    branche
+
+  }
+  // le container en cours est de type formulaire 
+  // tous les widgets sont sur une même ligne => type =0 
+  // types de formulaire :
+  //    inlineFform 
+  //    basicForm 
+  //    horizontalForm 
+  // 
+  def scanDesfilsDuformulairePourDeterminerLeType(branche: ArrayBuffer[WidgetDeBase]): String = {
+    var typeDeFormulaire = "horizontalForm"
+    val ar1 = ArrayBuffer[(Int, Int)]()
+    // on récupère les widgets du container (formulaire)
+
+    branche.foreach(widget => {
+      val rowNumber = widget.rowNumber
+      val positionEnDouzieme = widget.positionEnDouzieme
+      val tuple1 = (rowNumber, positionEnDouzieme)
+      ar1 += tuple1
+
+    })
+    val maxRowNumber = ar1.filter { case (rowNumber, positionEnDouzieme) => rowNumber > 0 }.size
+    // inline-form 
+    if (maxRowNumber == 0) { typeDeFormulaire = "inlineForm" }
+    else {
+      val ar2 = ar1.groupBy {
+        case (rowNumber, positionEnDouzieme) => {
+          rowNumber
+        }
+      }
+      // Type De Formulaire 
+      // Un seul composant par ligne ?? 
+      if (ar2.forall { case (rowNumber, ar3) => ar3.size <= 1 }) { typeDeFormulaire = "basicForm" }
+
+    }
+    typeDeFormulaire
   }
   /**
    * <p>pour chaque widget de la branche enrichit l'attribut labelFor</p>
    * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui est sur la même ligne</p>
    * <p>on renseigne alors l'attribut labelFor du composant label ainsi que l'attribut labelForWidget</p>
    * @param branche
-   * @param widgetPere
+   * @param widgetPerep
    * @return ArrayBuffer[WidgetDeBase]
    */
   def labelFor(branche: ArrayBuffer[WidgetDeBase], widgetPere: WidgetDeBase): ArrayBuffer[WidgetDeBase] = {
@@ -247,8 +310,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           branche(ind).rowNumber = rowNumber // n° de ligne dans la table
           branche(ind).tailleCellulePere = tailleCelluleEnDouzieme
           val reste = (branche(ind).xRelative % tailleCelluleEnDouzieme)
-          if (reste > demitailleCelluleEnDouzieme) branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1
-          else branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme)
+          if (reste > demitailleCelluleEnDouzieme) {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1}
+          else {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme)}
           logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
           logBack.debug(utilitaire.getContenuMessage("mes36"), branche(ind).xRelative, tailleCelluleEnDouzieme)
           logBack.debug(utilitaire.getContenuMessage("mes37"), branche(ind).w)

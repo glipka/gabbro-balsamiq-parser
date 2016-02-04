@@ -213,7 +213,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     tableauEnrichi
   }
 
-  /**
+  /**0
    * return type of widget and readOnly true or False
    * @param widgetFils : WidgetDeBase
    * @return (typeOfWidget,ReadOnly)

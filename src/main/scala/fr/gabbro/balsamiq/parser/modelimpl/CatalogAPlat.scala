@@ -96,7 +96,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           traitementGroupe(controle_en_cours.componentXML, controle_en_cours) // on traite le code xml du composant qui a été récupéré dans le traitement du catalogue des composants
         } // le controle groupe n'est pas mis en table, mais va servir à recalculer les coordonnées du fils 
         // l'id interne n'est pas incrémenté après un grpupe car il sert à récuperer les adresses des élements
-        else if (controle_en_cours.controlTypeID == cstGroupConstante) traitementGroupe(elementXML, controle_en_cours)
+        else if (controle_en_cours.controlTypeID == cstGroupConstante) {traitementGroupe(elementXML, controle_en_cours)}
         else {
           // si le widget est un element d'un composant traité localement, on récupère les 
           // attributs en override du groupe.
@@ -190,7 +190,9 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           val m3 = catalogAPlat(j).controlID.toString
           val m4 = catalogAPlat(j).controlTypeID.toString()
 
-          logBack.debug(m1 + " " + m2 + " is included " + " in " + m3 + " " + m4)
+         // logBack.debug(m1 + " " + m2 + " is included " + " in " + m3 + " " + m4)
+          logBack.debug(s"${m1}  ${m2}  is included in ${m3}  ${m4}")
+           
 
         }
         j = j + 1

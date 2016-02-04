@@ -94,13 +94,13 @@ class MockupContext() {
    */
   def ecritureDuCodeJaveOuScala: Boolean = {
     val keysSet = tableDesCodesDesClassesJavaouScala.keys
-    keysSet.foreach(classNameAliasName => {
-      val className = classNameAliasName._1
-      val subPackage = classNameAliasName._2
-      val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala(classNameAliasName) // contient le nom dela classe et le nom du sous package sous forme de tuple
-      utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse(classNameAliasName, ""))
+    keysSet.foreach {
+      case (className, subPackage) => {
+        val ficJavaName = utilitaire.getNomDuFichierCodeJavaOuScala((className, subPackage)) // contient le nom dela classe et le nom du sous package sous forme de tuple
+        utilitaire.ecrire_fichier(ficJavaName, CommonObjectForMockupProcess.mockupContext.tableDesCodesDesClassesJavaouScala.getOrElse((className, subPackage), ""))
 
-    })
+      }
+    }
     true
   }
   /**
@@ -110,7 +110,7 @@ class MockupContext() {
    * @param typeDeFragment : Panel, Popup, ...
    * @return ArrayList[Fragment]
    */
-  
+
   def getFragmentsByType(typeDeFragment: String): java.util.ArrayList[Fragment] = {
     val listeDesFragments = new java.util.ArrayList[Fragment]
     fragments.foreach(fragment => {
@@ -119,7 +119,6 @@ class MockupContext() {
       }
     })
     listeDesFragments
-  } 
-   
-   
+  }
+
 }

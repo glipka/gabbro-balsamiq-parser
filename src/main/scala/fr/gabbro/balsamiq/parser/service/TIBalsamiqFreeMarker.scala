@@ -3,7 +3,6 @@ package fr.gabbro.balsamiq.parser.service
 import org.slf4j.LoggerFactory
 import scala.beans.BeanProperty
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurAnalyseJericho
-import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementMenu
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementFormatageSourceJava
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
@@ -19,7 +18,6 @@ trait TIBalsamiqFreeMarker {
   protected var utilitaire: Utilitaire = new Utilitaire
   protected var catalogDesComposantsCommuns: CatalogDesComposants = _
   @BeanProperty val globalContext = new GlobalContext() // zone de partage pour l'ensemble des maquettes
-  protected var traitementMenu: TraitementMenu = _
-  val traitementFormatageSourceJava = new TraitementFormatageSourceJava
+   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
 
 }

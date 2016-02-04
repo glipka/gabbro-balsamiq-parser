@@ -59,6 +59,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  */
 object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
 
+ 
   if (!init()) { System.exit(99) }
   else {
     process() // process du batch
@@ -81,8 +82,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     } else {
       moteurTemplateFreeMarker = new MoteurTemplatingFreeMarker(CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir, CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath, globalContext)
       globalContext.moteurTemplatingFreeMarker = moteurTemplateFreeMarker
-      traitementMenu = new TraitementMenu(globalContext) // va servir à mettre en session les menuItem
-
+   
       if (moteurTemplateFreeMarker.init()) { // init du moteur et chargement des templates
         moteurJericho = new MoteurAnalyseJericho(moteurTemplateFreeMarker, utilitaire) // les trad
         catalogDesComposantsCommuns = new CatalogDesComposants // catalogue commun à l'ensemble des écrans
@@ -101,12 +101,14 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * -------------------------------------------------------------------------------------------------------------------
    * process de l'ensemble des fichiers du repertoire balsamiq
    * on extrait d'abord les fragments des fichiers mockups principaux
+   * Execution des traitement globaux puis génération des fichiers javascript 
    * En fin de traitement de l'ensemble des fichiers, on sauvegarde les clefs de traduction dans un fichier commun
    * --------------------------------------------------------------------------------------------------------------------
    *
    */
   private def process(): Boolean = {
     logBack.info(utilitaire.getContenuMessage("mes40"))
+    // on met en table les composants du catalogue
     if (catalogDesComposantsCommuns.chargementDesCatalogues(CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir)) { // chargement du catalog BootStrap  
       logBack.info(utilitaire.getContenuMessage("mes41"))
       // generation des fragments depuis les mockups principaux. l'instance de GlobalContext et traitementBinding est temporaire.
@@ -121,7 +123,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate2, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath2, traitementFormatageSourceJava)
       traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
       logBack.info(utilitaire.getContenuMessage("mes44"))
-      globalContext.generation_fichiers_javascript
+      globalContext.generation_fichiers_javascript // generation de l'ensemble des fichiers javascript
       //globalContext.printBindedForms()
       logBack.info(utilitaire.getContenuMessage("mes59"))
       moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
@@ -154,7 +156,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     val utilZip = new UtilZip() // utilitaire winzip pour extraction des fichiers bmml despuis l'archive générée par l'export balsamiq3
     utilZip.scanRepositoryToExtractBmmlFile(fichiersBalsamiqATraiter)
 
-    traitementDesFichiers(fichiersBalsamiqATraiter, true) // on traite d'abord les fragments 
+    traitementDesFichiers(fichiersBalsamiqATraiter, true) // on traite d'abord les fragments pour mettre à jour les dépendances en global pour les écrans principaux.
     traitementDesFichiers(fichiersBalsamiqATraiter, false) // puis on traite les autres fichiers (ecrans principaux).
 
     logBack.info(utilitaire.getContenuMessage("mes14"), directory1, compteur_fichiers_traites)
@@ -227,7 +229,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     CommonObjectForMockupProcess.ecranContenantLeSegment = if (ecranContenantLeFragment != "") ecranContenantLeFragment else CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement
     CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement = typeDeFragment
     // la détection des dépendances ne sert plus plus
-    new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances
+  //  new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances (donc des fragments)
     if (!isAfragment) { // si ce n'est pas un fragment => mise en table menu et recherche des fragments
       CommonObjectForMockupProcess.mockupContext.fragments ++= new DetectFragments(utilitaire).processEtMiseEntable() // mise en table des fragments
 

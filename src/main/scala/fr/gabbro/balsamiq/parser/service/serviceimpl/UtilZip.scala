@@ -112,7 +112,7 @@ class UtilZip extends TTraitementCommun {
       else {
         // on ne sélectionne que les fichiers se terminant par .zip
         if (file.getName.endsWith(cstZip)) {
-          extractArchive(file.getPath, file.getAbsoluteFile().getParentFile().getAbsolutePath())
+          extractArchive(file.getPath, file.getAbsoluteFile().getParentFile().getAbsolutePath()) // extraction du fichier dans l'archive
           // file.delete // suppression de l'archive
         }
       }

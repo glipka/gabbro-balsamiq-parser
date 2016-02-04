@@ -53,7 +53,7 @@ class Sqlite extends TIBalsamiqFreeMarker {
 
   }
 
-  def extractProject(projectBmpr: String): Unit = {
+  def extractProjectxs(projectBmpr: String): Unit = {
 
     var c: Connection = null;
     var stmt: Statement = null;

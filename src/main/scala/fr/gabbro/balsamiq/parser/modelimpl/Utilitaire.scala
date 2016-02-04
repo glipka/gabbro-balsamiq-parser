@@ -624,7 +624,7 @@ class Utilitaire {
     if (traitementPreserve) {
       val preserveSection = new TraitementPreserveSection().process(filename)
       if (preserveSection != null) {
-        // on fait un replace des preserve section
+        // on fait un replace des preserve sections
         bufferFormate = preserveSection.replacePreserveSection(buffer)
       }
     }

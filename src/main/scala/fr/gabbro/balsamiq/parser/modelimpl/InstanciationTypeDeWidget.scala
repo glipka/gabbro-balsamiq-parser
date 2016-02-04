@@ -51,7 +51,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 
 class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants) {
   val controlTypeID = elementXML.getAttributeValue(cstControlTypeID)
-  var componentName = ""
+
   //  var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
   val utilitaire = new Utilitaire
   /**
@@ -68,18 +68,20 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
       // traitement d'un composant : src contient le nom du compsant ainsi que 
       // le nom du repository.
       // ------------------------------------------------------------------------------------------------------------------
-      case `cstComponentBalsamiq` => {
+      case `cstComponentBalsamiq` => { //com.balsamiq.mockups::Component
+        var componentName  = ""
         val src = recuperationDesAttributsEtendus(elementXML).getOrElse(cstSrc, "").toString()
         if (src.contains("#")) {
           val tab1 = src.split("#")
           componentName = tab1.last // nom du composant : tb_bagde
         }
         // rajouter à cet endroit pour des composants spécifiques
-        if (componentName == cstDhtmlxgrid) new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
-        else if (componentName == cstCustomsteps) new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)
+        if (componentName == cstDhtmlxgrid) {new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)}
+        else if (componentName == cstCustomsteps) { new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)}
         else new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true) {}
 
-      }
+      } 
+      // ce n'est pas un composant => traitement de widgets spécifiques
       case `cstRoundButton` => new RoundButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstDatagrid` => new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstCheckBoxGroup` => new CheckBoxRadioButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
@@ -98,6 +100,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
 
   /**
    * @param e:Element
+   *on recupere un map (nmo de l'element, valeur de l'element)
    * @return : Map[String, Object] Attributs étendus
    */
   private def recuperationDesAttributsEtendus(e: Element): scala.collection.mutable.Map[String, Object] = {
@@ -105,7 +108,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
     if (e.getChildren().size() != 0) {
       val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
-        val cp = controlProperties.getChildren().toList;
+        val cp:List[Element] = controlProperties.getChildren().toList;  
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           var elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii
