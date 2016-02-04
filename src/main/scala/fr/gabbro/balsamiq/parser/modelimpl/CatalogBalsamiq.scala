@@ -217,7 +217,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   //    horizontalForm 
   // 
   def scanDesfilsDuformulairePourDeterminerLeType(branche: ArrayBuffer[WidgetDeBase]): String = {
-    var typeDeFormulaire = "horizontalForm"
+    var typeDeFormulaire = cstHorizontalForm
     val ar1 = ArrayBuffer[(Int, Int)]()
     // on récupère les widgets du container (formulaire)
 
@@ -230,7 +230,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     })
     val maxRowNumber = ar1.filter { case (rowNumber, positionEnDouzieme) => rowNumber > 0 }.size
     // inline-form 
-    if (maxRowNumber == 0) { typeDeFormulaire = "inlineForm" }
+    if (maxRowNumber == 0) { typeDeFormulaire = cstInlineForm }
     else {
       val ar2 = ar1.groupBy {
         case (rowNumber, positionEnDouzieme) => {
@@ -239,7 +239,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       }
       // Type De Formulaire 
       // Un seul composant par ligne ?? 
-      if (ar2.forall { case (rowNumber, ar3) => ar3.size <= 1 }) { typeDeFormulaire = "basicForm" }
+      if (ar2.forall { case (rowNumber, ar3) => ar3.size <= 1 }) { typeDeFormulaire = cstBasicForm }
 
     }
     typeDeFormulaire
