@@ -72,6 +72,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   @BeanProperty var positionDansLeConteneur: Int = 0 // position du widget dans le conteneur (sans tenir compte des n° de lignes et colonnes)
   @BeanProperty var labelFor = "";
   @BeanProperty var labelForWidget: WidgetDeBase = null;
+  @BeanProperty var labelForReferenceur: WidgetDeBase = null; 
   @BeanProperty var customId: String = "" // id du composant
   @BeanProperty var iconNameList = new java.util.ArrayList[IconInWidget] // sera renseigné dans le traitement du catalogue si un widget de type icon est inclus dans le widget
   // largeur et hauteur du widget par rapport à la taille de la fenêtre 

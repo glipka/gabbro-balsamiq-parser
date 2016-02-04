@@ -47,6 +47,8 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
     var sourceHtml: StringBuilder = new StringBuilder()
     var sourceJavascript: StringBuilder = new StringBuilder()
     var sourceJavaOuScala: StringBuilder = new StringBuilder()
+        var queueDesWidgets = new ArrayBuffer[WidgetDeBase]()
+ 
     // on ne génere le conteneur que pour le 1er appel
     val containerName = if (container != null) { container.getWidgetNameOrComponentName().split("::").last } else {
       null
@@ -141,8 +143,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       // -------------------------------------------------------------------- 
       var widgetPrecedent: WidgetDeBase = null
       var widgetLabelForWidget: WidgetDeBase = null
-      var queueDesWidgets = new ArrayBuffer[WidgetDeBase]()
-      var numeroColonneEnDouziemeDeLecran = 0
+       var numeroColonneEnDouziemeDeLecran = 0
       var numeroColonne = 0
       val tailleCelluleEnDouzieme = calculTailleCelluleEnDouzieme(container)
       val demiTailleCelluleEnDouzieme = tailleCelluleEnDouzieme / 2
@@ -206,11 +207,12 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
             sourceJavascript = sourceJavascript.append(sourceJavaScript9)
             sourceJavaOuScala = sourceJavaOuScala.append(codeEcran9)
             widgetPrecedent = widget
-             
+             queueDesWidgets.add(widget)
             positionWidget += 1
           }) // fin de calcul du widget  
           // Appel template col fin
-            val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstChildrenInCurrentColumn, childrenInCurrentColumn), (cstLeftSibling, widgetLabelForWidget))
+          val avantDernierWidget=if ((queueDesWidgets.size-2) >= 0) {queueDesWidgets(queueDesWidgets.size-2)} else { null}
+            val (ret10, source10, sourceJavaScript10, codeEcran10) = moteurTemplateFreeMarker.generationDuTemplate(cstTemplateCol, CommonObjectForMockupProcess.templatingProperties.phase_fin, container, (cstContainerName, containerName), (cstColNumber, numeroColonne.toString), (cstContainer, container), (cstBootstrapColWidth, tailleEnCoursEnDouzieme.toString), (cstBootstrapColOffset, colspan.toString), (cstChildrenInCurrentColumn, childrenInCurrentColumn), (cstLeftSibling,  avantDernierWidget))
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)

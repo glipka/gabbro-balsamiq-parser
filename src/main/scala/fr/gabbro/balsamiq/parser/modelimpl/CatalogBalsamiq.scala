@@ -265,6 +265,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
             val composant_associe = branche(i + 1)
             branche(i).labelFor = if (composant_associe.isAComponent) branche(i + 1).componentName else branche(i + 1).controlTypeID.split("::").last.toLowerCase()
             branche(i).labelForWidget = branche(i + 1) // widget référencé par le label
+            branche(i+1).labelForReferenceur=branche(i)
           }
         }
       }
