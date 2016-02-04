@@ -214,7 +214,6 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           sourceHtml = sourceHtml.append(source10)
           sourceJavascript = sourceJavascript.append(sourceJavaScript10)
           sourceJavaOuScala = sourceJavaOuScala.append(codeEcran10)
-          widgetLabelForWidget=null
           numeroColonne += 1 // numero de colonne va servir pour la balise td
 
         } // fin de else1 
