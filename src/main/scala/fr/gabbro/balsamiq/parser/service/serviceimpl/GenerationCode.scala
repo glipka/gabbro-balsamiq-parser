@@ -43,12 +43,13 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
    * @param forceFormulaire boolean
    * @return  (sourceHtml, sourceJavascript, sourceJavaOuScala) : (StringBuilder, StringBuilder, StringBuilder)
    */
+     var queueDesWidgets = new ArrayBuffer[WidgetDeBase]()
+ 
   def traitement_widget_par_ligne_colonne(branche_catalog: ArrayBuffer[WidgetDeBase], rowNumber: Int, niveau: Int, branche_perex: ArrayBuffer[WidgetDeBase], container: WidgetDeBase, forceFormulaire: Boolean): (StringBuilder, StringBuilder, StringBuilder) = {
     var sourceHtml: StringBuilder = new StringBuilder()
     var sourceJavascript: StringBuilder = new StringBuilder()
     var sourceJavaOuScala: StringBuilder = new StringBuilder()
-        var queueDesWidgets = new ArrayBuffer[WidgetDeBase]()
- 
+     
     // on ne génere le conteneur que pour le 1er appel
     val containerName = if (container != null) { container.getWidgetNameOrComponentName().split("::").last } else {
       null
