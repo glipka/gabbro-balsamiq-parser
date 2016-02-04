@@ -304,5 +304,4 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
 
     }
   }
-
 }
