@@ -39,7 +39,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.CatalogAPlat
  */
 class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, val catalogDesComposantsCommuns: CatalogDesComposants, val moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, val traitementBinding: TraitementBinding) extends TCatalogAPlat {
   final val repertoireContenuDesFragmentsGeneres = repertoireDesBmmlATraiter + "/" + cstGeneratedFragment
-  var nombreDeFragmentsGeneres = 1
+  var nombreDeFragmentsGeneres = 0
   /**
    * Le repertoire  repertoireContenuDesFragments va contenir les fichiers bmml générés.
    */
@@ -74,7 +74,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
           val (fic, rep, useCase, fileNameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
           if (!isAfragment) { // on ne traite que les fichiers principaux et non les fragments
             traitementDesFragmentsDuMockupBalsamiq(file) // generation des fragments du mockup en cours
-            nombreDeFragmentsGeneres += 1
+            
           }
         }
       }
@@ -141,6 +141,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
       })
       if (lewidgetGenereUnFragment) { // un génère un fragment pour ce container. 
         logBack.info(utilitaire.getContenuMessage("mes63"), widgetNameOrComponentName) // start generating fragment
+        nombreDeFragmentsGeneres += 1
         val idDuContainer = if (controle.customId != "") { controle.customId } else { typeDuFragment + nombreDeFragmentsGeneres } // id du container pour générer le nom du fragment. Si l'ID est à blanc=> type + numero de fichier genere
         val codeSourceXmlDuFragment = recuperationCodeDuFragment(controle.tableau_des_fils, controle.sourceXmldDeLelement) // on recupere le code xml du container ainsi que le xml des enfants du container
         mapDesSourcesDesFragmentsAGenerer += (idDuContainer, typeDuFragment) -> codeSourceXmlDuFragment // on met dans un map le code source du fragement
@@ -197,7 +198,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
         } else {
           nomDuFichierFragmentAgenerer += cstBalsamiqFileSuffix
         }
-        utilitaire.fileWrite(nomDuFichierFragmentAgenerer, fragmentContent, false)
+        utilitaire.ecrire_fichier(nomDuFichierFragmentAgenerer, fragmentContent, false)
         logBack.info(utilitaire.getContenuMessage("mes65"), nomDuFichierFragmentAgenerer) // start generating fragment
       }
     })
