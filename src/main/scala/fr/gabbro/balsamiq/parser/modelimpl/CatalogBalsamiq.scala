@@ -187,7 +187,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
 
   /**
    * <p>pour chaque widget de la branche enrichit l'attribut labelFor</p>
-   * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui est sur la même ligne</p>
+   * <p>si le widget est un label est que le composant suivant est un composant du formulaire qui n'est pas forcément sur sur la même ligne</p>
    * <p>on renseigne alors l'attribut labelFor du composant label ainsi que l'attribut labelForWidget</p>
    * @param branche
    * @param widgetPerep
@@ -313,7 +313,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           val reste = (branche(ind).xRelative % tailleCelluleEnDouzieme)
           if (reste > demitailleCelluleEnDouzieme) {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1}
           else {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme)}
-          logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
+           if (branche(ind).positionEnDouzieme >= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {branche(ind).positionEnDouzieme = (CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-1)}
+           logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
           logBack.debug(utilitaire.getContenuMessage("mes36"), branche(ind).xRelative, tailleCelluleEnDouzieme)
           logBack.debug(utilitaire.getContenuMessage("mes37"), branche(ind).w)
         })
