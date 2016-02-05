@@ -171,7 +171,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
 
     contenuXMLDeLaBranche
   }
-
+   
   /**
    * @param mapDesSourcesDesFragmentsAGenerer :Map[(String,String),String] Map contenant le nom du fragment son type, ansi que le contenu du fragment
    * la map mapDesSourcesDesFragmentsAGenerer contient le code source à générer pour chaque fragment d'un mockup principal
