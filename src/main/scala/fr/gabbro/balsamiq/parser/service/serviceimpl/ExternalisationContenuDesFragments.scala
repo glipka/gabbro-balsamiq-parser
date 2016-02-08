@@ -58,7 +58,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     } catch {
       case ex: Exception =>
     }
-  }
+  } 
 
   /**
    * scan itératif du répertoire et traitement de chaque fichier bmml qui n'est pas un fragment.
@@ -143,7 +143,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
         logBack.info(utilitaire.getContenuMessage("mes63"), widgetNameOrComponentName) // start generating fragment
         nombreDeFragmentsGeneres += 1
         val idDuContainer = if (controle.customId != "") { controle.customId } else { typeDuFragment + nombreDeFragmentsGeneres } // id du container pour générer le nom du fragment. Si l'ID est à blanc=> type + numero de fichier genere
-        val codeSourceXmlDuFragment = recuperationCodeDuFragment(controle.tableau_des_fils, "") // on recupere le code xml du container ainsi que le xml des enfants du container
+        val codeSourceXmlDuFragment = recuperationCodeDuFragment(controle.tableau_des_fils, controle.sourceXmldDeLelement) // on recupere le code xml du container ainsi que le xml des enfants du container
         mapDesSourcesDesFragmentsAGenerer += (idDuContainer, typeDuFragment) -> codeSourceXmlDuFragment // on met dans un map le code source du fragement
       } else { // le widget n'est pas un container pour lequel on génère un fragment, on traite donc les fils du widget en cours.
         if (controle.tableau_des_fils.size > 0) {
@@ -166,7 +166,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     var contenuXMLDeLaBranche = content
     branche.foreach(controle => {
       contenuXMLDeLaBranche += controle.sourceXmldDeLelement
-      if (controle.tableau_des_fils.size > 0) { contenuXMLDeLaBranche += recuperationCodeDuFragment(controle.tableau_des_fils, contenuXMLDeLaBranche) }
+      if (controle.tableau_des_fils.size > 0) { contenuXMLDeLaBranche  = recuperationCodeDuFragment(controle.tableau_des_fils, contenuXMLDeLaBranche) }
     })
 
     contenuXMLDeLaBranche
