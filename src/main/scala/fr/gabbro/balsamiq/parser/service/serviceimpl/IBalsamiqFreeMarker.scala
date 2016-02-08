@@ -232,7 +232,6 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
   //  new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances (donc des fragments)
     if (!isAfragment) { // si ce n'est pas un fragment => mise en table menu et recherche des fragments
       CommonObjectForMockupProcess.mockupContext.fragments ++= new DetectFragments(utilitaire).processEtMiseEntable() // mise en table des fragments
-      println("fragment mis en table:" +  CommonObjectForMockupProcess.mockupContext.fragments.size)
 
     } // fin de isAFragment
     else {
