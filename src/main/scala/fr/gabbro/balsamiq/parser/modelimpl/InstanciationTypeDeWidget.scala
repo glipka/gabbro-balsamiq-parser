@@ -23,11 +23,12 @@ import scala.collection.immutable.List
 import scala.collection.mutable.ArrayBuffer
 import org.jdom2.Element
 import org.slf4j.LoggerFactory
-import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
+ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DefaultWidget
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.TabsBar
 import fr.gabbro.balsamiq.parser.model.composantsetendus.ListHTML
+import fr.gabbro.balsamiq.parser.model.composantsetendus.MenuItem
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.model.composantsetendus.RoundButton
 import fr.gabbro.balsamiq.parser.model.composantsetendus.BreadCrumbsOrButtonBarEnrichissementParametres
@@ -69,18 +70,18 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
       // le nom du repository.
       // ------------------------------------------------------------------------------------------------------------------
       case `cstComponentBalsamiq` => { //com.balsamiq.mockups::Component
-        var componentName  = ""
+        var componentName = ""
         val src = recuperationDesAttributsEtendus(elementXML).getOrElse(cstSrc, "").toString()
         if (src.contains("#")) {
           val tab1 = src.split("#")
           componentName = tab1.last // nom du composant : tb_bagde
         }
         // rajouter à cet endroit pour des composants spécifiques
-        if (componentName == cstDhtmlxgrid) {new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)}
-        else if (componentName == cstCustomsteps) { new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true)}
+        if (componentName == cstDhtmlxgrid) { new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true) }
+        else if (componentName == cstCustomsteps) { new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true) }
         else new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, true) {}
 
-      } 
+      }
       // ce n'est pas un composant => traitement de widgets spécifiques
       case `cstRoundButton` => new RoundButton(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstDatagrid` => new Datagrid(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
@@ -92,6 +93,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
       case `cstVerticalTabbar` => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstListHTML` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstComboBox` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
+      case `cstMenu` => new MenuItem(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
 
       case _ => new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
     }
@@ -100,7 +102,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
 
   /**
    * @param e:Element
-   *on recupere un map (nmo de l'element, valeur de l'element)
+   * on recupere un map (nmo de l'element, valeur de l'element)
    * @return : Map[String, Object] Attributs étendus
    */
   private def recuperationDesAttributsEtendus(e: Element): scala.collection.mutable.Map[String, Object] = {
@@ -108,7 +110,7 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
     if (e.getChildren().size() != 0) {
       val controlProperties = e.getChild(cstControlProperties);
       if (controlProperties != null) {
-        val cp:List[Element] = controlProperties.getChildren().toList;  
+        val cp: List[Element] = controlProperties.getChildren().toList;
         cp.foreach(propertie => {
           val elementName = propertie.getName().trim
           var elementValue = utilitaire.remplaceHexa(propertie.getText().trim) // on remplace les %xy par leur valeur ascii

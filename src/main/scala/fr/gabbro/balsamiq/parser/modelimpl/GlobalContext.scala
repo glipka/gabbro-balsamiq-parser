@@ -30,12 +30,10 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 //  
 //  
 //  
-class MenuItem(val itemName: String, var children: ArrayBuffer[MenuItem], var url: String, var usecaseName: String)
 class NomDesFichiersJavascript(@BeanProperty var path: String, @BeanProperty var useCase: String, @BeanProperty var fileName: String)
 
 class GlobalContext() {
   val utilitaire = new Utilitaire
-  var tableauDesMenuItems = ArrayBuffer[MenuItem]() // mis à jour par 
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu
   var moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker = _
   // modif le 22/4/15 par gl Itemsvars est une Map dont la clef est le usecase,ecran principla, fragmentName, identifiabt unique et la valeur itemsVar
