@@ -114,7 +114,7 @@ class MockupContext() {
   def getFragmentsByType(typeDeFragment: String): java.util.ArrayList[Fragment] = {
     val listeDesFragments = new java.util.ArrayList[Fragment]
     fragments.foreach(fragment => {
-      println(s"getFragmentByType : valeur du fragment ${fragment.typeOfFragment}  ${fragment.fragmentName}")
+   //   println(s"getFragmentByType : valeur du fragment ${fragment.typeOfFragment}  ${fragment.fragmentName}")
       if (fragment.typeOfFragment.toLowerCase() == typeDeFragment.toLowerCase()) {
         listeDesFragments.add(fragment)
       }

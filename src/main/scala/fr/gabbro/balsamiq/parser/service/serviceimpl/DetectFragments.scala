@@ -38,9 +38,10 @@ class DetectFragments(utilitaire: Utilitaire) {
   val isAfragment = CommonObjectForMockupProcess.isAfragment
   /**
    * appel de la procédure raitementDesFragmentsDuRepertoireBalsamiq et retour liste des fragments.
- * @return ArrayList[Fragment]
- */
-def processEtMiseEntable(): ArrayList[Fragment] = {
+   * @return ArrayList[Fragment]
+   */
+  def processEtMiseEntable(): ArrayList[Fragment] = {
+
     val repertoireName = repertoireDesSources
     return traitementDesFragmentsDuRepertoireBalsamiq(repertoireName, nomEcran)
 
@@ -48,26 +49,33 @@ def processEtMiseEntable(): ArrayList[Fragment] = {
   /**
    * traitement des fragments pour un mockup principal
    * Si le fichier en cours de traitement est un fragment et qu'il y a correspondance entre le usecase et le mockup principla
-   * alors on met en table le fragement 
+   * alors on met en table le fragement
    * remarque : le nom des fragments est sous la forme: useCase-mockupPrincipal$fragmentName
-   * 
- * @param directory1 : name of repository to scan
- * @param nomEcran : name of mainMockup
- * @return ArrayList[Fragment]
- */
-private def traitementDesFragmentsDuRepertoireBalsamiq(directory1: String, nomEcran: String): ArrayList[Fragment] = {
+   *
+   * @param directory1 : name of repository to scan
+   * @param nomEcran : name of mainMockup
+   * @return ArrayList[Fragment]
+   */
+  private def traitementDesFragmentsDuRepertoireBalsamiq(directory1: String, nomEcran: String): ArrayList[Fragment] = {
     var compteur_fichiers_traites = 0
+    println("contenu de directory1="+directory1)
     val listeDesFragments = new ArrayList[Fragment]();
     val fichiersBalsamiqAtraiter = new File(directory1).listFiles
     if (fichiersBalsamiqAtraiter != null) {
       fichiersBalsamiqAtraiter.foreach(file => {
-        if (file.getName().endsWith(cstBalsamiqFileSuffix)) { // on ne traite que les fichiers bmml
-          val (ficname, rep, usecaseDuSegment, fileNameComplet, isAfragment, fragmentName, generateContoller, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
-          if (isAfragment && ficname.toLowerCase().startsWith(nomEcran.toLowerCase()) && (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement == usecaseDuSegment)) {
-            listeDesFragments.add(IBalsamiqFreeMarker.globalContext.createFragment(file.getName.split("\\.").head))
+        if ((file.isDirectory()) && (file.getName() != cstAssets)) {
+          listeDesFragments.addAll(traitementDesFragmentsDuRepertoireBalsamiq( file.getAbsolutePath, nomEcran))
+        } else {
+
+          if (file.getName().endsWith(cstBalsamiqFileSuffix)) { // on ne traite que les fichiers bmml
+            val (ficname, rep, usecaseDuSegment, fileNameComplet, isAfragment, fragmentName, generateContoller, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
+            if (isAfragment && ficname.toLowerCase().startsWith(nomEcran.toLowerCase()) && (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement == usecaseDuSegment)) {
+              listeDesFragments.add(IBalsamiqFreeMarker.globalContext.createFragment(file.getName.split("\\.").head))
+            }
           }
         }
       })
+
     }
     return listeDesFragments
   }
