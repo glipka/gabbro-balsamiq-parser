@@ -102,10 +102,10 @@ class GlobalContext() {
    */
   def listOfSubPackageInJavaOrScalaCode(usecaseNameAFiltrer: String, mockupNameAFiltrer: String): java.util.ArrayList[String] = {
     val tableDesPackages = new java.util.ArrayList[String]
-    tableDesCodesDesClassesJavaouScala.foreach{
-    case ((usecaseName, mockupName, subPackageName, className),code) =>      // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
-      if (usecaseName == usecaseNameAFiltrer &&  mockupName == mockupNameAFiltrer) { tableDesPackages.add( subPackageName) } //  recupération non du package
-    } 
+    tableDesCodesDesClassesJavaouScala.foreach {
+      case ((usecaseName, mockupName, subPackageName, className), code) => // la clef est un tuple de 4 parties : usecaseName,mockupName,subpackageName,className
+        if (usecaseName == usecaseNameAFiltrer && mockupName == mockupNameAFiltrer) { tableDesPackages.add(subPackageName) } //  recupération non du package
+    }
     tableDesPackages
 
   }
@@ -283,9 +283,14 @@ class GlobalContext() {
   def getItemsVars(): ArrayList[ItemVar] = {
     //Itemsvars est une Map dont la clef est le usecase,ecran principal, fragmentName, identifiabt unique et la valeur itemsVar
     val array1 = new ArrayList[ItemVar]()
+
     itemsVars.foreach {
-      case ((usecase, ecranPrincipal, fragmentNae, unqiueId), itemVar) => array1.add(itemVar)
+      // modif le 9/2/16 ajout controle unicité
+      case ((usecase, ecranPrincipal, fragmentName, unqiueId), itemVar) => {
+        if (!array1.contains(itemVar)) { array1.add(itemVar) }
+      }
     } // return an array containaing value of itemsvars
+
     array1
   }
 
@@ -450,13 +455,10 @@ class GlobalContext() {
 
   def printBindedForms(): Unit = {
     // useCase, l'ecran principal et le nom du fragment 
-    bindedForms.foreach{
-         case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
-      println("usecase %s ecran %s fragment%s identifiant %s".format(useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire))
-    } 
+    bindedForms.foreach {
+      case ((useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire), formulaireCode) =>
+        println("usecase %s ecran %s fragment%s identifiant %s".format(useCaseDuFormulaire, ecranDuFormulaire, fragmentDuFormulaire, uniqueIdDuFormulaire))
+    }
   }
-  
- 
-   
 
 }
