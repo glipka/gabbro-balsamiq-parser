@@ -287,7 +287,7 @@ class GlobalContext() {
     itemsVars.foreach {
       // modif le 9/2/16 ajout controle unicité
       case ((usecase, ecranPrincipal, fragmentName, unqiueId), itemVar) => {
-        if (!array1.contains(itemVar)) { array1.add(itemVar) }
+        if (array1.filter(x=>x.content==itemVar.content).size==0) { array1.add(itemVar) }
       }
     } // return an array containaing value of itemsvars
 
