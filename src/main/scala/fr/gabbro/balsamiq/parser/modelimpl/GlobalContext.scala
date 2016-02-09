@@ -31,7 +31,11 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 //  
 //  
 class NomDesFichiersJavascript(@BeanProperty var path: String, @BeanProperty var useCase: String, @BeanProperty var fileName: String)
-
+// ---------------------------------------------------------------
+// content 
+// shortPath
+// ----------------------------------------------------------------
+class ItemVar(@BeanProperty var content: String, @BeanProperty var shortPath: String)
 class GlobalContext() {
   val utilitaire = new Utilitaire
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu

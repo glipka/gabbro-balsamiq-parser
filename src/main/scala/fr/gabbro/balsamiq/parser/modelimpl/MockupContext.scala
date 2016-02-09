@@ -49,11 +49,7 @@ class FormulaireCode(@BeanProperty var classname: String, @BeanProperty var inst
 class Location(@BeanProperty var location: String, @BeanProperty var shortPath: String, @BeanProperty var restUrl: String) {
   val utilitaire = new Utilitaire
 }
-// ---------------------------------------------------------------
-// content 
-// shortPath
-// ----------------------------------------------------------------
-class ItemVar(@BeanProperty var content: String, @BeanProperty var shortPath: String)
+
 /**
  * <p>classe expostion de données au niveau de l'ecran</p>
  * <p>les widgets enrichissent les données au moment de la mise en table</p>
@@ -69,7 +65,6 @@ class MockupContext() {
   var global_max_height: Double = 0
   @BeanProperty var location: Location = _ // emplacement des jsp générés. 
   @BeanProperty var links = new java.util.ArrayList[DirectoryFile]()
-  @BeanProperty var itemsVars = new java.util.ArrayList[ItemVar]()
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur
   @BeanProperty var bindedForms = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var fragments = new java.util.ArrayList[Fragment]() // table des fragments

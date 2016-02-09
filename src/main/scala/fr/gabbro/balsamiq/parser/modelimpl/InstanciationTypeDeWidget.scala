@@ -93,13 +93,13 @@ class InstanciationTypeDeWidget(val id_interne: Int, groupe_en_cours: WidgetDeBa
       case `cstVerticalTabbar` => new TabsBar(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstListHTML` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case `cstComboBox` => new ListHTML(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-      case `cstMenu` => new MenuItem(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
-
+      case `cstMenu` | `cstMenuBar` => new MenuItem(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
       case _ => new DefaultWidget(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, false) {}
     }
 
   }
 
+  
   /**
    * @param e:Element
    * on recupere un map (nmo de l'element, valeur de l'element)

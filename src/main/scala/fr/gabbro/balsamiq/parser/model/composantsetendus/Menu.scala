@@ -25,25 +25,66 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
- class ListItemMenu(@BeanProperty var content: String, @BeanProperty var url: String)
- class MenuItem(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
+
+//menu Item contenu Open,CTRL+O
+//menu Item contenu Open Recent >
+//menu Item contenu ---
+//menu Item contenu o Option One
+//menu Item contenu Option Two
+//menu Item contenu =
+//menu Item contenu x Toggle Item
+//menu Item contenu -Disabled Item-
+//menu Item contenu Exit,CTRL+Q
+class ListItemMenu(
+  @BeanProperty var libelle: String,
+  @BeanProperty var url: String,
+  @BeanProperty var disabled: Boolean,
+  @BeanProperty var option: Boolean,
+  @BeanProperty var separator: Boolean,
+  @BeanProperty var checked: Boolean)
+
+class MenuItem(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Element, traitementBinding: TraitementBinding, catalogDesComposants: CatalogDesComposants, isAcomponent: Boolean) extends WidgetDeBase(id_interne, groupe_en_cours, elementXML, traitementBinding, catalogDesComposants, isAcomponent) {
 
   /* (non-Javadoc)
  * @see fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase#enrichissementParametres(java.lang.String)
  */
-override def enrichissementParametres(param: String): (String, Object) = {
+  override def enrichissementParametres(param: String): (String, Object) = {
     var items = new java.util.ArrayList[ListItemMenu]()
     val str1 = this.mapExtendedAttribut.getOrElse(cstText, "").toString().split("\n").toList
-    var nbre_lignes = 0
+    val urls = this.mapExtendedAttribut.getOrElse(cstHrefs, "").toString().split(",").toList
+
+    var numeroItemDansMenu = 0
     str1.foreach(item =>
       {
-        val item2 = item.trim 
-        println(s"menu Item contenu ${item}")
-        var enabled=if(item2.startsWith("-") && item2.endsWith("-")) "fals" else "true"
-        items.add(new ListItemMenu(item2, enabled))
-        nbre_lignes += 1
-
+        val url = if (numeroItemDansMenu <  urls.size) { urls.get(numeroItemDansMenu) } else { "" }
+        items.add(recupContent(item, url))
+        numeroItemDansMenu += 1
       })
+
     (cstItems, items)
+  }
+  // ------------------------------------------------------
+  // *** récupération du contenu de l'item de menu ***
+  // -------------------------------------------------------
+  def recupContent(item: String, url: String): ListItemMenu = {
+    var libelle = ""
+
+    var disabled = false
+    var option = false
+    var separator = false
+    var checked = false
+    if (item.startsWith("---") || item.startsWith("= ")) {
+      separator = true
+    } else if (item.startsWith("o ")) {
+      option = true
+      libelle = item.substring(2)
+    } else if (item.startsWith("x ")) {
+      checked = true
+      libelle = item.substring(2)
+    } else {
+      libelle = item
+    }
+    new ListItemMenu(libelle, url, disabled, option, separator, checked)
+
   }
 }

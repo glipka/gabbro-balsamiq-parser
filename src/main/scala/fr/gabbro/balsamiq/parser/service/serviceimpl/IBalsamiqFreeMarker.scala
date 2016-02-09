@@ -59,7 +59,6 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  */
 object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
 
- 
   if (!init()) { System.exit(99) }
   else {
     process() // process du batch

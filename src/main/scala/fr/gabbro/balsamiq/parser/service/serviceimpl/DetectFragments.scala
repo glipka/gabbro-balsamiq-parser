@@ -58,13 +58,13 @@ class DetectFragments(utilitaire: Utilitaire) {
    */
   private def traitementDesFragmentsDuRepertoireBalsamiq(directory1: String, nomEcran: String): ArrayList[Fragment] = {
     var compteur_fichiers_traites = 0
-    println("contenu de directory1="+directory1)
     val listeDesFragments = new ArrayList[Fragment]();
     val fichiersBalsamiqAtraiter = new File(directory1).listFiles
     if (fichiersBalsamiqAtraiter != null) {
       fichiersBalsamiqAtraiter.foreach(file => {
         if ((file.isDirectory()) && (file.getName() != cstAssets)) {
-          listeDesFragments.addAll(traitementDesFragmentsDuRepertoireBalsamiq( file.getAbsolutePath, nomEcran))
+
+          listeDesFragments.addAll(traitementDesFragmentsDuRepertoireBalsamiq(file.getAbsolutePath, nomEcran))
         } else {
 
           if (file.getName().endsWith(cstBalsamiqFileSuffix)) { // on ne traite que les fichiers bmml

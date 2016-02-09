@@ -129,16 +129,28 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
   def mise_en_table_items_vars(branche: ArrayBuffer[WidgetDeBase], containerPere: WidgetDeBase) {
     //   val listeDesengineProperties.widgetsEnablingContainerAsAForm = CommonObjectForMockupProcess .engineProperties.widgetsEnablingContainerAsAForm.split(",").map(_.trim).toList
     branche.foreach(controle => {
-      val itemsVar = controle.mapExtendedAttribut.getOrElse(cstItemsVar, "").toString()
-      if (itemsVar != "" && !CommonObjectForMockupProcess.mockupContext.itemsVars.exists { item => item.content == itemsVar }) { CommonObjectForMockupProcess.mockupContext.itemsVars.add(new ItemVar(itemsVar, itemsVar.toUpperCase())) }
-      if (itemsVar != "") {
-        val itemVar = new ItemVar(itemsVar, itemsVar.toUpperCase())
-        if (CommonObjectForMockupProcess.isAfragment) { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, itemVar.content) -> itemVar }
-        else { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", itemVar.content) -> itemVar }
-
+      // Si l'objet est n'est pas un fragment, on bypass les containers generant des fragments
+      var processControle = true
+      // le fichier à traiter n'est pas un fragment, on écarte du traitement les contrôles de la liste des container générant un fragment 
+      // et ce ci pour éviter de trauter en double les itmesvars (dans le fragment et dans l'écran principal)
+      if (!CommonObjectForMockupProcess.isAfragment) {
+        CommonObjectForMockupProcess.generationProperties.generateFragmentFromTheseContainers.foreach(containerType => {
+          if (containerType._1 == controle.getWidgetNameOrComponentName()) {
+            processControle = false // on ne traite pas les itemsvars du container et de ses enfants
+          }
+        })
       }
-      // traitement itératif des fils
-      if (controle.tableau_des_fils.size > 0) { mise_en_table_items_vars(controle.tableau_des_fils, controle) }
+      if (processControle) {
+        val itemsVar = controle.mapExtendedAttribut.getOrElse(cstItemsVar, "").toString()
+        if (itemsVar != "") {
+          val itemVar = new ItemVar(itemsVar, itemsVar.toUpperCase())
+          if (CommonObjectForMockupProcess.isAfragment) { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.ecranContenantLeSegment, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, itemVar.content) -> itemVar }
+          else { globalContext.itemsVars += (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", itemVar.content) -> itemVar }
+
+        }
+        // traitement itératif des fils
+        if (controle.tableau_des_fils.size > 0) { mise_en_table_items_vars(controle.tableau_des_fils, controle) }
+      }
     })
   }
 
