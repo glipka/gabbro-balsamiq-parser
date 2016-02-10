@@ -25,6 +25,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurTemplatingFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import scala.collection.JavaConversions._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurAnalyseJericho
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le menu par exemple.  
 //  
@@ -38,6 +39,7 @@ class NomDesFichiersJavascript(@BeanProperty var path: String, @BeanProperty var
 class ItemVar(@BeanProperty var content: String, @BeanProperty var shortPath: String)
 class GlobalContext() {
   val utilitaire = new Utilitaire
+  var moteurJericho:MoteurAnalyseJericho=null
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu
   var moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker = _
   // modif le 22/4/15 par gl Itemsvars est une Map dont la clef est le usecase,ecran principla, fragmentName, identifiabt unique et la valeur itemsVar

@@ -49,7 +49,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  * <p> même logique pour les templates de type code </p>
  *
  */
-class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirOut: String, val templateCodeOut: String, sessionBalsamiq: GlobalContext) extends TMoteurTemplatingFreeMarker {
+class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirOut: String, val templateCodeOut: String, globalContext: GlobalContext) extends TMoteurTemplatingFreeMarker {
 
   /**
    *  -----------------------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     // internationalisation du fichier ??
     if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == cstTrueString) {
       logBack.info(utilitaire.getContenuMessage("mes46"))
-      sourceEcran = new MoteurAnalyseJericho(this, utilitaire).traductHtmlFile(sourceASauvegarder) // extraction des clefs de traduction
+      sourceEcran = globalContext.moteurJericho.traductHtmlFile(sourceASauvegarder) // extraction des clefs de traduction
     }
     val sourceFormat = new SourceFormatter(new Source(sourceEcran)).setIndentString("\t").setCollapseWhiteSpace(true).toString;
     // ajout par gl le 22 juillet 2015. (rq:La solution de merge retenue est windiff)

@@ -84,6 +84,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    
       if (moteurTemplateFreeMarker.init()) { // init du moteur et chargement des templates
         moteurJericho = new MoteurAnalyseJericho(moteurTemplateFreeMarker, utilitaire) // les trad
+        globalContext.moteurJericho=moteurJericho
         catalogDesComposantsCommuns = new CatalogDesComposants // catalogue commun à l'ensemble des écrans
         true
       } else { false }
