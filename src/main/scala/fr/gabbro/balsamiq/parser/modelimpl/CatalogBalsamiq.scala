@@ -314,6 +314,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           if (reste > demitailleCelluleEnDouzieme) {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1}
           else {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme)}
            if (branche(ind).positionEnDouzieme >= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {branche(ind).positionEnDouzieme = (CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-1)}
+           
            logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
           logBack.debug(utilitaire.getContenuMessage("mes36"), branche(ind).xRelative, tailleCelluleEnDouzieme)
           logBack.debug(utilitaire.getContenuMessage("mes37"), branche(ind).w)
@@ -332,8 +333,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
    * @param widget
    * @return taille de la cellule
    */
-  private def calculTailleCelluleEnDouzieme(widget: WidgetDeBase): Int = {
-    var tailleCelluleEnDouzieme = if (widget != null) { widget.w / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns } else { (global_max_width / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns).toInt }
+  private def calculTailleCelluleEnDouzieme(container: WidgetDeBase): Int = {
+    var tailleCelluleEnDouzieme = if (container != null) { container.w / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns } else { (global_max_width / CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns).toInt }
     if (tailleCelluleEnDouzieme < CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) { tailleCelluleEnDouzieme = CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns }
     tailleCelluleEnDouzieme
   }

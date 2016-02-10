@@ -102,6 +102,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   var widgetDejaTraiteDansLaBranche = false // champ technique temporaire : sert dans la determination du nombre de colonnes
   //  var sizeEnDouzieme: Int = 0 // taille en douzieme pour bootstrap
   var positionEnDouzieme: Int = 0; // position du widget en douzieme
+  var largeurEnDouzieme:Int=0;  // largeur du composant en douzieme
   var rowNumber: Int = 0 //  n° de ligne calculé : utilisé pour les row dans les tables
   var columnNumber: Int = 0 //  n° de colonne dans la ligne  : utilisé pour les row dans les tables
   @BeanProperty var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()

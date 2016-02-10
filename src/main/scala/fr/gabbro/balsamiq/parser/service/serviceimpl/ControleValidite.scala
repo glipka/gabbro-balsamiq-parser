@@ -73,7 +73,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
     for (i <- 0 until branche.size) {
       for (j <- i + 1 until branche.size) {
         branche(i).xAbsolute
-        if (intersection(branche(i), branche(j))) { logBack.error(utilitaire.getContenuMessage("mes25"), branche(i).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).controlTypeID.toString(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString()) }
+        if (intersection(branche(i), branche(j))) { logBack.error(utilitaire.getContenuMessage("mes25"), branche(i).getWidgetNameOrComponentName() , branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).getWidgetNameOrComponentName() , branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString()) }
       }
       if (branche(i).tableau_des_fils.size > 0) { verification_intersection_entre_widgets_branche(branche(i).tableau_des_fils) }
 

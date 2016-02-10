@@ -137,6 +137,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       })
     }
     // traitement des colonnes du container bootstrap (qui n'est pas une table)
+    // cette procedure est appelée pour chaque ligne du container (widget.rowNumber)
     def traitementDesColonnesBootstrap(brancheFiltreeParLigne: ArrayBuffer[WidgetDeBase], container: WidgetDeBase): Unit = {
       // --------------------------------------------------------------------
       // Pour la ligne sélectionnée on balaie chaque colonne en douzieme 
@@ -161,7 +162,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
           numeroColonneEnDouziemeDeLecran += 1
         } else { // la colonne en douzieme peut contenir plusieurs widgets.
           // on calcule la taille de la cellule en douzieme à partir de la position du dernier widget de cette cellule
-          tailleEnCoursEnDouzieme = (brancheFiltreeParColonneEnDouzieme.last.w) / tailleCelluleEnDouzieme
+           tailleEnCoursEnDouzieme = (brancheFiltreeParColonneEnDouzieme.last.w) / tailleCelluleEnDouzieme
           // on s'aligne à la cellule suivante si necessaire
           val reste = brancheFiltreeParColonneEnDouzieme.last.w % tailleCelluleEnDouzieme
           if (reste >= (tailleCelluleEnDouzieme / 2)) { tailleEnCoursEnDouzieme += 1 }
@@ -234,8 +235,9 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
     def traitementPrincipal: Unit = {
       var etoile = "*" * niveau
       // traitement de la ligne en cours
+      // widget.rownNumber est mis à jour dans la procédure : calcul_numero_colonne_dans_la_branche du traitement catalogue
       val brancheFiltreeParLigne = branche_catalog.filter(widget => widget.rowNumber == rowNumber)
-      if (brancheFiltreeParLigne.size > 0) { // il y a des colonnes à traiter ?
+      if (brancheFiltreeParLigne.size > 0) { // il y a des colonnes à traiter ? si non arrêt du traitement de la branche en cours. 
 
         // ------------------------------------------------------------------------------------------
         // __________________________________________________________________________________________

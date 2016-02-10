@@ -54,19 +54,20 @@ class GlobalContext() {
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
   /**
-   * <p>methode appelée par freeMarker pour mettre en table le code source des classes java.</p>
+   * <p>methode appelée par freeMarker pour mettre en table le code source des block java ou scala.</p>
+   * <p> les blocks java ou scala seront récupérés dans les différents templates </p>
    * <p>subPackageName est le sous package dans lequel sera générée la classe</p>
    *
    * @param usecaseName
    * @param mockupName
    * @param subPackageName
-   * @param className
+   * @param blockName
    * @param classCode
    * @param subPackageName
    */
-  def setCodeClasse(usecaseName: String, mockupName: String, subPackageName: String, className: String, classCode: String): Unit = {
+  def registerCodeBlock(usecaseName: String, mockupName: String, subPackageName: String, blockName: String, classCode: String): Unit = {
     // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
-    tableDesCodesDesClassesJavaouScala += (usecaseName, mockupName, subPackageName, className) -> classCode
+    tableDesCodesDesClassesJavaouScala += (usecaseName, mockupName, subPackageName, blockName) -> classCode
   }
 
   /**
@@ -77,8 +78,8 @@ class GlobalContext() {
    * @param subPackageName
    * @return content of java code for the className
    */
-  def RetrieveCodeJaveOuScala(usecaseName: String, mockupName: String, className: String, subPackageName: String): String = {
-    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, className), "")
+  def retrieveCodeBlock(usecaseName: String, mockupName: String, blockName: String, subPackageName: String): String = {
+    val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, blockName), "")
     codeJavaOrScala
   }
 
@@ -93,6 +94,18 @@ class GlobalContext() {
     val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, className), "")
     if (codeJavaOrScala.trim.size > 0) { true }
     else { false }
+  } 
+  
+   
+  def getNomDuFichierCodeJavaOuScala(nomDuUseCaseEnCoursDeTraitement:String,filenameAliasName: Tuple2[String, String]): String = {
+    var ficJava = ""
+    if (nomDuUseCaseEnCoursDeTraitement != "") {
+      ficJava = CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath + System.getProperty("file.separator") + nomDuUseCaseEnCoursDeTraitement + System.getProperty("file.separator") + filenameAliasName._2 + System.getProperty("file.separator") + filenameAliasName._1.capitalize + "." + CommonObjectForMockupProcess.generationProperties.languageSource
+    } else {
+      ficJava = CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath + System.getProperty("file.separator") + filenameAliasName._2 + System.getProperty("file.separator") + filenameAliasName._1.capitalize + "." + CommonObjectForMockupProcess.generationProperties.languageSource
+    }
+    ficJava.replace("\\", "/").trim
+
   }
 
   /**
