@@ -296,7 +296,8 @@ class GlobalContext() {
   def getItemsVars(): ArrayList[ItemVar] = {
     //Itemsvars est une Map dont la clef est le usecase,ecran principal, fragmentName, identifiabt unique et la valeur itemsVar
     val array1 = new ArrayList[ItemVar]()
-
+    val l1=List(1,2,3) 
+      
     itemsVars.foreach {
       // modif le 9/2/16 ajout controle unicité
       case ((usecase, ecranPrincipal, fragmentName, unqiueId), itemVar) => {
