@@ -82,6 +82,24 @@ class GlobalContext() {
     val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, blockName), "")
     codeJavaOrScala
   }
+  /**
+   * @param usecaseName
+   * @param mockupName
+   *
+   * @param className
+   * @param subPackageName
+   * @return content of java code for the className
+   */
+  def retrieveCodeBlock(usecaseName: String, mockupName: String): String = {
+    val tableResultat = tableDesCodesDesClassesJavaouScala.filter {
+      case ((usecaseName1, mockupName1, subPackageName, blockName), content) => (usecaseName1 == usecaseName && mockupName1 == mockupName)
+
+    }.map {
+      case ((usecaseName1, mockupName1, subPackageName, blockName), content) => content
+    }
+    val resultat = tableResultat.toList.mkString("")
+    resultat
+  }
 
   /**
    * @param usecaseName
@@ -94,10 +112,9 @@ class GlobalContext() {
     val codeJavaOrScala = tableDesCodesDesClassesJavaouScala.getOrElse((usecaseName, mockupName, subPackageName, className), "")
     if (codeJavaOrScala.trim.size > 0) { true }
     else { false }
-  } 
-  
-   
-  def getNomDuFichierCodeJavaOuScala(nomDuUseCaseEnCoursDeTraitement:String,filenameAliasName: Tuple2[String, String]): String = {
+  }
+
+  def getNomDuFichierCodeJavaOuScala(nomDuUseCaseEnCoursDeTraitement: String, filenameAliasName: Tuple2[String, String]): String = {
     var ficJava = ""
     if (nomDuUseCaseEnCoursDeTraitement != "") {
       ficJava = CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath + System.getProperty("file.separator") + nomDuUseCaseEnCoursDeTraitement + System.getProperty("file.separator") + filenameAliasName._2 + System.getProperty("file.separator") + filenameAliasName._1.capitalize + "." + CommonObjectForMockupProcess.generationProperties.languageSource
@@ -296,12 +313,12 @@ class GlobalContext() {
   def getItemsVars(): ArrayList[ItemVar] = {
     //Itemsvars est une Map dont la clef est le usecase,ecran principal, fragmentName, identifiabt unique et la valeur itemsVar
     val array1 = new ArrayList[ItemVar]()
-    val l1=List(1,2,3) 
-      
+    val l1 = List(1, 2, 3)
+
     itemsVars.foreach {
       // modif le 9/2/16 ajout controle unicité
       case ((usecase, ecranPrincipal, fragmentName, unqiueId), itemVar) => {
-        if (array1.filter(x=>x.content==itemVar.content).size==0) { array1.add(itemVar) }
+        if (array1.filter(x => x.content == itemVar.content).size == 0) { array1.add(itemVar) }
       }
     } // return an array containaing value of itemsvars
 
