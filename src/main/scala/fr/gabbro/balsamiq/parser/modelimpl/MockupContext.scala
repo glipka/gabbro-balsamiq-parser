@@ -78,9 +78,9 @@ class MockupContext() {
    * @param classCode
    * @param subPackageName
    */
-  def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
-    tableDesCodesDesClassesJavaouScala += (className.trim, subPackageName.trim) -> classCode
-  }
+//  def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
+//    tableDesCodesDesClassesJavaouScala += (className.trim, subPackageName.trim) -> classCode
+//  }
   /**
    * <p>écriture du code java ou scala genéré pour la page html en cours</p>
    * <p>la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java</p>
@@ -113,6 +113,22 @@ class MockupContext() {
       if (fragment.typeOfFragment.toLowerCase() == typeDeFragment.toLowerCase()) {
         listeDesFragments.add(fragment)
       }
+    })
+    listeDesFragments
+  }
+  /**
+   * <p>récupération des fragments par leur type</p>
+   * <p>cette méthode est appelée depuis les templates freemarker</p>
+   *
+   * @param typeDeFragment : Panel, Popup, ...
+   * @return ArrayList[Fragment]
+   */
+
+  def getAllFragments( ): java.util.ArrayList[Fragment] = {
+    val listeDesFragments = new java.util.ArrayList[Fragment]
+    fragments.foreach(fragment => {
+           listeDesFragments.add(fragment)
+      
     })
     listeDesFragments
   }
