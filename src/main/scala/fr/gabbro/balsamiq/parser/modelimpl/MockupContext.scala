@@ -78,9 +78,9 @@ class MockupContext() {
    * @param classCode
    * @param subPackageName
    */
-//  def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
-//    tableDesCodesDesClassesJavaouScala += (className.trim, subPackageName.trim) -> classCode
-//  }
+    def setCodeClasse(className: String, classCode: String, subPackageName: String): Unit = {
+    tableDesCodesDesClassesJavaouScala += (className.trim, subPackageName.trim) -> classCode
+   }
   /**
    * <p>écriture du code java ou scala genéré pour la page html en cours</p>
    * <p>la table tableDesCodesDesClassesJavaouScala contientl le code l'ensemble des classes java</p>
