@@ -44,7 +44,13 @@ import scala.collection.mutable.ListBuffer
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
-
+def printTableDesValeursClefs():Unit ={
+    println("---------------------------------------------")
+    tableDesValeursClefsDeTraduction.foreach{
+      case ((valeur,ecran,usecase),clef) => println(s"usecase:$usecase  ecran:$ecran clef:$clef valeur:$valeur")
+    }
+    
+  }
   /**
    * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
    * <p>on recharge les clefs de traduction depuis ce fichier properties dans 2 hashTables :
@@ -253,6 +259,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     if (valeurATraduire.length() > 0 && !valeurATraduire.forall(_.isDigit)) { //if1
       // valeur non déjà traduite pour le usecase et écran en cours. 
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
+       println(s"valeur non trouve $valeurATraduire  usecase!$CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement fichier:$CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement")
         val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
         // On en fait la traduction que si le tag n'est pas dans la liste des tags à bypasser.
         if (!table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.bypassProcessI18nTagHierachy).size > 0 })) {
@@ -324,6 +331,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param templateDirOut
    */
   def traductHtmlFileASupprimer(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
+    printTableDesValeursClefs
     var directoryName = templateDirOut
     val sourceHTML = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
     val fileHTML = new File(sourceHTML)
@@ -345,6 +353,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param templateDirOut
    */
   def traductHtmlFile(sourceEcran: String): String = {
+    printTableDesValeursClefs
     val source = new Source(sourceEcran);
     source.fullSequentialParse();
     val outputDocument = new OutputDocument(source);
