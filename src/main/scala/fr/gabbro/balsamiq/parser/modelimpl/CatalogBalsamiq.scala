@@ -180,7 +180,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     val tableauEnrichi1 = calcul_numero_colonne_dans_la_branche(tableau, container)
     val tableauEnrichi2 = labelFor(tableauEnrichi1, null) // on reca
     // atention l'appel du type de formulaire est obligatoirement après l'enrichissemnt sur les n° de colonnes
-    val tableauEnrichi3= determinationTypeDeFormulaire(tableauEnrichi2,null) // type de formulaire
+    val tableauEnrichi3 = determinationTypeDeFormulaire(tableauEnrichi2, null) // type de formulaire
 
     tableauEnrichi3
   }
@@ -197,17 +197,31 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     for (i <- 0 until branche.size) {
       // on ne traite que les widgets qui  sont des formulaires
       val widget = branche(i)
-      if (widget.isFormulaireHTML) { 
+      if (widget.isFormulaireHTML) {
         widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
-      }
-      else {
-      // traitement itératif des fils,pour les widges qui ne sont pas des formulaires
-      if (widget.tableau_des_fils.size > 0) {widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget)}
+        // les sous containers du formualaire héritent du même type
+        if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = heritageTypeDeFormulaire(widget.tableau_des_fils, widget.typeDeFormulaire) }
+
+      } else {
+        // traitement itératif des fils,pour les widges qui ne sont pas des formulaires
+        if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget) }
       }
 
     } // fin du for
     branche
 
+  }
+  // le container est inclus dans un container de type formuaire => il herite du type de formulaire. 
+  def heritageTypeDeFormulaire(branche: ArrayBuffer[WidgetDeBase], typeDeFormulaire: String): ArrayBuffer[WidgetDeBase] = {
+    branche.foreach(widget => {
+      // le sous container est considéré comme un formulaire ?? 
+      if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0)) {
+        widget.typeDeFormulaire = typeDeFormulaire
+        if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget) }
+      }
+
+    })
+    branche
   }
   // le container en cours est de type formulaire 
   // tous les widgets sont sur une même ligne => type =0 
@@ -219,7 +233,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   def scanDesfilsDuformulairePourDeterminerLeType(branche: ArrayBuffer[WidgetDeBase]): String = {
     var typeDeFormulaire = cstHorizontalForm
     val ar1 = ArrayBuffer[(Int, Int)]()
-    // on récupère les widgets du container (formulaire)
+    // on récupère les widgets du container (formulaire) eton met en talbe le numero de ligne et la position en douzieme
 
     branche.foreach(widget => {
       val rowNumber = widget.rowNumber
@@ -260,12 +274,12 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           // on verifie que le widget suivant est un element de la liste des widgets formulaire
           val l1 = List(branche(i + 1).controlTypeID).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm)
           val l2 = List(branche(i + 1).componentName).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm)
-          if ((l1.size > 0 || l2.size > 0)  ) { // && (branche(i).rowNumber == branche(i + 1).rowNumber)
+          if ((l1.size > 0 || l2.size > 0)) { // && (branche(i).rowNumber == branche(i + 1).rowNumber)
             //   val controlIdPere= if (widgetPere != null) widgetPere.customId else ""
             val composant_associe = branche(i + 1)
             branche(i).labelFor = if (composant_associe.isAComponent) branche(i + 1).componentName else branche(i + 1).controlTypeID.split("::").last.toLowerCase()
             branche(i).labelForWidget = branche(i + 1) // widget référencé par le label
-            branche(i+1).labelForReferenceur=branche(i)
+            branche(i + 1).labelForReferenceur = branche(i)
           }
         }
       }
@@ -311,11 +325,11 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           branche(ind).rowNumber = rowNumber // n° de ligne dans la table
           branche(ind).tailleCellulePere = tailleCelluleEnDouzieme
           val reste = (branche(ind).xRelative % tailleCelluleEnDouzieme)
-          if (reste > demitailleCelluleEnDouzieme) {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1}
-          else {branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme)}
-           if (branche(ind).positionEnDouzieme >= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) {branche(ind).positionEnDouzieme = (CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns-1)}
-           
-           logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
+          if (reste > demitailleCelluleEnDouzieme) { branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) + 1 }
+          else { branche(ind).positionEnDouzieme = (branche(ind).xRelative / tailleCelluleEnDouzieme) }
+          if (branche(ind).positionEnDouzieme >= CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) { branche(ind).positionEnDouzieme = (CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns - 1) }
+
+          logBack.debug(utilitaire.getContenuMessage("mes35"), branche(ind).positionEnDouzieme, branche(ind).controlTypeID.toString)
           logBack.debug(utilitaire.getContenuMessage("mes36"), branche(ind).xRelative, tailleCelluleEnDouzieme)
           logBack.debug(utilitaire.getContenuMessage("mes37"), branche(ind).w)
         })
