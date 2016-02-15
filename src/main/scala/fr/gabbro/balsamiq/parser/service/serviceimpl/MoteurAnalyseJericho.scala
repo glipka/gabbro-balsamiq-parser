@@ -24,7 +24,6 @@ import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.util.Properties
-
 import scala.annotation.migration
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.enumerationAsScalaIterator
@@ -41,11 +40,11 @@ import net.htmlparser.jericho.Element
 import net.htmlparser.jericho.OutputDocument
 import net.htmlparser.jericho.Source
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import scala.collection.mutable.ListBuffer
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
 
-  
   /**
    * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
    * <p>on recharge les clefs de traduction depuis ce fichier properties dans 2 hashTables :
@@ -61,6 +60,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     var ok = true
     tableDesClefsValeursDeTraduction.clear
     tableDesValeursClefsDeTraduction.clear
+
     var clefMaxi = 0;
     try {
       val props = new Properties();
@@ -118,7 +118,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     val ficPropertyLocal = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
 
     propsLocal.load(new InputStreamReader(new FileInputStream(ficPropertyLocal), cstUtf8));
-    val listeDesclefDusFichierDeProprietesNonLocalise = propsLocal.keys().toList
+    val listeDesclefDusFichierDeProprietesNonLocalise = propsLocal.keys().map(_.toString).toList.sortWith((x, y) => x < y)
 
     // pour chaque langue à traiter
     CommonObjectForMockupProcess.generationProperties.i18nLocales.foreach(country => {
@@ -126,20 +126,25 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       val propsPays = new java.util.Properties();
       val filePays = new File(ficPropertyPays)
       if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), cstUtf8)); }
-      val sbuf = new StringBuilder
+   //   val sbuf = new StringBuilder
       val propsPaysMap = propsPays.toMap[String, String] // on récupère les clefs du fichier properties du pays en cours
-
+      val listTemporaire = ListBuffer[String]()
       // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties de la langue en cours
       listeDesclefDusFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => { // pour chaque clef du fichier properties non localisé 
         if (propsPays.getProperty(clefnonlocalisee.toString) == null) { // la clef n'existe pas dans le fichier properties de la langue en cours
-          sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties non localisé
+       //   sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties non localisé
+          val s: String = s"$clefnonlocalisee=${propsLocal.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
+          listTemporaire += s
         } else {
-          sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties de la langue en cours
+          val s: String = s"$clefnonlocalisee=${propsPays.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
+          listTemporaire += s
+
+   //       sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties de la langue en cours
         }
       })
       // écriture du fichier properties de la langue en cours
       val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), cstUtf8)
-      filewriter.write(sbuf.toString())
+      filewriter.write( listTemporaire.sortWith((x,y)=>x<y).mkString("\r\n"))
       filewriter.close
     })
     true
@@ -340,7 +345,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param templateDirOut
    */
   def traductHtmlFile(sourceEcran: String): String = {
-    val source  = new Source(sourceEcran);
+    val source = new Source(sourceEcran);
     source.fullSequentialParse();
     val outputDocument = new OutputDocument(source);
     val childElements = source.getChildElements().toList

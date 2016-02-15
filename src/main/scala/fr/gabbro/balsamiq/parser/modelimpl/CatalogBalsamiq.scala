@@ -217,7 +217,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // le sous container est considéré comme un formulaire ?? 
       if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0)) {
         widget.typeDeFormulaire = typeDeFormulaire
-        if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget) }
+        if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = heritageTypeDeFormulaire(widget.tableau_des_fils, typeDeFormulaire) }
       }
 
     })
