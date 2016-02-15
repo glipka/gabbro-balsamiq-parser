@@ -44,12 +44,14 @@ import scala.collection.mutable.ListBuffer
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
-def printTableDesValeursClefs():Unit ={
+
+  def printTableDesValeursClefs(): Unit = {
     println("---------------------------------------------")
-    tableDesValeursClefsDeTraduction.foreach{
-      case ((valeur,ecran,usecase),clef) => println(s"usecase:$usecase  ecran:$ecran clef:$clef valeur:$valeur")
+
+    tableDesValeursClefsDeTraduction.keys.toList.sortWith { case (x, y) => x._2 < y._2 }.foreach {
+      case (valeur, ecran, usecase) => println(s"usecase:$usecase  ecran:$ecran   valeur:${valeur}")
+
     }
-    
   }
   /**
    * <p>Les clefs de traduction sont sauvegardées dans un fichier properties</p>
@@ -132,25 +134,25 @@ def printTableDesValeursClefs():Unit ={
       val propsPays = new java.util.Properties();
       val filePays = new File(ficPropertyPays)
       if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), cstUtf8)); }
-   //   val sbuf = new StringBuilder
+      //   val sbuf = new StringBuilder
       val propsPaysMap = propsPays.toMap[String, String] // on récupère les clefs du fichier properties du pays en cours
       val listTemporaire = ListBuffer[String]()
       // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties de la langue en cours
       listeDesclefDusFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => { // pour chaque clef du fichier properties non localisé 
         if (propsPays.getProperty(clefnonlocalisee.toString) == null) { // la clef n'existe pas dans le fichier properties de la langue en cours
-       //   sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties non localisé
+          //   sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties non localisé
           val s: String = s"$clefnonlocalisee=${propsLocal.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
           listTemporaire += s
         } else {
           val s: String = s"$clefnonlocalisee=${propsPays.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
           listTemporaire += s
 
-   //       sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties de la langue en cours
+          //       sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties de la langue en cours
         }
       })
       // écriture du fichier properties de la langue en cours
       val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), cstUtf8)
-      filewriter.write( listTemporaire.sortWith((x,y)=>x<y).mkString("\r\n"))
+      filewriter.write(listTemporaire.sortWith((x, y) => x < y).mkString("\r\n"))
       filewriter.close
     })
     true
@@ -259,7 +261,7 @@ def printTableDesValeursClefs():Unit ={
     if (valeurATraduire.length() > 0 && !valeurATraduire.forall(_.isDigit)) { //if1
       // valeur non déjà traduite pour le usecase et écran en cours. 
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
-       println(s"valeur non trouve $valeurATraduire  usecase!$CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement fichier:$CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement")
+        println(s"valeur non trouve $valeurATraduire  usecase:${CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement} fichier:${CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement}")
         val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
         // On en fait la traduction que si le tag n'est pas dans la liste des tags à bypasser.
         if (!table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.bypassProcessI18nTagHierachy).size > 0 })) {
