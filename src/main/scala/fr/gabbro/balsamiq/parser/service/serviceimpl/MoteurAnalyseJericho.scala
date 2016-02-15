@@ -90,7 +90,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
 
-      case ex: Exception =>
+      case ex: Exception => println("exception dans lecture clef" + ex.getMessage)
 
     }
     (ok, clefMaxi)
