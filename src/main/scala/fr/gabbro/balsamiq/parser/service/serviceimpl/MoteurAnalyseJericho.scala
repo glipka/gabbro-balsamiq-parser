@@ -84,7 +84,8 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         tableDesClefsValeursDeTraduction += (clef.toString -> valeur) // on enrichit la table des clefs valeurs
         tableDesValeursClefsDeTraduction += ((valeur, ecranReference, usecaseReference) -> clef.toString()) // on enrichit la table des valeurs clefs
         if (clefNumerique > clefMaxi) clefMaxi = clefNumerique // va servir pour generer les nouvelles clefs
-
+    println(s"valeur de la clef avant mise  en table : ${clef} clefNUmerique:${clefNumerique}, usecaseReference:${usecaseReference}, ecranReference:${ecranReference} " )
+    
       })
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
