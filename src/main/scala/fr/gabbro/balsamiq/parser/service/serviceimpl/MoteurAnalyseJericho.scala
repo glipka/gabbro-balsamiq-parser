@@ -92,7 +92,6 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
       case ex: Exception =>       logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName,ex.getMessage,"");
-
     }
     (ok, clefMaxi)
 
