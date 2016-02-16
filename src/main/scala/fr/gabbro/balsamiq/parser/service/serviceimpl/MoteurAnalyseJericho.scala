@@ -47,7 +47,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
   val logBack = LoggerFactory.getLogger(this.getClass());
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
   val traitementFormatageSourceJava = new TraitementFormatageSourceJava
-
+  var traitementI18NPossible = true
   def printTableDesValeursClefsx(): Unit = {
     println("---------------------------------------------")
 
@@ -80,39 +80,61 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       // on récupère l'ensemble des clefs
       val enuKeys = props.keys().toList
       enuKeys.foreach(clef => {
-        val valeur = props.getProperty(clef.toString()).trim // valeur à traduire
-        val clefNumerique = (clef.toString().split("\\.").last.toInt) // N° unique 
-        val usecaseReference = (clef.toString().split("\\.").head.toString) // 1ere element de la clef = usecase Name
-        val ecranReference = (clef.toString().split("\\.").tail.head.toString) // 2eme élément de la clef = nom de l'écran
-        tableDesClefsValeursDeTraduction += (clef.toString -> valeur) // on enrichit la table des clefs valeurs
-        tableDesValeursClefsDeTraduction += ((valeur, ecranReference, usecaseReference) -> clef.toString()) // on enrichit la table des valeurs clefs
-        if (clefNumerique > clefMaxi) clefMaxi = clefNumerique // va servir pour generer les nouvelles clefs
-     
+        if (!clef.toString.trim.startsWith("#")) { // commentaire ??
+          val valeur = props.getProperty(clef.toString()).trim // valeur à traduire
+          val (usecaseReference, ecranReference, clefNumerique) = extractInfoFromKey(clef.toString)
+          tableDesClefsValeursDeTraduction += (clef.toString -> valeur) // on enrichit la table des clefs valeurs
+          tableDesValeursClefsDeTraduction += ((valeur, ecranReference, usecaseReference) -> clef.toString()) // on enrichit la table des valeurs clefs
+          if (clefNumerique > clefMaxi) { clefMaxi = clefNumerique } // va servir pour generer les nouvelles clefs
+        }
       })
+
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
-      case ex: Exception =>       logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName,ex.getMessage,"");
+      case ex: Exception => {
+        logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
+        traitementI18NPossible = false
+      }
     }
     (ok, clefMaxi)
 
   }
   /**
+   * extraction des informations de la clef
+   * @return (useCaseReference,EcranReference,clefNumerique)
+   */
+  def extractInfoFromKey(clef: String): (String, String, Int) = {
+    val clefNumerique = (clef.toString().split("\\.").last.toInt) // N° unique 
+    val usecaseReference = (clef.toString().split("\\.").head.toString) // 1ere element de la clef = usecase Name
+    val ecranReference = (clef.toString().split("\\.").tail.head.toString) // 2eme élément de la clef = nom de l'écran
+    (usecaseReference, ecranReference, clefNumerique)
+
+  }
+  /**
    * <p> ecriture dans le fichier properties des libelles à traduire</p>
    * <p>On lit l'ensemble des clefs que l'on trie par ordre descendant</p>
-   * <p>on récupere la valeur de chaque clef</p>
+   * <p>on récupère la valeur de chaque clef</p>
    * <p>puis on écrit le tout dans un buffer.</p>
    */
   def sauvegardeDesClefsDeTraduction(): Unit = {
-    val keysSet = tableDesClefsValeursDeTraduction.keys.toList.sortWith((x, y) => x < y)
-    var fileWriter: java.io.FileWriter = null
-    val sbuf = new StringBuilder
-    keysSet.foreach(key => {
-      val value = tableDesClefsValeursDeTraduction.getOrElse(key, " ")
-      sbuf.append(key).append("=").append(value).append("\r\n");
-    })
-    val ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
-    utilitaire.ecrire_fichier(ficPropertyName, sbuf.toString())
-
+    if (traitementI18NPossible) {
+      val keysSet = tableDesClefsValeursDeTraduction.keys.toList.sortWith((x, y) => x < y)
+      var fileWriter: java.io.FileWriter = null
+      val sbuf = new StringBuilder
+      var ecranEnCoursDeTraitement = ""
+      keysSet.foreach(key => {
+        val (usecase, ecran, clefNumerique) = extractInfoFromKey(key.toString)
+        if (ecranEnCoursDeTraitement != ecran) {
+          ecranEnCoursDeTraitement = ecran
+          val mes = utilitaire.getContenuMessage("mes68")
+          sbuf.append(mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)).append("\r\n")
+        }
+        val value = tableDesClefsValeursDeTraduction.getOrElse(key, " ")
+        sbuf.append(key).append("=").append(value).append("\r\n");
+      })
+      val ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
+      utilitaire.ecrire_fichier(ficPropertyName, sbuf.toString())
+    }
   }
 
   /**
@@ -122,41 +144,54 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * <p>@return true or false</p>
    */
   def traitementDeltaDesFichiersDeTraductionDesDifferentsPays: Boolean = {
-    // fichier properties non loaclisé
-    val propsLocal = new Properties();
-    val ficPropertyLocal = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
+    try {
+      // fichier properties non loaclisé
+      val propsLocal = new Properties();
+      val ficPropertyLocal = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
 
-    propsLocal.load(new InputStreamReader(new FileInputStream(ficPropertyLocal), cstUtf8));
-    val listeDesclefDusFichierDeProprietesNonLocalise = propsLocal.keys().map(_.toString).toList.sortWith((x, y) => x < y)
+      propsLocal.load(new InputStreamReader(new FileInputStream(ficPropertyLocal), cstUtf8));
+      val listeDesclefDusFichierDeProprietesNonLocalise = propsLocal.keys().map(_.toString).toList.sortWith((x, y) => x < y)
 
-    // pour chaque langue à traiter
-    CommonObjectForMockupProcess.generationProperties.i18nLocales.foreach(country => {
-      val ficPropertyPays = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").head + "_" + country + "." + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").last
-      val propsPays = new java.util.Properties();
-      val filePays = new File(ficPropertyPays)
-      if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), cstUtf8)); }
-      //   val sbuf = new StringBuilder
-      val propsPaysMap = propsPays.toMap[String, String] // on récupère les clefs du fichier properties du pays en cours
-      val listTemporaire = ListBuffer[String]()
-      // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties de la langue en cours
-      listeDesclefDusFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => { // pour chaque clef du fichier properties non localisé 
-        if (propsPays.getProperty(clefnonlocalisee.toString) == null) { // la clef n'existe pas dans le fichier properties de la langue en cours
-          //   sbuf.append(clefnonlocalisee).append("=").append(propsLocal.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties non localisé
-          val s: String = s"$clefnonlocalisee=${propsLocal.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
-          listTemporaire += s
-        } else {
-          val s: String = s"$clefnonlocalisee=${propsPays.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
-          listTemporaire += s
-
-          //       sbuf.append(clefnonlocalisee).append("=").append(propsPays.getProperty(clefnonlocalisee.toString)).append("\r\n"); // on rajoute la valeur du fichier properties de la langue en cours
-        }
+      // pour chaque langue à traiter
+      CommonObjectForMockupProcess.generationProperties.i18nLocales.foreach(country => {
+        val ficPropertyPays = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").head + "_" + country + "." + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName.split("\\.").last
+        val propsPays = new java.util.Properties();
+        val filePays = new File(ficPropertyPays)
+        if (filePays.exists()) { propsPays.load(new InputStreamReader(new FileInputStream(ficPropertyPays), cstUtf8)); }
+        //   val sbuf = new StringBuilder
+        val propsPaysMap = propsPays.toMap[String, String] // on récupère les clefs du fichier properties du pays en cours
+        val listTemporaire = ListBuffer[String]()
+        var ecranEnCoursDeTraitement = ""
+        // on verifie que chaque clef du fichier properties non localisé existe dans le fichier properties de la langue en cours
+        listeDesclefDusFichierDeProprietesNonLocalise.foreach(clefnonlocalisee => { // pour chaque clef du fichier properties non localisé 
+          if (!clefnonlocalisee.trim.startsWith("#")) { // on ne traite pas les commentaires.
+            val (usecase, ecran, clefNumerique) = extractInfoFromKey(clefnonlocalisee.toString)
+            if (ecranEnCoursDeTraitement != ecran) {
+              ecranEnCoursDeTraitement = ecran
+              val mes = utilitaire.getContenuMessage("mes68")
+              val s = mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)
+              listTemporaire += s
+            }
+            if (propsPays.getProperty(clefnonlocalisee.toString) == null) { // la clef n'existe pas dans le fichier properties de la langue en cours
+              val s: String = s"$clefnonlocalisee=${propsLocal.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
+              listTemporaire += s
+            } else {
+              val s: String = s"$clefnonlocalisee=${propsPays.getProperty(clefnonlocalisee.toString)}"; // on rajoute la valeur du fichier properties non localisé
+              listTemporaire += s
+            }
+          }
+        })
+        // écriture du fichier properties de la langue en cours
+        val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), cstUtf8)
+        filewriter.write(listTemporaire.mkString("\r\n"))
+        filewriter.close
       })
-      // écriture du fichier properties de la langue en cours
-      val filewriter = new OutputStreamWriter(new FileOutputStream(ficPropertyPays), cstUtf8)
-      filewriter.write(listTemporaire.sortWith((x, y) => x < y).mkString("\r\n"))
-      filewriter.close
-    })
-    true
+      true
+    } catch {
+      case ex: Exception =>
+        logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
+        false
+    }
 
   }
 
@@ -262,7 +297,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     if (valeurATraduire.length() > 0 && !valeurATraduire.forall(_.isDigit)) { //if1
       // valeur non déjà traduite pour le usecase et écran en cours. 
       if (!tableDesValeursClefsDeTraduction.contains(valeurATraduire, CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)) {
-          val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
+        val table_hierachie = getHierarchie(element); // hiérarchie pour l'élément en cours
         // On en fait la traduction que si le tag n'est pas dans la liste des tags à bypasser.
         if (!table_hierachie.exists(element => { List(element.getStartTag.getName).intersect(CommonObjectForMockupProcess.generationProperties.bypassProcessI18nTagHierachy).size > 0 })) {
           counterClef += 1 // compteur unicité des clefs
@@ -332,8 +367,8 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param subDirectory
    * @param templateDirOut
    */
-  def traductHtmlFileASupprimer(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
-   
+  def traductHtmlFileASupprimerxx(fileName: String, subDirectory: String, templateDirOut: String): Unit = {
+
     var directoryName = templateDirOut
     val sourceHTML = utilitaire.getEmplacementFichierHtml(fileName, directoryName)
     val fileHTML = new File(sourceHTML)
@@ -355,13 +390,16 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
    * @param templateDirOut
    */
   def traductHtmlFile(sourceEcran: String): String = {
-   
-    val source = new Source(sourceEcran);
-    source.fullSequentialParse();
-    val outputDocument = new OutputDocument(source);
-    val childElements = source.getChildElements().toList
-    extractMessages(childElements, outputDocument); // on met à jour le fichier HTML
-    return outputDocument.toString()
+    if (traitementI18NPossible) {
+      val source = new Source(sourceEcran);
+      source.fullSequentialParse();
+      val outputDocument = new OutputDocument(source);
+      val childElements = source.getChildElements().toList
+      extractMessages(childElements, outputDocument); // on met à jour le fichier HTML
+      return outputDocument.toString()
+    } else {
+      return sourceEcran
+    }
   }
 
 } // fin de la classe
