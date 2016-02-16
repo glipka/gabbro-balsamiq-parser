@@ -70,7 +70,8 @@ class DetectFragments(utilitaire: Utilitaire) {
           if (file.getName().endsWith(cstBalsamiqFileSuffix)) { // on ne traite que les fichiers bmml
             val (ficname, rep, usecaseDuSegment, fileNameComplet, isAfragment, fragmentName, generateContoller, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
             if (isAfragment && ecranContenantLeFragment.toLowerCase() == nomEcran.toLowerCase() && (CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement == usecaseDuSegment)) {
-              listeDesFragments.add(IBalsamiqFreeMarker.globalContext.createFragment(file.getName.split("\\.").head))
+              val widgetDuContainerDuFragment=IBalsamiqFreeMarker.globalContext.tableDesContainersDesFragments.getOrElse((usecaseDuSegment,ecranContenantLeFragment, fragmentName), null)
+              listeDesFragments.add(IBalsamiqFreeMarker.globalContext.createFragment(file.getName.split("\\.").head,widgetDuContainerDuFragment))
             }
           }
         }
