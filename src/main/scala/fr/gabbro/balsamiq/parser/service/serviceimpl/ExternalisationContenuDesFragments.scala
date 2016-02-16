@@ -31,13 +31,14 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import scala.collection.mutable.Map
 import fr.gabbro.balsamiq.parser.modelimpl.MockupContext
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogAPlat
+import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 
 /**
  * @author FRA9972467
  * cette classe sert à générer les fragments bmml depuis le contenu de certains containers dans le mockup principal de l'écran.
  * Les containers sont référencés dans le paramètre generateFragmentFromTheseContainers du fichier properties
  */
-class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, val catalogDesComposantsCommuns: CatalogDesComposants, val moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, val traitementBinding: TraitementBinding) extends TCatalogAPlat {
+class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, val catalogDesComposantsCommuns: CatalogDesComposants, val moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, val traitementBinding: TraitementBinding,globalContext:GlobalContext) extends TCatalogAPlat {
   final val repertoireContenuDesFragmentsGeneres = repertoireDesBmmlATraiter + "/" + cstGeneratedFragment
   var nombreDeFragmentsGeneres = 0
   /**
@@ -107,7 +108,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     } else {
       catalogBalsamiq.creation_catalog(catalogAPlat.catalog, w, h) // creation et enrichissement du catalogue balsamiq
       // la map mapDesSourcesDesFragmentsAGenerer  contient le code source des fragments à générer. 
-      recuperationCodeXmlContainersDeFragment(catalogBalsamiq.catalog, mapDesSourcesDesFragmentsAGenerer) // récuperation du contenu des fragements
+      recuperationCodeXmlContainersDeFragment(catalogBalsamiq.catalog, mapDesSourcesDesFragmentsAGenerer,fic, useCase) // récuperation du contenu des fragements
       generationDesfichiersFragmentDuMockupEnCours(mapDesSourcesDesFragmentsAGenerer, fic, useCase, w.toString, h.toString)
     }
     true
@@ -123,7 +124,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
    *
    */
   import scala.collection.mutable.Map
-  def recuperationCodeXmlContainersDeFragment(branche: ArrayBuffer[WidgetDeBase], mapDesSourcesDesFragmentsAGenerer: Map[(String, String), String]) {
+  def recuperationCodeXmlContainersDeFragment(branche: ArrayBuffer[WidgetDeBase], mapDesSourcesDesFragmentsAGenerer: Map[(String, String), String],fic:String,usecase:String) {
     var numero_En_cours = 0
 
     branche.foreach(controle => { // traitement de la branche en cours
@@ -144,10 +145,11 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
         nombreDeFragmentsGeneres += 1
         val idDuContainer = if (controle.customId != "") { controle.customId } else { typeDuFragment + nombreDeFragmentsGeneres } // id du container pour générer le nom du fragment. Si l'ID est à blanc=> type + numero de fichier genere
         val codeSourceXmlDuFragment = recuperationCodeDuFragment(controle.tableau_des_fils, controle.sourceXmldDeLelement) // on recupere le code xml du container ainsi que le xml des enfants du container
+        globalContext.tableDesContainersDesFragments += (usecase,fic,idDuContainer) -> controle  // on met en table le widget du container afin de récupérer ultérieurement ses attributs
         mapDesSourcesDesFragmentsAGenerer += (idDuContainer, typeDuFragment) -> codeSourceXmlDuFragment // on met dans un map le code source du fragement
       } else { // le widget n'est pas un container pour lequel on génère un fragment, on traite donc les fils du widget en cours.
         if (controle.tableau_des_fils.size > 0) {
-          recuperationCodeXmlContainersDeFragment(controle.tableau_des_fils, mapDesSourcesDesFragmentsAGenerer)
+          recuperationCodeXmlContainersDeFragment(controle.tableau_des_fils, mapDesSourcesDesFragmentsAGenerer,fic,usecase)
         }
 
       }

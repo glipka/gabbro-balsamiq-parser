@@ -113,7 +113,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       logBack.info(utilitaire.getContenuMessage("mes41"))
       // generation des fragments depuis les mockups principaux. l'instance de GlobalContext et traitementBinding est temporaire.
       if (CommonObjectForMockupProcess.generationProperties.processExtractFragments) { // on extrait les fragments du bmml principal ?
-        new ExternalisationContenuDesFragments(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir, catalogDesComposantsCommuns, moteurTemplateFreeMarker, new TraitementBinding(moteurTemplateFreeMarker, new GlobalContext)).process()   // extraction des fragments
+        val temporaryGloBalContext = new GlobalContext
+        new ExternalisationContenuDesFragments(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir, catalogDesComposantsCommuns, moteurTemplateFreeMarker, new TraitementBinding(moteurTemplateFreeMarker,temporaryGloBalContext),temporaryGloBalContext).process()   // extraction des fragments
+        // on récupère la table des containers des fragments
+        globalContext.tableDesContainersDesFragments=temporaryGloBalContext.tableDesContainersDesFragments
       }
       traitementDesFichiersDuRepertoireBalsamiq(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir) // traitement ensemble des fichiers
 

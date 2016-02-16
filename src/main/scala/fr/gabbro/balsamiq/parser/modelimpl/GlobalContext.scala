@@ -26,6 +26,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import scala.collection.JavaConversions._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurAnalyseJericho
+import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le menu par exemple.  
 //  
@@ -39,7 +40,7 @@ class NomDesFichiersJavascript(@BeanProperty var path: String, @BeanProperty var
 class ItemVar(@BeanProperty var content: String, @BeanProperty var shortPath: String)
 class GlobalContext() {
   val utilitaire = new Utilitaire
-  var moteurJericho:MoteurAnalyseJericho=null
+  var moteurJericho: MoteurAnalyseJericho = null
   var globalSourceMenu = new StringBuilder() // va contenir le code HTML du menu
   var moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker = _
   // modif le 22/4/15 par gl Itemsvars est une Map dont la clef est le usecase,ecran principla, fragmentName, identifiabt unique et la valeur itemsVar
@@ -47,6 +48,7 @@ class GlobalContext() {
   var itemsVars = Map[(String, String, String, String), ItemVar]() // pour stocker les itemsvar
   @BeanProperty var firstLevelObject = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les classes du DTO dans le contrôleur  
   @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String, String, String), String]() // table des classes : clef de la map: (useCaseName, nomduMockup,nom du sous package,nom de la classe),code de la classe
+  @BeanProperty var tableDesContainersDesFragments = Map[(String, String, String), WidgetDeBase]() // table  : clef de la map: (useCaseName, nomduMockup,nom du fragment),widget du container
 
   // modif le 22/4/15 par georges 
   // bindedForms est une Map dont la clef est le useCase, l'ecran principal et le nom du fragment ainsi qu'un identifiant unique
@@ -477,13 +479,17 @@ class GlobalContext() {
    * @param bookmark
    * @return Fragment
    */
-  def createFragment(bookmark: String): Fragment = {
+  def createFragment(bookmark: String, widgetDuContainer: WidgetDeBase): Fragment = {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     if (isAfragment) {
       val location = retrieveLocation(bookmark)
-      val fragment1 = new Fragment(fragmentName, bookmark, useCaseName, location, typeDeFragment)
+      val fragment1 = new Fragment(fragmentName, bookmark, useCaseName, location, typeDeFragment, widgetDuContainer)
       fragment1
     } else { null }
+  }
+  def createFragment(bookmark: String): Fragment = {
+    createFragment(bookmark, null)
+
   }
 
   def printBindedForms(): Unit = {
