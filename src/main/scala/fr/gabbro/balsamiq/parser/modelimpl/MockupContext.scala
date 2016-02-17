@@ -30,7 +30,13 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 // location: location
 // typeOfFragment: panel, popup, ...
 // -----------------------------------------------
-class Fragment(@BeanProperty var fragmentName: String, @BeanProperty var ficName: String, @BeanProperty var ucName: String, @BeanProperty var location: Location, @BeanProperty var typeOfFragment: String,@BeanProperty var widgetDuContainer: WidgetDeBase=null) {
+class Fragment(
+    @BeanProperty var fragmentName: String,
+    @BeanProperty var ficName: String,
+    @BeanProperty var ucName: String, 
+    @BeanProperty var location: Location, 
+    @BeanProperty var typeOfFragment: String,
+    @BeanProperty var widgetOfContainer: WidgetDeBase=null) {
 }
 // ----------------------------------------------
 // classname: nom de la classe 
