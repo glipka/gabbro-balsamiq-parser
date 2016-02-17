@@ -483,7 +483,7 @@ class GlobalContext() {
     var (filename, useCaseName, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(bookmark)
     if (isAfragment) {
       val location = retrieveLocation(bookmark)
-      val fragment1 = new Fragment(fragmentName, bookmark, useCaseName, location, typeDeFragment, widgetDuContainer)
+      val fragment1 = new Fragment(fragmentName, bookmark, useCaseName, location, typeDeFragment.toUpperCase(), widgetDuContainer)
       fragment1
     } else { null }
   }
