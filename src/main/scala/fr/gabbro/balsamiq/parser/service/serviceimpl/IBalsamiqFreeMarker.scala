@@ -81,10 +81,10 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     } else {
       moteurTemplateFreeMarker = new MoteurTemplatingFreeMarker(CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir, CommonObjectForMockupProcess.generationProperties.srcWebFilesDir, CommonObjectForMockupProcess.generationProperties.srcDtoFilesFullPath, globalContext)
       globalContext.moteurTemplatingFreeMarker = moteurTemplateFreeMarker
-   
+
       if (moteurTemplateFreeMarker.init()) { // init du moteur et chargement des templates
         moteurJericho = new MoteurAnalyseJericho(moteurTemplateFreeMarker, utilitaire) // les trad
-        globalContext.moteurJericho=moteurJericho
+        globalContext.moteurJericho = moteurJericho
         catalogDesComposantsCommuns = new CatalogDesComposants // catalogue commun à l'ensemble des écrans
         true
       } else { false }
@@ -101,7 +101,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    * -------------------------------------------------------------------------------------------------------------------
    * process de l'ensemble des fichiers du repertoire balsamiq
    * on extrait d'abord les fragments des fichiers mockups principaux
-   * Execution des traitement globaux puis génération des fichiers javascript 
+   * Execution des traitement globaux puis génération des fichiers javascript
    * En fin de traitement de l'ensemble des fichiers, on sauvegarde les clefs de traduction dans un fichier commun
    * --------------------------------------------------------------------------------------------------------------------
    *
@@ -114,9 +114,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       // generation des fragments depuis les mockups principaux. l'instance de GlobalContext et traitementBinding est temporaire.
       if (CommonObjectForMockupProcess.generationProperties.processExtractFragments) { // on extrait les fragments du bmml principal ?
         val temporaryGloBalContext = new GlobalContext
-        new ExternalisationContenuDesFragments(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir, catalogDesComposantsCommuns, moteurTemplateFreeMarker, new TraitementBinding(moteurTemplateFreeMarker,temporaryGloBalContext),temporaryGloBalContext).process()   // extraction des fragments
+        new ExternalisationContenuDesFragments(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir, catalogDesComposantsCommuns, moteurTemplateFreeMarker, new TraitementBinding(moteurTemplateFreeMarker, temporaryGloBalContext), temporaryGloBalContext).process() // extraction des fragments
         // on récupère la table des containers des fragments
-        globalContext.tableDesContainersDesFragments=temporaryGloBalContext.tableDesContainersDesFragments
+        globalContext.tableDesContainersDesFragments = temporaryGloBalContext.tableDesContainersDesFragments
       }
       traitementDesFichiersDuRepertoireBalsamiq(CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir) // traitement ensemble des fichiers
 
@@ -127,10 +127,13 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       traitementLocalOuGlobalTemplate(CommonObjectForMockupProcess.generationProperties.globalExecutionTemplate3, CommonObjectForMockupProcess.generationProperties.globalExecutionFilePath3, traitementFormatageSourceJava)
       logBack.info(utilitaire.getContenuMessage("mes44"))
       globalContext.generation_fichiers_javascript // generation de l'ensemble des fichiers javascript
-      //globalContext.printBindedForms()
-      logBack.info(utilitaire.getContenuMessage("mes59"))
-      moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
-      moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
+      
+      // Génération des fihciers properties pour i18N  
+      if (CommonObjectForMockupProcess.generationProperties.processI18nInFiles == cstTrueString) {
+        logBack.info(utilitaire.getContenuMessage("mes59"))
+        moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
+        moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
+      }
       return true
     } else { false }
 
@@ -232,7 +235,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     CommonObjectForMockupProcess.ecranContenantLeSegment = if (ecranContenantLeFragment != "") ecranContenantLeFragment else CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement
     CommonObjectForMockupProcess.typeDuFragmentEnCoursDeTraitement = typeDeFragment
     // la détection des dépendances ne sert plus plus
-  //  new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances (donc des fragments)
+    //  new DetectDependencies(CommonObjectForMockupProcess.mockupContext).process() // mise en table des dépendances (donc des fragments)
     if (!isAfragment) { // si ce n'est pas un fragment => mise en table menu et recherche des fragments
       CommonObjectForMockupProcess.mockupContext.fragments ++= new DetectFragments(utilitaire).processEtMiseEntable() // mise en table des fragments
 

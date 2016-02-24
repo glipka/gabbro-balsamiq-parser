@@ -127,7 +127,8 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
         if (ecranEnCoursDeTraitement != ecran) {
           ecranEnCoursDeTraitement = ecran
           val mes = utilitaire.getContenuMessage("mes68")
-          sbuf.append(mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)).append("\r\n")
+          // message de contenant le com de l'ecran en cours 
+          if (mes.indexOf("#") >=0) {sbuf.append(mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)).append("\r\n")}
         }
         val value = tableDesClefsValeursDeTraduction.getOrElse(key, " ")
         sbuf.append(key).append("=").append(value).append("\r\n");

@@ -112,7 +112,18 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       val containerIsAformulaire = if (container != null && container.isFormulaireHTML) { true } else { false }
       if ((List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0) &&
         (!containerIsAformulaire) && // un formulaire ne peut être inclus dans un autre formulaire    
-        (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))) {
+        // modif le 24 fevrrier 2016 : le formulaire peut contenir des sous sections 
+        (
+            (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils))
+      //      (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
+          ||
+          // tous les fils doivent être des objets de type formulaire et chaque" objet de type formulaire doit contenir des objets de type widgetFormulaire
+          (widget.tableau_des_fils.forall(widgetFils => {
+            ((CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName())))
+              // chaque sous container doit contenir au moins un widget de type widgetFormulaire      
+              && (widgetFils.tableau_des_fils.exists(widgetPetitFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetPetitFils.getWidgetNameOrComponentName())))))
+
+          })))) {
         widget.isFormulaireHTML = true
         var actionDuFormulaire = ListBuffer[String]()
         widget.tableau_des_fils.foreach(widgetFils => {
@@ -194,23 +205,55 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
    * @return ArrayBuffer[WidgetDeBase]
    */
   def determinationTypeDeFormulaire(branche: ArrayBuffer[WidgetDeBase], widgetPere: WidgetDeBase): ArrayBuffer[WidgetDeBase] = {
+
     for (i <- 0 until branche.size) {
       // on ne traite que les widgets qui  sont des formulaires
       val widget = branche(i)
       if (widget.isFormulaireHTML) {
-        widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
-        // les sous containers du formualaire héritent du même type
+        // le type ne sera vérifié que si le conteneur contient des widgets de type formulaire
+        if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils)) {
+          widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
+        } else {
+          // le container ne contient pas des widgets de type formulaire 
+          // le type sera déterminé par le type de 1er sous container  
+          // on traite chque fils du container 
+          val typeDeFormulaireDesSousContainers = ArrayBuffer[String]()
+          // pour chaque fils on détermine si ses petits fils sont des objets de type formulaire et si oui on recupere le type de sous formulaire
+          // on se met ce type dans une table en supprimant les doublons.
+          widget.tableau_des_fils.foreach(widgetFils => {
+            if (leConteneurContientDesWidgetsDeTypeFormulaire(widgetFils.tableau_des_fils)) {
+              typeDeFormulaireDesSousContainers += scanDesfilsDuformulairePourDeterminerLeType(widgetFils.tableau_des_fils)
+            }
+          })
+          // s'il y a plus d'un type on considere que c'est une basic form, sinon on récupère le type de formulaire des sus containers 
+          widget.typeDeFormulaire = if (typeDeFormulaireDesSousContainers.toList.distinct.size != 1) { cstBasicForm } else { typeDeFormulaireDesSousContainers.distinct.head }
+
+        }
+        // les sous containers du formualaire héritent du même type (ludovic a beson du type dans ses templates).
         if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = heritageTypeDeFormulaire(widget.tableau_des_fils, widget.typeDeFormulaire) }
 
       } else {
-        // traitement itératif des fils,pour les widges qui ne sont pas des formulaires
+        // traitement itératif des fils,pour les widgets qui ne sont pas des formulaires
         if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = determinationTypeDeFormulaire(widget.tableau_des_fils, widget) }
       }
 
-    } // fin du for
+    } // fin du for//
     branche
 
   }
+  //
+  // Le container contient il des widgets de type formulaire ? 
+  //
+  def leConteneurContientDesWidgetsDeTypeFormulaire(branche: ArrayBuffer[WidgetDeBase]): Boolean = {
+    branche.exists(widget => {
+      // le sous container est considéré comme un formulaire ?? (doit contenir des widgets de type input,radio, ...) 
+      List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm).size > 0
+  //    (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
+ 
+    })
+
+  }
+
   // le container est inclus dans un container de type formuaire => il herite du type de formulaire. 
   def heritageTypeDeFormulaire(branche: ArrayBuffer[WidgetDeBase], typeDeFormulaire: String): ArrayBuffer[WidgetDeBase] = {
     branche.foreach(widget => {
@@ -224,11 +267,10 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     branche
   }
   // le container en cours est de type formulaire 
-  // tous les widgets sont sur une même ligne => type =0 
   // types de formulaire :
-  //    inlineFform 
+  //    inlineFform  // tout sur une seule ligne 
   //    basicForm 
-  //    horizontalForm 
+  //    horizontalForm  // une ligne par element de formualire 
   // 
   def scanDesfilsDuformulairePourDeterminerLeType(branche: ArrayBuffer[WidgetDeBase]): String = {
     var typeDeFormulaire = cstHorizontalForm
@@ -244,9 +286,9 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     })
     val maxRowNumber = ar1.filter { case (rowNumber, positionEnDouzieme) => rowNumber > 0 }.size
     // inline-form 
-    if (maxRowNumber == 0) { typeDeFormulaire = cstInlineForm }
+    if (maxRowNumber == 0) { typeDeFormulaire = cstInlineForm } // tout est sur une seule ligne
     else {
-      val ar2 = ar1.groupBy {
+      val ar2 = ar1.groupBy { // on regroupe les elements par ligne
         case (rowNumber, positionEnDouzieme) => {
           rowNumber
         }
@@ -426,7 +468,6 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       val controleEnrichi = controle.tableau_des_fils.map(fils => recopieDesFils(fils, catalogAPlat))
       controle.tableau_des_fils = controleEnrichi
     }
-
     controle
 
   }
