@@ -114,8 +114,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
         (!containerIsAformulaire) && // un formulaire ne peut être inclus dans un autre formulaire    
         // modif le 24 fevrrier 2016 : le formulaire peut contenir des sous sections 
         (
-            (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils))
-      //      (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
+          (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils))
+          //      (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
           ||
           // tous les fils doivent être des objets de type formulaire et chaque" objet de type formulaire doit contenir des objets de type widgetFormulaire
           (widget.tableau_des_fils.forall(widgetFils => {
@@ -211,9 +211,12 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       val widget = branche(i)
       if (widget.isFormulaireHTML) {
         // le type ne sera vérifié que si le conteneur contient des widgets de type formulaire
-        if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils)) {
+        if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && !leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
           widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
-        } else {
+          // si le conteneur contient des sous conteneurs avec des widgets de type formulaire => type horizontal form par defaut
+        } else if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
+          widget.typeDeFormulaire = cstHorizontalForm
+        } else { // il n'y a que des containers  
           // le container ne contient pas des widgets de type formulaire 
           // le type sera déterminé par le type de 1er sous container  
           // on traite chque fils du container 
@@ -248,8 +251,18 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
     branche.exists(widget => {
       // le sous container est considéré comme un formulaire ?? (doit contenir des widgets de type input,radio, ...) 
       List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm).size > 0
-  //    (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
- 
+      //    (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
+
+    })
+
+  }
+
+  def leConteneurContientDesSousConteneurs(branche: ArrayBuffer[WidgetDeBase]): Boolean = {
+    branche.exists(widget => {
+      // le sous container est considéré comme un formulaire ?? (doit contenir des widgets de type input,radio, ...) 
+      List(widget.getWidgetNameOrComponentName()).intersect(CommonObjectForMockupProcess.templatingProperties.widgetsConsideredAsAForm).size > 0
+      //    (widget.tableau_des_fils.exists(widgetFils => CommonObjectForMockupProcess.engineProperties.widgetsEnablingContainerAsAForm.exists(x => (x == widgetFils.getWidgetNameOrComponentName()))))
+
     })
 
   }
@@ -269,8 +282,8 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
   // le container en cours est de type formulaire 
   // types de formulaire :
   //    inlineFform  // tout sur une seule ligne 
-  //    basicForm 
-  //    horizontalForm  // une ligne par element de formualire 
+  //    basicForm  // un element par ligne
+  //    horizontalForm  // couple elements par ligne 
   // 
   def scanDesfilsDuformulairePourDeterminerLeType(branche: ArrayBuffer[WidgetDeBase]): String = {
     var typeDeFormulaire = cstHorizontalForm
