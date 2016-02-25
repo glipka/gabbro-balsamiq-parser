@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat
 import java.sql.Timestamp
 import java.util.Date
 import org.apache.commons.io.FileUtils
+import scala.collection.convert.wrapAsJava
 class Utilitaire {
   val logBack = LoggerFactory.getLogger(this.getClass());
   val propsMessages = new Properties();
@@ -783,6 +784,9 @@ class Utilitaire {
 
   }
 
+def wrap[A](ar1:List[A]) : java.util.List[A]  ={
+  wrapAsJava.seqAsJavaList (ar1)
+}
   /**
    * <p>impression de la trace depuis freeMarket</p>
    * @param trace to print
