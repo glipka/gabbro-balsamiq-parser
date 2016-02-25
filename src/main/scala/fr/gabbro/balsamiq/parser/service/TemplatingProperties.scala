@@ -1,6 +1,9 @@
 package fr.gabbro.balsamiq.parser.service
 
 import scala.beans.BeanProperty
+//import scala.collection.JavaConversions._
+import scala.collection.convert.wrapAsJava
+import scala.collection.JavaConversions._
 // Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
@@ -38,7 +41,7 @@ class TemplatingProperties {
   @BeanProperty var separator_template_file = "_" // separateur dans le nom du fichier template
   @BeanProperty var suffix_template_code = "" // suffix des templates code
   @BeanProperty var suffix_template_javascript = "" // suffix des templates javascript
-  @BeanProperty var widgetsConsideredAsAForm = List[String]() // liste des widgets composants d'un formulaire
+  @BeanProperty var widgetsConsideredAsAForm:java.util.List[String] = new  java.util.ArrayList[String]() // liste des widgets composants d'un formulaire
   @BeanProperty var widgetsListProcessedLocally = List[String]() // liste des composants à traiter localement (chaque widget est traité cas par cas)
   @BeanProperty var preserveCodeIhm = ""
   @BeanProperty var preserveCodeScript = ""
@@ -53,7 +56,7 @@ class TemplatingProperties {
     freemarkerAutoIncludeFile = propsMap.getOrElse("config.templating.freemarkerAutoIncludeFile", "")
     freemarkerAutoImportNamespace = propsMap.getOrElse("config.templating.freemarkerAutoImportNamespace", "")
     widgetsListProcessedLocally = propsMap.getOrElse("config.templating.widgetsListProcessedLocally", "test2").split(",").toList.map(_.trim)
-    widgetsConsideredAsAForm = propsMap.getOrElse("config.templating.widgetsConsideredAsAForm", "com.balsamiq.mockups::Canvas").split(",").toList.map(_.trim)
+    widgetsConsideredAsAForm = wrapAsJava.seqAsJavaList ( propsMap.getOrElse("config.templating.widgetsConsideredAsAForm", "com.balsamiq.mockups::Canvas").split(",").map(_.trim))
     // va servir pour les templates utilisant la position absolue et pour reprojeter les abcisses en fonction de l'écran cible
     customProperty1 = propsMap.getOrElse("config.templating.customProperty1", "")
     customProperty2 = propsMap.getOrElse("config.templating.customProperty2", "")
