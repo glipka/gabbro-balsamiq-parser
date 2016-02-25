@@ -83,6 +83,7 @@ class Constants {
   final val cstFichierJavaScriptNonformate = "FichierJavaScriptNonformate.js"
   final val cstFieldName = "fieldName"
   final val cstFieldType = "fieldType"
+  final val cstFirstWidgetOfContainer="firstWidgetOfContainer"
   final val cstFormularAction = "formularAction"
   final val cstFragment = "fragment"
   final val cstGenerateController = "generateController"
