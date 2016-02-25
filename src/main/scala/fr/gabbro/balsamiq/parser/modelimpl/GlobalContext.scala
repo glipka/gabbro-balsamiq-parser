@@ -27,6 +27,8 @@ import scala.collection.JavaConversions._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 import fr.gabbro.balsamiq.parser.service.serviceimpl.MoteurAnalyseJericho
 import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 // Zone commune freemarker enrichie par l'ensemble du traitements des maquettes
 //  va servir pour générer le menu par exemple.  
 //  
@@ -57,6 +59,26 @@ class GlobalContext() {
   var bindedForms = Map[(String, String, String, String), FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
+  val logBack = LoggerFactory.getLogger(this.getClass());
+  
+
+  /**
+ * @param bmml
+ * @param templateID
+ * @param componant
+ * @param mes1
+ * @param description
+ * @param gravity
+ */
+def addTraceToReport(bmml: String, templateID: String, componant: String, mes1: String, description: String, gravity: String): Unit = {
+    var mes = s"bmml ${bmml} composant ${componant} templateId ${templateID} ${mes1}  ${description} "
+    gravity match {
+      case "error" => logBack.error(mes)
+      case "debug" => logBack.debug(mes)
+      case _ => logBack.info(mes)
+    }
+
+  }
   /**
    * <p>methode appelée par freeMarker pour mettre en table le code source des block java ou scala.</p>
    * <p> les blocks java ou scala seront récupérés dans les différents templates </p>

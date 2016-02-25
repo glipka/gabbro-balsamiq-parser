@@ -210,12 +210,17 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // on ne traite que les widgets qui  sont des formulaires
       val widget = branche(i)
       if (widget.isFormulaireHTML) {
+      
         // le type ne sera vérifié que si le conteneur contient des widgets de type formulaire
         if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && !leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
           widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
+          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType1);
+          
           // si le conteneur contient des sous conteneurs avec des widgets de type formulaire => type horizontal form par defaut
         } else if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
           widget.typeDeFormulaire = cstHorizontalForm
+          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType2);
+   
         } else { // il n'y a que des containers  
           // le container ne contient pas des widgets de type formulaire 
           // le type sera déterminé par le type de 1er sous container  
@@ -228,9 +233,10 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
               typeDeFormulaireDesSousContainers += scanDesfilsDuformulairePourDeterminerLeType(widgetFils.tableau_des_fils)
             }
           })
-          // s'il y a plus d'un type on considere que c'est une basic form, sinon on récupère le type de formulaire des sus containers 
-          widget.typeDeFormulaire = if (typeDeFormulaireDesSousContainers.toList.distinct.size != 1) { cstBasicForm } else { typeDeFormulaireDesSousContainers.distinct.head }
-
+          // s'il y a plus d'un type on considere que c'est une horizontale form, sinon on récupère le type de formulaire des sus containers 
+          widget.typeDeFormulaire = if (typeDeFormulaireDesSousContainers.toList.distinct.size != 1) { cstHorizontalForm } else { typeDeFormulaireDesSousContainers.distinct.head }
+          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType3);
+   
         }
         // les sous containers du formualaire héritent du même type (ludovic a beson du type dans ses templates).
         if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = heritageTypeDeFormulaire(widget.tableau_des_fils, widget.typeDeFormulaire) }
