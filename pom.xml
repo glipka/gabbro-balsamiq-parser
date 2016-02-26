@@ -25,6 +25,9 @@
 		<shadeVersion>2.3</shadeVersion>
 		<springBootRelease>1.2.3.RELEASE</springBootRelease>
 		<sqliteJdbc>3.8.11.1</sqliteJdbc>
+		<birtVersion>4.4.2</birtVersion>
+		<dynamicReports>1.3.0</dynamicReports>
+
 
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -119,17 +122,29 @@
 			<artifactId>json</artifactId>
 			<version>20140107</version>
 		</dependency>
-		 <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.4.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <version>1.1</version>
-        </dependency>
-        
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+			<version>1.1</version>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>net.sourceforge.dynamicreports</groupId>
+			<artifactId>dynamicreports</artifactId>
+			<version>${dynamicReports}</version>
+		</dependency>-->
+		<dependency>
+			<groupId>net.sourceforge.dynamicreports</groupId>
+			<artifactId>dynamicreports-core</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+
+
 
 
 	</dependencies>

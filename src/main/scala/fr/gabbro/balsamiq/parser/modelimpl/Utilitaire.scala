@@ -470,6 +470,26 @@ class Utilitaire {
     }
   }
   /**
+   * Recup contenu message erreur
+   * @param mesId
+   * @return content of message
+   */
+  def getContenuMessage(mesId: String, params: String*): String = {
+    var mes = ""
+    try {
+      mes = propsMessages.getProperty(mesId);
+      if (mes != null) {
+        params.foreach(param => {
+          mes = mes.replaceFirst("{}", param.trim)
+        })
+      }
+      return mes
+    } catch {
+      case ex: Exception => return mes
+
+    }
+  }
+  /**
    * <p>*** attention le nom du fichier ne doit pas contenir le nom du répertoire ***</p>
    * <p>Détermination si le widget est un fragment</p>
    * <p>récupération du nom du fragment avec son type</p>
@@ -639,7 +659,7 @@ class Utilitaire {
    * @param buffer : buffer à écrire
    * @return true or false
    */
-   def fileWrite(filename: String, buffer: String, traitemementFormatage: Boolean = true): Boolean = {
+  def fileWrite(filename: String, buffer: String, traitemementFormatage: Boolean = true): Boolean = {
     var bufferFormate = buffer
     if (traitemementFormatage) {
       val traitementFormatageSourceJava = new TraitementFormatageSourceJava()
@@ -784,9 +804,9 @@ class Utilitaire {
 
   }
 
-def wrap[A](ar1:List[A]) : java.util.List[A]  ={
-  wrapAsJava.seqAsJavaList (ar1)
-}
+  def wrap[A](ar1: List[A]): java.util.List[A] = {
+    wrapAsJava.seqAsJavaList(ar1)
+  }
   /**
    * <p>impression de la trace depuis freeMarket</p>
    * @param trace to print

@@ -60,23 +60,25 @@ class GlobalContext() {
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
   val logBack = LoggerFactory.getLogger(this.getClass());
-  
+  val gblTableTrace = ArrayBuffer[(String, String, String, String, String, String)]() // (bmml,templateID,componant,mes1,description,gravity)
 
   /**
- * @param bmml
- * @param templateID
- * @param componant
- * @param mes1
- * @param description
- * @param gravity
- */
-def addTraceToReport(bmml: String, templateID: String, componant: String, mes1: String, description: String, gravity: String): Unit = {
+   * @param bmml
+   * @param templateID
+   * @param componant
+   * @param mes1
+   * @param description
+   * @param gravity
+   */
+  def addTraceToReport(bmml: String, templateID: String, componant: String, mes1: String, description: String, gravity: String): Unit = {
     var mes = s"bmml ${bmml} composant ${componant} templateId ${templateID} ${mes1}  ${description} "
-    gravity match {
-      case "error" => logBack.error(mes)
-      case "debug" => logBack.debug(mes)
-      case _ => logBack.info(mes)
-    }
+    val trace = (bmml, templateID, componant, mes1, description, gravity)
+    gblTableTrace += trace
+   // gravity match {
+   //   case "error" => logBack.error(mes)
+   //   case "debug" => logBack.debug(mes)
+   //   case _ => logBack.info(mes)
+   // }
 
   }
   /**

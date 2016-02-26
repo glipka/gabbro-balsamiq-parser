@@ -109,7 +109,7 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
         var widgetPrecedent: WidgetDeBase = null
         // on balaie l'ensemble des widgets et on sélectionne les widgets dont la position début est incluse dans la position début et fin de la colonne
         brancheFiltreeParPositionWidget.foreach(widget => {
-          // on ne s'occupe que des abscisses, il faut donc faire attention que les widgets soient bien alignés dans le container 
+          // on ne s'occupe que des abscisses, il faut donc que les widgets soient bien alignés dans le container 
           // pour chaque colonne on balaie systématiquement l'ensemble des widgets du container. 
           if (widget.xRelative >= colonne.beginningPositionRelativeToContainer && widget.xRelative < colonne.endPositionRelativeToContainer) {
             // generation du template widget début
@@ -242,7 +242,10 @@ class ModuleGenerationCode(moteurTemplateFreeMarker: MoteurTemplatingFreeMarker)
       if (brancheFiltreeParLigne.size > 0) { // il y a des colonnes à traiter ? si non arrêt du traitement de la branche en cours. 
 
         // ------------------------------------------------------------------------------------------
+        // firstWidgetOFContainer sert dans les templates row pour déterminer si le 1er Element du container est ou pas 
+        // un sous container. 
         // __________________________________________________________________________________________
+        
 
         val firstWidgetOFContainer=brancheFiltreeParLigne.sortWith((x,y)=>x.positionEnDouzieme < y.positionEnDouzieme).head // on prendre le 1er elemeent
         val (ret1, source1, sourceJavaScript1, codeEcran1) = if ((container != null) && (container.isFormulaireHTML)) { moteurTemplateFreeMarker.generationDuTemplate(cstTemplateRow, CommonObjectForMockupProcess.templatingProperties.phase_debut, container, (cstContainerIsForm, cstTrueString), (cstContainerName, containerName), (cstContainer, container),(cstFirstWidgetOfContainer,firstWidgetOFContainer)) }

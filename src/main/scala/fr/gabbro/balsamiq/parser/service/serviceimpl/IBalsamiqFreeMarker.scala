@@ -133,7 +133,9 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
         logBack.info(utilitaire.getContenuMessage("mes59"))
         moteurJericho.sauvegardeDesClefsDeTraduction // ecriture dans fichier properties des clefs de traduction
         moteurJericho.traitementDeltaDesFichiersDeTraductionDesDifferentsPays; // mise à jours des fichiers properties internationalisés
-      }
+      } 
+      println("avant execution dynamic Report")
+      val dynamicReport = new DynamicReport(globalContext,utilitaire)
       return true
     } else { false }
 

@@ -129,7 +129,7 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
         widget.tableau_des_fils.foreach(widgetFils => {
           // on verifie si le widget est un bouton et on recupre le champ hrefs
           if (CommonObjectForMockupProcess.engineProperties.buttonWidgetsList.exists(bouton => (bouton == widgetFils.getWidgetNameOrComponentName()))) {
-            val hrefs = utilitaire.remplaceHexa(widgetFils.mapExtendedAttribut.getOrElse("href", "").toString())
+            val hrefs = utilitaire.remplaceHexa(widgetFils.mapExtendedAttribut.getOrElse(cstHref, "").toString())
             val action = hrefs.split(";").head.split("&").head
             if (action != "") actionDuFormulaire += action.toLowerCase()
           }

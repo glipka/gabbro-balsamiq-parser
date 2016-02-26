@@ -23,8 +23,8 @@ import scala.collection.JavaConversions._
 
 class TemplatingProperties {
   @BeanProperty var customProperty1 = "" // propriété custom1 
-  @BeanProperty var customProperty2 = "" // propriété custom1 
-  @BeanProperty var customProperty3 = "" // propriété custom1 
+  @BeanProperty var customProperty2 = "" // propriété custom2
+  @BeanProperty var customProperty3 = "" // propriété custom3
   @BeanProperty var freemarkerAutoImportFile = "" // auto import file
   @BeanProperty var freemarkerAutoImportNamespace = "" // auto import namespace
   @BeanProperty var freemarkerAutoIncludeFile = "" // auto include file
