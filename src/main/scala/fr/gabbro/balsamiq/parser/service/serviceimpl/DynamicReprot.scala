@@ -49,8 +49,8 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
       val condition2 = stl.conditionalStyle(cnd.equal(gravity, cstWarning)).setBackgroundColor(Color.orange);
       val plainStyle = stl.style().setFontName("FreeUniversal").setFontSize(6)
       val groupStyle = stl.style().setFontSize(12).bold()
-      val grpBmml = grp.group(bmml).startInNewPage();
-      grpBmml.setStyle(groupStyle)
+      val grpGravity = grp.group(gravity).startInNewPage();
+      grpGravity.setStyle(groupStyle)
 
       val rep1 =
         report()
@@ -61,7 +61,7 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
           .pageFooter(cmp.pageXofY().setStyle(boldCenteredStyle))
           .detailRowHighlighters(condition1, condition2)
           .setGroupTitleStyle(groupStyle)
-          .groupBy(grpBmml)
+          .groupBy(grpGravity)
           .setDataSource(createDataSource()) //set datasource
           .setPageFormat(1000, 400, PageOrientation.PORTRAIT)
 
@@ -80,7 +80,7 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
   def createDataSource(): JRDataSource = {
 
     val dataSource = new DRDataSource(cstBmml, cstTemplateId, cstComponent, cstMessage, cstDescription, cstGravity)
-    globalContext.gblTableTrace.distinct.foreach {
+    globalContext.gblTableTrace.distinct.sortWith((x,y)  => (x._6 < y._6)).foreach {
       case (bmml, templateID, componant, mes1, description, gravity) => dataSource.add(bmml, templateID, componant, mes1, description, gravity);
     }
 
