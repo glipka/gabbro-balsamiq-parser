@@ -80,6 +80,7 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
   def createDataSource(): JRDataSource = {
 
     val dataSource = new DRDataSource(cstBmml, cstTemplateId, cstComponent, cstMessage, cstDescription, cstGravity)
+    // on trie la table sur la gravité 
     globalContext.gblTableTrace.distinct.sortWith((x,y)  => (x._6 < y._6)).foreach {
       case (bmml, templateID, componant, mes1, description, gravity) => dataSource.add(bmml, templateID, componant, mes1, description, gravity);
     }

@@ -31,7 +31,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.ListHTML
 import fr.gabbro.balsamiq.parser.model.composantsetendus.MenuItem
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
 import fr.gabbro.balsamiq.parser.model.composantsetendus.RoundButton
-import fr.gabbro.balsamiq.parser.model.composantsetendus.BreadCrumbsOrButtonBarEnrichissementParametres
+import fr.gabbro.balsamiq.parser.model.BreadCrumbsOrButtonBarEnrichissementParametres
 import fr.gabbro.balsamiq.parser.model.composantsetendus.Datagrid
 import fr.gabbro.balsamiq.parser.model.composantsetendus.CheckBoxRadioButton
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._

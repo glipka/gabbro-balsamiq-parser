@@ -91,12 +91,13 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
 
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
+     
       case ex: Exception => {
         logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
         val mes = utilitaire.getContenuMessage("mes67", CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage)
         CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
 
-        traitementI18NPossible = false
+       // traitementI18NPossible = false
       }
     }
     (ok, clefMaxi)

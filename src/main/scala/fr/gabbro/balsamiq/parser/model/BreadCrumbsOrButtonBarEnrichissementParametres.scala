@@ -1,4 +1,4 @@
-package fr.gabbro.balsamiq.parser.model.composantsetendus
+package fr.gabbro.balsamiq.parser.model
 // Gabbro - scala program to manipulate balsamiq sketches files an generate code with FreeMarker
 // Version 1.0
 // Copyright (C) 2014 Georges Lipka
@@ -17,14 +17,13 @@ package fr.gabbro.balsamiq.parser.model.composantsetendus
 // See the individual licence texts for more details.
 
 import org.jdom2.Element
-import org.slf4j.LoggerFactory
-import org.slf4j.Logger
 import scala.beans.BeanProperty
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementBinding
-import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess
 import fr.gabbro.balsamiq.parser.modelimpl.CatalogDesComposants
 import fr.gabbro.balsamiq.parser.service.serviceimpl.IBalsamiqFreeMarker
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import fr.gabbro.balsamiq.parser.model.composantsetendus.Href
+import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 class Adresse(@BeanProperty var href: java.lang.String,
   @BeanProperty var libelle: java.lang.String, @BeanProperty var id: java.lang.String)
 
