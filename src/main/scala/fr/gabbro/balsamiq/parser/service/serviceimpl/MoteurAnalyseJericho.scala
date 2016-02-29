@@ -78,26 +78,30 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       val ficPropertyName = CommonObjectForMockupProcess.generationProperties.srcI18nFilesDir + System.getProperty("file.separator") + CommonObjectForMockupProcess.generationProperties.generatedi18nFileName
       props.load(new InputStreamReader(new FileInputStream(ficPropertyName), cstUtf8));
       // on récupère l'ensemble des clefs
-      val enuKeys = props.keys().toList
-      enuKeys.foreach(clef => {
-        if (!clef.toString.trim.startsWith("#")) { // commentaire ??
-          val valeur = props.getProperty(clef.toString()).trim // valeur à traduire
-          val (usecaseReference, ecranReference, clefNumerique) = extractInfoFromKey(clef.toString)
-          tableDesClefsValeursDeTraduction += (clef.toString -> valeur) // on enrichit la table des clefs valeurs
-          tableDesValeursClefsDeTraduction += ((valeur, ecranReference, usecaseReference) -> clef.toString()) // on enrichit la table des valeurs clefs
-          if (clefNumerique > clefMaxi) { clefMaxi = clefNumerique } // va servir pour generer les nouvelles clefs
-        }
-      })
+      if (props.keys != null) {
+        val enuKeys = props.keys().toList
+        enuKeys.foreach(clef => {
+          if (!clef.toString.trim.startsWith("#")) { // commentaire ??
+            val valeur = props.getProperty(clef.toString()).trim // valeur à traduire
+            val (usecaseReference, ecranReference, clefNumerique) = extractInfoFromKey(clef.toString)
+            tableDesClefsValeursDeTraduction += (clef.toString -> valeur) // on enrichit la table des clefs valeurs
+            tableDesValeursClefsDeTraduction += ((valeur, ecranReference, usecaseReference) -> clef.toString()) // on enrichit la table des valeurs clefs
+            if (clefNumerique > clefMaxi) { clefMaxi = clefNumerique } // va servir pour generer les nouvelles clefs
+          }
+        })
+      }
 
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
-     
+
       case ex: Exception => {
         logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
         val mes = utilitaire.getContenuMessage("mes67", CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage)
-        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        if (CommonObjectForMockupProcess.globalContext != null) {
+          CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        }
 
-       // traitementI18NPossible = false
+        // traitementI18NPossible = false
       }
     }
     (ok, clefMaxi)
