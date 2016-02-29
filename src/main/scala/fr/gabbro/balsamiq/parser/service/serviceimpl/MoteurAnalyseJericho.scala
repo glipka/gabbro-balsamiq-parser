@@ -43,6 +43,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 import scala.collection.mutable.ListBuffer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.FileNotFoundException
 class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, utilitaire: Utilitaire) extends TMoteurAnalyseJericho {
   val logBack = LoggerFactory.getLogger(this.getClass());
   var (ok, counterClef) = recuperationDesClefsDeTraduction()
@@ -93,8 +94,9 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
 
     } catch {
       // si le fichier des clefs n'existe pas, il sera créé
-
+      case ex:FileNotFoundException =>  
       case ex: Exception => {
+        traitementI18NPossible=false
         logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
         val mes = utilitaire.getContenuMessage("mes67", CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage)
         if (CommonObjectForMockupProcess.globalContext != null) {

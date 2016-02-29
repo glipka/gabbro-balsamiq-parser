@@ -350,6 +350,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
    */
   private def initProperties(): Boolean = {
     var ok = true
+    CommonObjectForMockupProcess.globalContext=globalContext   // pour éviter null pointer exception 
     logBack.info(utilitaire.getContenuMessage("mes58"))
 
     CommonObjectForMockupProcess.generationProperties.projectName = System.getProperty("gencodefrombalsamiq.projectName")
