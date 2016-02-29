@@ -85,6 +85,9 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     } catch {
       case ex: Exception =>
         logBack.error(utilitaire.getContenuMessage("mes11") + ex.getMessage())
+        val mes = ex.getMessage
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
         false
     }
     true
@@ -169,11 +172,15 @@ class MoteurTemplatingFreeMarker(val templateDirectory: String, val templateDirO
     } catch {
       case ex: IOException => {
         logBack.error(utilitaire.getContenuMessage("mes12"), ex.getMessage() + " " + ficPropertyName)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, ex.getMessage, "", cstError)
+
         ok = false;
         (false, null)
       }
       case ex: Exception => {
         logBack.error(utilitaire.getContenuMessage("mes12"), ex.getMessage() + " " + templateEncours)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, ex.getMessage, "", cstError)
+
         ok = false;
         (false, null)
       }

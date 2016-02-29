@@ -72,7 +72,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   @BeanProperty var positionDansLeConteneur: Int = 0 // position du widget dans le conteneur (sans tenir compte des n° de lignes et colonnes)
   @BeanProperty var labelFor = "";
   @BeanProperty var labelForWidget: WidgetDeBase = null;
-  @BeanProperty var labelForReferenceur: WidgetDeBase = null; 
+  @BeanProperty var labelForReferenceur: WidgetDeBase = null;
   @BeanProperty var customId: String = "" // id du composant
   @BeanProperty var iconNameList = new java.util.ArrayList[IconInWidget] // sera renseigné dans le traitement du catalogue si un widget de type icon est inclus dans le widget
   // largeur et hauteur du widget par rapport à la taille de la fenêtre 
@@ -102,7 +102,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
   var widgetDejaTraiteDansLaBranche = false // champ technique temporaire : sert dans la determination du nombre de colonnes
   //  var sizeEnDouzieme: Int = 0 // taille en douzieme pour bootstrap
   var positionEnDouzieme: Int = 0; // position du widget en douzieme
-  var largeurEnDouzieme:Int=0;  // largeur du composant en douzieme
+  var largeurEnDouzieme: Int = 0; // largeur du composant en douzieme
   var rowNumber: Int = 0 //  n° de ligne calculé : utilisé pour les row dans les tables
   var columnNumber: Int = 0 //  n° de colonne dans la ligne  : utilisé pour les row dans les tables
   @BeanProperty var mapExtendedAttribut = scala.collection.mutable.Map[String, Object]()
@@ -300,7 +300,13 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           this.xAbsolute = groupe_en_cours.xAbsolute + this.xAbsolute
           this.yAbsolute = groupe_en_cours.yAbsolute + this.yAbsolute
         }
-      } else { logBack.info("attention non concordance avec le groupe :" + this.isInGroup) }
+      } else {
+        logBack.info(cstAttention + this.isInGroup)
+        val mes = cstAttention + this.isInGroup
+        if (CommonObjectForMockupProcess.globalContext != null) {
+          CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        }
+      }
 
     }
   }

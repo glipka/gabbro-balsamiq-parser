@@ -26,6 +26,7 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.mutable.Map
 
 import fr.gabbro.balsamiq.parser.service.TTraitementCommun
+import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
 
 /**
  *
@@ -48,8 +49,8 @@ class TraitementPreserveSection extends TTraitementCommun {
   @BeanProperty var fichierPresent = false
   var preserveSectionBegin = ""
   var preserveSectionEnd = ""
- // val l1 = CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix
- // val m = CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
+  // val l1 = CommonObjectForMockupProcess.generationProperties.generatedOtherConfFilesSuffix
+  // val m = CommonObjectForMockupProcess.generationProperties.generatedFrontFilesSuffix
 
   /**
    * lecture du fichier pour extraire les preserve sections
@@ -84,7 +85,11 @@ class TraitementPreserveSection extends TTraitementCommun {
 
         case ex: Exception =>
           val exception = ex;
-          logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x"); return this
+          logBack.error(utilitaire.getContenuMessage("mes51"), filename, ex.getMessage, "x");
+          val mes = utilitaire.getContenuMessage("mes51", ex.getMessage)
+          CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
+          return this
 
       }
       fichierPresent = true
@@ -220,13 +225,13 @@ class TraitementPreserveSection extends TTraitementCommun {
     // source et la cible. 
 
     for (ind1 <- 0 until mapDesPreserveSectionDuFichierCible.size) {
-      val (modifApres,contenuApres,sceauApres) = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
-       if (!modifApres) { // enrgt pas encore modifie dans la passe précédente
+      val (modifApres, contenuApres, sceauApres) = mapDesPreserveSectionDuFichierCible.getOrElse(ind1, (false, "", ""))
+      if (!modifApres) { // enrgt pas encore modifie dans la passe précédente
         var finRecherche = false
         for (ind2 <- 0 until mapDesPreserveSectionDuFichierAvantEcriture.size) {
           if (!finRecherche) { //pas de break en scala
-            val (modifAvant,contenuAvant,sceauAvant) = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
-              // preserve pas déjà utilisé et même sceau avant et après
+            val (modifAvant, contenuAvant, sceauAvant) = mapDesPreserveSectionDuFichierAvantEcriture.getOrElse(ind2, (false, "", ""))
+            // preserve pas déjà utilisé et même sceau avant et après
             if (!modifAvant) {
               mapDesPreserveSectionDuFichierCible(ind1) = (true, contenuAvant, sceauAvant)
               mapDesPreserveSectionDuFichierAvantEcriture(ind2) = (true, contenuAvant, sceauAvant) // on met l'indicateur de traitement à true

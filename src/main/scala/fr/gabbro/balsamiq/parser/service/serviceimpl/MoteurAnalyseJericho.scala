@@ -93,6 +93,9 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
       // si le fichier des clefs n'existe pas, il sera créé
       case ex: Exception => {
         logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
+        val mes = utilitaire.getContenuMessage("mes67", CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
         traitementI18NPossible = false
       }
     }
@@ -128,7 +131,7 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
           ecranEnCoursDeTraitement = ecran
           val mes = utilitaire.getContenuMessage("mes68")
           // message de contenant le com de l'ecran en cours 
-          if (mes.indexOf("#") >=0) {sbuf.append(mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)).append("\r\n")}
+          if (mes.indexOf("#") >= 0) { sbuf.append(mes.substring(mes.indexOf("#")).replace("%1", usecase).replace("%2", ecran)).append("\r\n") }
         }
         val value = tableDesClefsValeursDeTraduction.getOrElse(key, " ")
         sbuf.append(key).append("=").append(value).append("\r\n");
@@ -191,6 +194,9 @@ class MoteurAnalyseJericho(moteurTemplatingFreeMarker: MoteurTemplatingFreeMarke
     } catch {
       case ex: Exception =>
         logBack.error(utilitaire.getContenuMessage("mes67"), CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage, "");
+        val mes = utilitaire.getContenuMessage("mes67", CommonObjectForMockupProcess.generationProperties.generatedi18nFileName, ex.getMessage)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
         false
     }
 

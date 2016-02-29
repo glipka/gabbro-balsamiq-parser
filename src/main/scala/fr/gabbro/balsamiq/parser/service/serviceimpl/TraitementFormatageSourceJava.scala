@@ -67,7 +67,9 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
     } catch {
       case ex: Exception =>
-        logBack.error(utilitaire.getContenuMessage("mes8"),ex.getMessage)
+        val mes = utilitaire.getContenuMessage("mes8", ex.getMessage)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        logBack.error(utilitaire.getContenuMessage("mes8"), ex.getMessage)
         return bufferAformater
     }
 
@@ -88,12 +90,14 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
     val cmd = CommonObjectForMockupProcess.generationProperties.formatJavaScriptCommand.replace("%1", fichierJavaScriptTemporaireNonformate).replace("%2", fichierJavaScriptTemporaireFormate)
     try {
       new ExecuteCommand().execute(cmd) // appel de la commande de formatage javascriot
-      val bufferFormate=utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate)
-      if ( bufferFormate == "") {return bufferAformater}
-      else { return utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate)}
+      val bufferFormate = utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate)
+      if (bufferFormate == "") { return bufferAformater }
+      else { return utilitaire.recupContentFile(fichierJavaScriptTemporaireFormate) }
     } catch {
       case ex: Exception =>
-        logBack.error(utilitaire.getContenuMessage("mes8"),ex.getMessage)
+        val mes = utilitaire.getContenuMessage("mes8", ex.getMessage)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        logBack.error(utilitaire.getContenuMessage("mes8"), ex.getMessage)
         return bufferAformater
     }
 
@@ -119,7 +123,9 @@ class TraitementFormatageSourceJava extends TTraitementCommun {
 
     } catch {
       case ex: Exception =>
-        logBack.error(utilitaire.getContenuMessage("mes34"),ex.getMessage)
+        val mes = utilitaire.getContenuMessage("mes34", ex.getMessage)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+        logBack.error(utilitaire.getContenuMessage("mes34"), ex.getMessage)
         return jsCode
     }
 

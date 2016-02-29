@@ -74,9 +74,9 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
       for (j <- i + 1 until branche.size) {
         branche(i).xAbsolute
         if (intersection(branche(i), branche(j))) {
-          val mes = utilitaire.getContenuMessage("mes25", branche(i).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString())
-          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", "", mes, "", cstWarning)
-          logBack.error(utilitaire.getContenuMessage("mes25"), branche(i).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString())
+          val mes = utilitaire.getContenuMessage("mes25", branche(i).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).getWidgetNameOrComponentName(), branche(j).xAbsolute.toString(), branche(j).yAbsolute.toString())
+          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
+          logBack.error(utilitaire.getContenuMessage("mes25"), branche(i).getWidgetNameOrComponentName(), branche(i).xAbsolute.toString(), branche(i).yAbsolute.toString(), branche(j).getWidgetNameOrComponentName(), branche(j).xAbsolute.toString(), branche(j).yAbsolute.toString())
         }
       }
       if (branche(i).tableau_des_fils.size > 0) { verification_intersection_entre_widgets_branche(branche(i).tableau_des_fils) }
@@ -118,14 +118,14 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
         // id formulaire renseigné ? 
         if (controle.customId == "") {
           val mes = utilitaire.getContenuMessage("mes29", controle.controlTypeID.split("::").last)
-          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", "", mes, "", cstError)
+          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "",this.getClass.toString().split("\\.").last, mes, "", cstError)
           logBack.error(utilitaire.getContenuMessage("mes29"), controle.controlTypeID.split("::").last)
 
         } // plus de 1 formulaire avec le même Nom ? 
         else if (CommonObjectForMockupProcess.tableauDesIdsDesWidgets.filter(_ == controle.customId).size > 1) {
-          val mes = utilitaire.getContenuMessage("mes30", controle.controlTypeID.split("::").last)
-          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", "", mes, "", cstWarning)
-          logBack.warn(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last)
+          val mes = utilitaire.getContenuMessage("mes30", controle.controlTypeID.split("::").last,controle.customId)
+          globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+          logBack.error(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last,controle.customId,"xx")
         }
       }
       if (controle.tableau_des_fils.size > 0) { verification_binding_variable(controle.tableau_des_fils, controle) }

@@ -27,7 +27,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
 // WITHOUT WARRANTY OF ANY KIND, either express or implied.
 // See the individual licence texts for more details.
 
-class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBalsamiq {
+class CatalogBalsamiq(traitementBinding: TraitementBinding,trace:Boolean=false) extends TCatalogBalsamiq {
   var global_max_width: Int = 0
   var global_max_heigth: Int = 0
   /**
@@ -210,17 +210,23 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
       // on ne traite que les widgets qui  sont des formulaires
       val widget = branche(i)
       if (widget.isFormulaireHTML) {
-      
+
         // le type ne sera vérifié que si le conteneur contient des widgets de type formulaire
         if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && !leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
           widget.typeDeFormulaire = scanDesfilsDuformulairePourDeterminerLeType(widget.tableau_des_fils)
-          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType1);
-          
+          logBack.info(utilitaire.getContenuMessage("mes69"), widget.customId, widget.typeDeFormulaire, cstContainerType1);
+
+          val mes = utilitaire.getContenuMessage("mes69", widget.customId, widget.typeDeFormulaire, cstContainerType1)
+          if (trace) {CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstInfo)}
+
           // si le conteneur contient des sous conteneurs avec des widgets de type formulaire => type horizontal form par defaut
         } else if (leConteneurContientDesWidgetsDeTypeFormulaire(widget.tableau_des_fils) && leConteneurContientDesSousConteneurs(widget.tableau_des_fils)) {
           widget.typeDeFormulaire = cstHorizontalForm
-          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType2);
-   
+          logBack.info(utilitaire.getContenuMessage("mes69"), widget.customId, widget.typeDeFormulaire, cstContainerType2);
+
+          val mes = utilitaire.getContenuMessage("mes69", widget.customId, widget.typeDeFormulaire, cstContainerType2)
+          if (trace) {CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstInfo)}
+
         } else { // il n'y a que des containers  
           // le container ne contient pas des widgets de type formulaire 
           // le type sera déterminé par le type de 1er sous container  
@@ -235,8 +241,10 @@ class CatalogBalsamiq(traitementBinding: TraitementBinding) extends TCatalogBals
           })
           // s'il y a plus d'un type on considere que c'est une horizontale form, sinon on récupère le type de formulaire des sus containers 
           widget.typeDeFormulaire = if (typeDeFormulaireDesSousContainers.toList.distinct.size != 1) { cstHorizontalForm } else { typeDeFormulaireDesSousContainers.distinct.head }
-          logBack.info(utilitaire.getContenuMessage("mes69"),widget.customId,widget.typeDeFormulaire,cstContainerType3);
-   
+          logBack.info(utilitaire.getContenuMessage("mes69"), widget.customId, widget.typeDeFormulaire, cstContainerType3);
+          val mes = utilitaire.getContenuMessage("mes69", widget.customId, widget.typeDeFormulaire, cstContainerType3)
+          if (trace) {CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstInfo)}
+
         }
         // les sous containers du formualaire héritent du même type (ludovic a beson du type dans ses templates).
         if (widget.tableau_des_fils.size > 0) { widget.tableau_des_fils = heritageTypeDeFormulaire(widget.tableau_des_fils, widget.typeDeFormulaire) }

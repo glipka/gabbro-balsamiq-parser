@@ -62,7 +62,12 @@ class UtilZip extends TTraitementCommun {
       zipInputStream.close
 
     } catch {
-      case ex: Exception => println(ex.getMessage)
+      case ex: Exception =>
+        println(ex.getMessage)
+        logBack.error(utilitaire.getContenuMessage("mes70"), ex.getMessage,archive,"x");
+        val mes = utilitaire.getContenuMessage("mes70", ex.getMessage,archive )
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
     }
 
     return fileList
@@ -75,16 +80,16 @@ class UtilZip extends TTraitementCommun {
    */
   def extractArchive(archive: String, destPath: String) {
     val buffer = new Array[Byte](2048);
-    val bufferSize=2048
+    val bufferSize = 2048
 
     var zipInputStream = new ZipInputStream(new FileInputStream(archive));
     var zipEntry = zipInputStream.getNextEntry();
     utilitaire.createRepostoriesIfNecessary(destPath)
     while (zipEntry != null) {
       if (zipEntry.getName().endsWith(cstBalsamiqFileSuffix)) { // on n'extrait que les fichiers bmml
-        val nameOfBmmlFile=zipEntry.getName().trim.replace(" ","_")
-        val fileoutputstream = new FileOutputStream(destPath + "/" +  nameOfBmmlFile);
-        logBack.info(utilitaire.getContenuMessage("mes66"),  nameOfBmmlFile, archive, "xxx");
+        val nameOfBmmlFile = zipEntry.getName().trim.replace(" ", "_")
+        val fileoutputstream = new FileOutputStream(destPath + "/" + nameOfBmmlFile);
+        logBack.info(utilitaire.getContenuMessage("mes66"), nameOfBmmlFile, archive, "xxx");
 
         var numberOfBytes = zipInputStream.read(buffer, 0, bufferSize)
         while (numberOfBytes > -1) {

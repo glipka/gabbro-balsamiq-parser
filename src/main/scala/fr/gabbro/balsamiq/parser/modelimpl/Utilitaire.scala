@@ -48,7 +48,12 @@ class Utilitaire {
   val ficPropertyName = if (System.getProperty("gencodefrombalsamiq.messagesFile") != null) System.getProperty("gencodefrombalsamiq.messagesFile") else "messages.properties" // appel direct du parametre car la classe utile est instanciée en début de programme  
   try { propsMessages.load(new FileInputStream(ficPropertyName)) }
   catch {
-    case ex: Exception => logBack.error("Messages File not found {}", ficPropertyName)
+    case ex: Exception =>
+      val mes = cstMessageFileNotFound + ficPropertyName
+      logBack.error(mes)
+      if (CommonObjectForMockupProcess.globalContext != null) {
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+      }
   }
 
   /**
@@ -478,9 +483,14 @@ class Utilitaire {
     var mes = ""
     try {
       mes = propsMessages.getProperty(mesId);
+      val pattern = "\\{\\}".r
       if (mes != null) {
         params.foreach(param => {
-          mes = mes.replaceFirst("{}", param.trim)
+          var position = mes.indexOf("{}")
+          if (position >= 0) {
+            mes = pattern replaceFirstIn (mes, param.trim)
+          }
+
         })
       }
       return mes
@@ -678,6 +688,9 @@ class Utilitaire {
     } catch {
       case ex: Exception =>
         logBack.error(getContenuMessage("mes49"), filename.toString, ex.getMessage().toString(), "x")
+        val mes = getContenuMessage("mes49", filename.toString, ex.getMessage().toString())
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
         false
     }
 
@@ -801,6 +814,10 @@ class Utilitaire {
     if (fragment != null) {
       return fragment.asInstanceOf[Fragment]
     } else { null }
+
+  }
+  def getClassName(className: String): String = {
+    className.split("\\.").last
 
   }
 

@@ -80,7 +80,12 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     val tableauDesColonnes = new java.util.ArrayList[ColumnDefinition]
     var largeurTotaleEnpourcentage = 0
     var largeurTotaleinDouzieme = 0
+    // si la largeur des colonnes n'est pas spécifiée => message erreur
 
+    if (CommonObjectForMockupProcess.globalContext != null && tableauDesColonnes.isEmpty()) {
+      val mes = utilitaire.getContenuMessage("mes71", this.customId)
+      CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
+    }
     // -----------------------------------------------------------------------------------
     // Name\r(job title) ^, Age ^v, Nickname, Employee v
     // on parcourt le tableau des noms des colonnes et pour chaque colonne on 
@@ -123,9 +128,19 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       }
 
       //on verifie que la largeur en % est numerique et que le total n'est pas > à 100%
-      if (!width.forall(_.isDigit)) { logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID) }
-      else { largeurTotaleEnpourcentage += width.toInt }
-      if (largeurTotaleEnpourcentage > 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
+      if (!width.forall(_.isDigit) || (width.forall(_.isDigit) && width.toInt == 0)) {
+        logBack.error(utilitaire.getContenuMessage("mes19"), this.controlTypeID)
+        val mes = utilitaire.getContenuMessage("mes19", this.customId)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
+
+      } else { largeurTotaleEnpourcentage += width.toInt }
+      if (largeurTotaleEnpourcentage > 100) {
+        logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID)
+        if (CommonObjectForMockupProcess.globalContext != null) {
+          val mes = utilitaire.getContenuMessage("mes20", this.customId)
+          CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
+        }
+      }
       // les positions départ et fin sont calculées à partir des pourcentages de la largeur des colonnes en rapport avec la largeur de la table en pixels.
       var positionDepart = positionEnCoursDeLaColonne
       var positionFin = positionDepart + (this.w.toInt * width.toInt) / 100 - 1
@@ -142,7 +157,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
       numeroColonneEnCours += 1
 
     })
-    if (largeurTotaleEnpourcentage != 100  ) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
+    if (largeurTotaleEnpourcentage != 100) { logBack.error(utilitaire.getContenuMessage("mes20"), this.controlTypeID) }
     (cstColumns, enrichissementDuTableau(tableauDesColonnes))
 
   } // fin de la methode  
@@ -156,7 +171,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     //    val x=  (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) % 100
     //   println("valeur de x = %s   widht %s".format(x,widthInPercentage))
     var tailleCelluleEnDouzieme = if (((widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns) % 100) < 50) { widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100 } else { (widthInPercentage * CommonObjectForMockupProcess.engineProperties.boostrapNumberOfColumns / 100) + 1 }
-    if (tailleCelluleEnDouzieme == 0)  {tailleCelluleEnDouzieme=1}
+    if (tailleCelluleEnDouzieme == 0) { tailleCelluleEnDouzieme = 1 }
     tailleCelluleEnDouzieme
   }
   /**
@@ -213,7 +228,8 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     tableauEnrichi
   }
 
-  /**0
+  /**
+   * 0
    * return type of widget and readOnly true or False
    * @param widgetFils : WidgetDeBase
    * @return (typeOfWidget,ReadOnly)

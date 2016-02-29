@@ -82,7 +82,10 @@ class CatalogDesComposants {
       mockup = doc.getRootElement();
     } catch {
       case e: Exception =>
-        logBack.info(utilitaire.getContenuMessage("mes61"), e.getMessage());
+        logBack.info(utilitaire.getContenuMessage("mes61"), e.getMessage(),fichierCatalogDesComposantsBootstrap,"x");
+        val mes = utilitaire.getContenuMessage("mes61", e.getMessage,fichierCatalogDesComposantsBootstrap)
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
         return (false, null)
     }
 
@@ -94,7 +97,7 @@ class CatalogDesComposants {
     logBack.info(utilitaire.getContenuMessage("mes4"), fichierCatalogDesComposantsBootstrap)
     return (true, catalog)
   }
-  
+
   /**
    * on ne met ici en table que les groupes qui seront réutilisés comme composants dans les maquettes
    * <p> --------------------------------------------------------------------<p>
@@ -133,14 +136,14 @@ class CatalogDesComposants {
   }
 
   /**
-  <p> * traitement d'un groupe</p>
-  <p> * On récupère les enfants du groupe.</p>
-  <p> * il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe</p>
-  <p> * on cumule les attributs étendus de chaque enfant du groupe</p>
-  <p> * attention aux attributs des enfants ayant le même nom.</p>
-  <p> * on met en table le controlId  de l'enfant et L'ID du widget du composant</p>
-    * @param elementXML : Element
-    * @param groupeEnCours : ComponentBalsamiq 
+   * <p> * traitement d'un groupe</p>
+   * <p> * On récupère les enfants du groupe.</p>
+   * <p> * il faudra prévoir un traitement spécifique si l'enfant est lui même un groupe</p>
+   * <p> * on cumule les attributs étendus de chaque enfant du groupe</p>
+   * <p> * attention aux attributs des enfants ayant le même nom.</p>
+   * <p> * on met en table le controlId  de l'enfant et L'ID du widget du composant</p>
+   * @param elementXML : Element
+   * @param groupeEnCours : ComponentBalsamiq
    * @return ComponentBalsamiq
    */
   private def traitementGroupeCatalogue(elementXML: Element, groupeEnCours: ComponentBalsamiq): ComponentBalsamiq = {
@@ -160,13 +163,13 @@ class CatalogDesComposants {
   }
 
   /**
-  <p> *  *** récupération des propriétés du contrôle en cours ***</p>
-  <p> * On fait une premire passe pour récupere dans une map l'ensemble des attributs (clef, valeur)</p>
-  <p> * Si l'attribut customId est présent, on modifie la clef de chaque attribut en concaténant le customId avec le nom de l'attribut (capitalized)</p>
-  <p> * modification 15 janvier : traitement de l'attribut markup d'un élément du composant</p>
-  <p> * si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup</p>
-  <p> * et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré par le moteur</p>
-  <p> *</p>
+   * <p> *  *** récupération des propriétés du contrôle en cours ***</p>
+   * <p> * On fait une premire passe pour récupere dans une map l'ensemble des attributs (clef, valeur)</p>
+   * <p> * Si l'attribut customId est présent, on modifie la clef de chaque attribut en concaténant le customId avec le nom de l'attribut (capitalized)</p>
+   * <p> * modification 15 janvier : traitement de l'attribut markup d'un élément du composant</p>
+   * <p> * si le markup est positionné à true sur un élément du composant, on ne tient pas compte de l'attribut markup</p>
+   * <p> * et ceci pour éviter que l'attribut markup remonte au niveau du composant et que le composant ne soit pas généré par le moteur</p>
+   * <p> *</p>
    * @param e : Element
    * @param controleID : String
    * @return (map des Attributs, customId)

@@ -58,7 +58,7 @@ import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProces
  * ==============================================================================================================================</p>
  */
 object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
-
+  
   if (!init()) { System.exit(99) }
   else {
     process() // process du batch
@@ -258,7 +258,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     val catalogAPlat = new CatalogAPlat(fichierBalsamiq, moteurTemplateFreeMarker, traitementBinding, catalogDesComposantsCommuns)
     var sourceJavascript = new StringBuilder() // contiendra le code généré depuis les templates
     var codeDesComposants = new StringBuilder() // contiendra le code java généré pour la page
-    val catalogBalsamiq = new CatalogBalsamiq(traitementBinding) // catalogBalsamiq final
+    val catalogBalsamiq = new CatalogBalsamiq(traitementBinding,true) // catalogBalsamiq final on trace les s appels
     val (ok, w, h) = catalogAPlat.chargementCatalog() // chargement du catalogue
     if (!ok) {
       logBack.info(utilitaire.getContenuMessage("mes9"), fichierBalsamiq.getName())

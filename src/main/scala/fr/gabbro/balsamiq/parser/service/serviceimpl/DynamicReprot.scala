@@ -11,14 +11,20 @@ import java.io.FileOutputStream
 import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
 import fr.gabbro.balsamiq.parser.modelimpl.Utilitaire
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import net.sf.dynamicreports.report.builder.group.GroupBuilder
+import javax.swing.GroupLayout
+import java.text.DateFormat
+import java.util.Date;
+import java.text.SimpleDateFormat
 
 //import net.sf.dynamicreports.report.builder.DynamicReports.{ `type` => type1 }
 
 class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
   val rep1 = createReport()
+  val format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
   val directory = CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir + "/" + cstReporting
   utilitaire.createRepostoriesIfNecessary(directory)
-  val fileName = directory + "/f1.pdf"
+  val fileName = directory + "/" + cstReporting + "-" +    format.format(new Date()) + cstSuffixPdf
   val f1 = new FileOutputStream(fileName)
   val pdf1 = rep1.toPdf(f1)
   // création d'un rapport 
@@ -29,21 +35,23 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
       val boldCenteredStyle = stl.style(boldStyle).setHorizontalAlignment(HorizontalAlignment.CENTER);
       val columnTitleStyle = stl.style(boldCenteredStyle).setBorder(stl.pen1Point()).setBackgroundColor(Color.LIGHT_GRAY).setFontSize(8)
       val centeredStyle = stl.style().setHorizontalAlignment(HorizontalAlignment.CENTER).setFontSize(7)
+      val leftStyle = stl.style().setHorizontalAlignment(HorizontalAlignment.LEFT).setFontSize(7)
+
       //("bmml", "templateID", "componant","message","description","gravity")
-      val bmml = col.column("bmml", "bmml", type1.stringType()).setStyle(centeredStyle).setWidth(20)
-      val templateID = col.column("templateID", "templateID", type1.stringType()).setStyle(centeredStyle).setWidth(5)
-      val componant = col.column("componant", "componant", type1.stringType()).setStyle(centeredStyle).setWidth(5)
-      val message = col.column("message", "message", type1.stringType()).setStyle(centeredStyle).setWidth(40)
-      val description = col.column("description", "description", type1.stringType()).setStyle(centeredStyle).setWidth(20)
-      val gravity = col.column("gravity", "gravity", type1.stringType()).setStyle(centeredStyle).setWidth(10)
+      val bmml = col.column(cstBmml, cstBmml, type1.stringType()).setStyle(centeredStyle).setWidth(20)
+      val templateID = col.column(cstTemplateId, cstTemplateId, type1.stringType()).setStyle(leftStyle).setWidth(5)
+      val componant = col.column(cstComponent, cstComponent, type1.stringType()).setStyle(leftStyle).setWidth(10)
+      val message = col.column(cstMessage, cstMessage, type1.stringType()).setStyle(leftStyle).setWidth(40)
+      val description = col.column(cstDescription, cstDescription, type1.stringType()).setStyle(centeredStyle).setWidth(15)
+      val gravity = col.column(cstGravity, cstGravity, type1.stringType()).setStyle(leftStyle).setWidth(10)
 
       val condition1 = stl.conditionalStyle(cnd.equal(gravity, cstError)).setBackgroundColor(Color.red);
       val condition2 = stl.conditionalStyle(cnd.equal(gravity, cstWarning)).setBackgroundColor(Color.orange);
       val plainStyle = stl.style().setFontName("FreeUniversal").setFontSize(6)
+      val groupStyle = stl.style().setFontSize(12).bold()
+      val grpBmml = grp.group(bmml).startInNewPage();
+      grpBmml.setStyle(groupStyle)
 
-    
-
-        
       val rep1 =
         report()
           .setColumnTitleStyle(columnTitleStyle)
@@ -52,10 +60,10 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
           .title(cmp.text("Execution Report").setStyle(boldCenteredStyle))
           .pageFooter(cmp.pageXofY().setStyle(boldCenteredStyle))
           .detailRowHighlighters(condition1, condition2)
-          // .groupBy(itemColumn)
+          .setGroupTitleStyle(groupStyle)
+          .groupBy(grpBmml)
           .setDataSource(createDataSource()) //set datasource
           .setPageFormat(1000, 400, PageOrientation.PORTRAIT)
-          
 
       // .show();//create and show report
 
@@ -71,8 +79,8 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
 
   def createDataSource(): JRDataSource = {
 
-    val dataSource = new DRDataSource("bmml", "templateID", "componant", "message", "description", "gravity");
-    globalContext.gblTableTrace.foreach {
+    val dataSource = new DRDataSource(cstBmml, cstTemplateId, cstComponent, cstMessage, cstDescription, cstGravity)
+    globalContext.gblTableTrace.distinct.foreach {
       case (bmml, templateID, componant, mes1, description, gravity) => dataSource.add(bmml, templateID, componant, mes1, description, gravity);
     }
 

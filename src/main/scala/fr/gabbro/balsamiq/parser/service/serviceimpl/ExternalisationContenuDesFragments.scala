@@ -38,7 +38,7 @@ import fr.gabbro.balsamiq.parser.modelimpl.GlobalContext
  * cette classe sert à générer les fragments bmml depuis le contenu de certains containers dans le mockup principal de l'écran.
  * Les containers sont référencés dans le paramètre generateFragmentFromTheseContainers du fichier properties
  */
-class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, val catalogDesComposantsCommuns: CatalogDesComposants, val moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, val traitementBinding: TraitementBinding,globalContext:GlobalContext) extends TCatalogAPlat {
+class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, val catalogDesComposantsCommuns: CatalogDesComposants, val moteurTemplatingFreeMarker: MoteurTemplatingFreeMarker, val traitementBinding: TraitementBinding, globalContext: GlobalContext) extends TCatalogAPlat {
   final val repertoireContenuDesFragmentsGeneres = repertoireDesBmmlATraiter + "/" + cstGeneratedFragment
   var nombreDeFragmentsGeneres = 0
   /**
@@ -59,7 +59,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     } catch {
       case ex: Exception =>
     }
-  } 
+  }
 
   /**
    * scan itératif du répertoire et traitement de chaque fichier bmml qui n'est pas un fragment.
@@ -75,7 +75,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
           val (fic, rep, useCase, fileNameComplet, isAfragment, fragmentName, generateController, ecranContenantLeFragment, typeDeFragment) = utilitaire.getFileInformation(file)
           if (!isAfragment) { // on ne traite que les fichiers principaux et non les fragments
             traitementDesFragmentsDuMockupBalsamiq(file) // generation des fragments du mockup en cours
-            
+
           }
         }
       }
@@ -108,7 +108,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     } else {
       catalogBalsamiq.creation_catalog(catalogAPlat.catalog, w, h) // creation et enrichissement du catalogue balsamiq
       // la map mapDesSourcesDesFragmentsAGenerer  contient le code source des fragments à générer. 
-      recuperationCodeXmlContainersDeFragment(catalogBalsamiq.catalog, mapDesSourcesDesFragmentsAGenerer,fic, useCase) // récuperation du contenu des fragements
+      recuperationCodeXmlContainersDeFragment(catalogBalsamiq.catalog, mapDesSourcesDesFragmentsAGenerer, fic, useCase) // récuperation du contenu des fragements
       generationDesfichiersFragmentDuMockupEnCours(mapDesSourcesDesFragmentsAGenerer, fic, useCase, w.toString, h.toString)
     }
     true
@@ -124,7 +124,7 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
    *
    */
   import scala.collection.mutable.Map
-  def recuperationCodeXmlContainersDeFragment(branche: ArrayBuffer[WidgetDeBase], mapDesSourcesDesFragmentsAGenerer: Map[(String, String), String],fic:String,usecase:String) {
+  def recuperationCodeXmlContainersDeFragment(branche: ArrayBuffer[WidgetDeBase], mapDesSourcesDesFragmentsAGenerer: Map[(String, String), String], fic: String, usecase: String) {
     var numero_En_cours = 0
 
     branche.foreach(controle => { // traitement de la branche en cours
@@ -142,14 +142,17 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
       })
       if (lewidgetGenereUnFragment) { // un génère un fragment pour ce container. 
         logBack.info(utilitaire.getContenuMessage("mes63"), widgetNameOrComponentName) // start generating fragment
+        val mes = utilitaire.getContenuMessage("mes63", widgetNameOrComponentName)
+        globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
+
         nombreDeFragmentsGeneres += 1
         val idDuContainer = if (controle.customId != "") { controle.customId } else { typeDuFragment + nombreDeFragmentsGeneres } // id du container pour générer le nom du fragment. Si l'ID est à blanc=> type + numero de fichier genere
         val codeSourceXmlDuFragment = recuperationCodeDuFragment(controle.tableau_des_fils, controle.sourceXmldDeLelement) // on recupere le code xml du container ainsi que le xml des enfants du container
-        globalContext.tableDesContainersDesFragments += (usecase,fic,idDuContainer) -> controle  // on met en table le widget du container afin de récupérer ultérieurement ses attributs
+        globalContext.tableDesContainersDesFragments += (usecase, fic, idDuContainer) -> controle // on met en table le widget du container afin de récupérer ultérieurement ses attributs
         mapDesSourcesDesFragmentsAGenerer += (idDuContainer, typeDuFragment) -> codeSourceXmlDuFragment // on met dans un map le code source du fragement
       } else { // le widget n'est pas un container pour lequel on génère un fragment, on traite donc les fils du widget en cours.
         if (controle.tableau_des_fils.size > 0) {
-          recuperationCodeXmlContainersDeFragment(controle.tableau_des_fils, mapDesSourcesDesFragmentsAGenerer,fic,usecase)
+          recuperationCodeXmlContainersDeFragment(controle.tableau_des_fils, mapDesSourcesDesFragmentsAGenerer, fic, usecase)
         }
 
       }
@@ -157,7 +160,6 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     })
   } // fin de  recuperationCodeXmlContainersDeFragment
 
- 
   /**
    * @param fragment
    * @return String   xml code of fragement
@@ -168,12 +170,12 @@ class ExternalisationContenuDesFragments(val repertoireDesBmmlATraiter: String, 
     var contenuXMLDeLaBranche = content
     branche.foreach(controle => {
       contenuXMLDeLaBranche += controle.sourceXmldDeLelement
-      if (controle.tableau_des_fils.size > 0) { contenuXMLDeLaBranche  = recuperationCodeDuFragment(controle.tableau_des_fils, contenuXMLDeLaBranche) }
+      if (controle.tableau_des_fils.size > 0) { contenuXMLDeLaBranche = recuperationCodeDuFragment(controle.tableau_des_fils, contenuXMLDeLaBranche) }
     })
 
     contenuXMLDeLaBranche
   }
-   
+
   /**
    * @param mapDesSourcesDesFragmentsAGenerer :Map[(String,String),String] Map contenant le nom du fragment son type, ansi que le contenu du fragment
    * la map mapDesSourcesDesFragmentsAGenerer contient le code source à générer pour chaque fragment d'un mockup principal

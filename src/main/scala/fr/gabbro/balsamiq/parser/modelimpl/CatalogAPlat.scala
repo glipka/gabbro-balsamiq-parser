@@ -46,6 +46,7 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
       mockup = doc.getRootElement();
     } catch {
       case e: Exception => {
+        CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, e.getMessage, "", cstError)
         logBack.error(e.getMessage())
         return (false, 0, 0)
       }
@@ -68,7 +69,10 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           (catalog(i).yAbsolute == catalog(j).yAbsolute) &&
           (catalog(i).w == catalog(j).w) &&
           (catalog(i).h == catalog(j).h)) {
-          logBack.error(utilitaire.getContenuMessage("mes26"), catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(i).xAbsolute.toString(), catalog(i).yAbsolute.toString())
+          logBack.error(utilitaire.getContenuMessage("mes26"), catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(j).xAbsolute.toString(), catalog(j).yAbsolute.toString())
+          val mes = utilitaire.getContenuMessage("mes26", catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(j).xAbsolute.toString(), catalog(j).yAbsolute.toString())
+          CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
+
           return false
         }
       }
@@ -96,15 +100,15 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           traitementGroupe(controle_en_cours.componentXML, controle_en_cours) // on traite le code xml du composant qui a été récupéré dans le traitement du catalogue des composants
         } // le controle groupe n'est pas mis en table, mais va servir à recalculer les coordonnées du fils 
         // l'id interne n'est pas incrémenté après un grpupe car il sert à récuperer les adresses des élements
-        else if (controle_en_cours.controlTypeID == cstGroupConstante) {traitementGroupe(elementXML, controle_en_cours)}
+        else if (controle_en_cours.controlTypeID == cstGroupConstante) { traitementGroupe(elementXML, controle_en_cours) }
         else {
           // si le widget est un element d'un composant traité localement, on récupère les 
           // attributs en override du groupe.
           // les attributs en override sont stockés sous la forme "CustomIDuComposantCLef" -> valeur
           if (groupe_en_cours != null && groupe_en_cours.isAComponent) {
             groupe_en_cours.mapExtendedAttribut.foreach(valeur => {
-              if(controle_en_cours.mapExtendedAttribut.getOrElse(cstMarkup, "") == "true"){
-              
+              if (controle_en_cours.mapExtendedAttribut.getOrElse(cstMarkup, "") == "true") {
+
                 // la clef commence par le cutomID du widget du commposant ? 
                 if (controle_en_cours.customId != "" && valeur._1.toString().startsWith(controle_en_cours.customId)) {
                   //on recupre le contenu de la clef
@@ -190,9 +194,8 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           val m3 = catalogAPlat(j).controlID.toString
           val m4 = catalogAPlat(j).controlTypeID.toString()
 
-         // logBack.debug(m1 + " " + m2 + " is included " + " in " + m3 + " " + m4)
+          // logBack.debug(m1 + " " + m2 + " is included " + " in " + m3 + " " + m4)
           logBack.debug(s"${m1}  ${m2}  is included in ${m3}  ${m4}")
-           
 
         }
         j = j + 1
