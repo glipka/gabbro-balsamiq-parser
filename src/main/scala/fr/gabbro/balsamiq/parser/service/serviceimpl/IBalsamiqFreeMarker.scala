@@ -362,6 +362,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
     CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir = System.getProperty("gencodefrombalsamiq.balsamiqBmmlDir")
     CommonObjectForMockupProcess.generationProperties.balsamiqAssetDir = System.getProperty("gencodefrombalsamiq.freemarkerCatalogComposantsDir")
     CommonObjectForMockupProcess.generationProperties.configProperties = System.getProperty("gencodefrombalsamiq.propertiesFile")
+     CommonObjectForMockupProcess.generationProperties.reportGenerationDir = System.getProperty("gencodefrombalsamiq.reportGenerationDir")
 
     if (CommonObjectForMockupProcess.templatingProperties.freemarkerTemplatesDir == null ||
       CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir == null ||

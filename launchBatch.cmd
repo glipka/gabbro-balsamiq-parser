@@ -6,5 +6,6 @@
    -Dgencodefrombalsamiq.freemarkerTemplatesPropertiesFile="C:/Temp/balsamiq/templates/freeMarkerTemplatesHTML.properties" ^
    -Dgencodefrombalsamiq.propertiesFile="c:/Temp/balsamiq/sourcesBalsamiq/config.properties" ^
    -Dgencodefrombalsamiq.messagesFile="c:/temp/balsamiq/sourcesBalsamiq/messages.properties" ^
+   -Dgencodefrombalsamiq.reportGenerationDir="c:/temp/balsamiq/sourcesBalsamiq/reportingb" ^
    -Dfile.encoding=UTF-8 ^
    -jar target/gabbro.balsamiq.parser-exec.jar

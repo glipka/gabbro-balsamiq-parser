@@ -142,7 +142,7 @@
 			<groupId>net.sourceforge.dynamicreports</groupId>
 			<artifactId>dynamicreports-core</artifactId>
 			<version>4.1.0</version>
-		</dependency>
+		</dependency>  
 
 
 
@@ -234,6 +234,7 @@
 						<argument>-Dgencodefrombalsamiq.propertiesFile=${fr.gencodefrombalsamiq.propertiesFile}</argument>
 						<argument>-Dgencodefrombalsamiq.messagesFile=${fr.gencodefrombalsamiq.messagesFile}</argument>
 						<argument>-Dgencodefrombalsamiq.projectName=${fr.gencodefrombalsamiq.projectName}</argument>
+						<argument>-Dgencodefrombalsamiq.reportGenerationDir=${fr.gencodefrombalsamiq.reportGenerationDir}</argument>
 						<argument>-Dfile.encoding=UTF-8</argument>
 						<argument>-classpath</argument>
 						<!-- automatically creates the classpath using all project dependencies, 

@@ -20,15 +20,23 @@ import java.text.SimpleDateFormat
 //import net.sf.dynamicreports.report.builder.DynamicReports.{ `type` => type1 }
 
 class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
-  val rep1 = createReport()
+
   val format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-  val directory = CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir + "/" + cstReporting
+  // si le repertoire de generation des rapports est renseigné  => 
+  val directory = if (CommonObjectForMockupProcess.generationProperties.reportGenerationDir != "") {
+    CommonObjectForMockupProcess.generationProperties.reportGenerationDir
+  } else {
+    CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir + "/" + cstReporting
+
+  }
   utilitaire.createRepostoriesIfNecessary(directory)
-  val fileName = directory + "/" + cstReporting + "-" +    format.format(new Date()) + cstSuffixPdf
+  val fileName = directory + "/" + cstReporting + "-" + format.format(new Date()) + cstSuffixPdf
   val f1 = new FileOutputStream(fileName)
+  val rep1 = createReport()
   val pdf1 = rep1.toPdf(f1)
   // création d'un rapport 
   def createReport(): JasperReportBuilder = {
+
     try {
 
       val boldStyle = stl.style().bold();
@@ -52,18 +60,28 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
       val grpGravity = grp.group(gravity).startInNewPage();
       grpGravity.setStyle(groupStyle)
 
+      val titleStyle = stl.style(boldCenteredStyle).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(15);
+
       val rep1 =
         report()
           .setColumnTitleStyle(columnTitleStyle)
           .highlightDetailEvenRows()
           .columns(bmml, message, gravity, templateID, componant, description)
-          .title(cmp.text("Execution Report").setStyle(boldCenteredStyle))
+          // .title(cmp.text("Execution Report").setStyle(boldCenteredStyle))
           .pageFooter(cmp.pageXofY().setStyle(boldCenteredStyle))
           .detailRowHighlighters(condition1, condition2)
-          .setGroupTitleStyle(groupStyle)
+          //.setGroupTitleStyle(groupStyle)
           .groupBy(grpGravity)
           .setDataSource(createDataSource()) //set datasource
           .setPageFormat(1000, 400, PageOrientation.PORTRAIT)
+
+      rep1.title( //shows report title
+        cmp.horizontalList()
+          .add(
+            cmp.image(getClass().getResourceAsStream("./bouvier.png")).setFixedDimension(80, 64),
+            cmp.text("Results of generation").setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.CENTER))
+          .newRow()
+          .add(cmp.filler().setStyle(stl.style().setTopBorder(stl.pen2Point())).setFixedHeight(10)))
 
       // .show();//create and show report
 
@@ -81,7 +99,7 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
 
     val dataSource = new DRDataSource(cstBmml, cstTemplateId, cstComponent, cstMessage, cstDescription, cstGravity)
     // on trie la table sur la gravité 
-    globalContext.gblTableTrace.distinct.sortWith((x,y)  => (x._6 < y._6)).foreach {
+    globalContext.gblTableTrace.distinct.sortWith((x, y) => (x._6 < y._6)).foreach {
       case (bmml, templateID, componant, mes1, description, gravity) => dataSource.add(bmml, templateID, componant, mes1, description, gravity);
     }
 

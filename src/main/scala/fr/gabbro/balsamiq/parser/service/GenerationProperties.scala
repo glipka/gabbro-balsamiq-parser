@@ -76,7 +76,9 @@ class GenerationProperties {
   @BeanProperty var headerXMLInGeneratedFragmentBegin = ""; // begin header in generated fragment 
   @BeanProperty var headerXMLInGeneratedFragmentEnd = ""; // end header in generated fragment
   @BeanProperty var processExtractFragments = true; // process extraction des fragments depuis le mockup principal true of false
-  // config.generation.overwriteJspOrHtmlFile
+  @BeanProperty var reportGenerationDir = ""; //  directory to generate report
+  
+   // config.generation.overwriteJspOrHtmlFile
   /**
    * load generation properties
    * @param propsMap
