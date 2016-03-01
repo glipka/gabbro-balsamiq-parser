@@ -34,7 +34,7 @@ class WidgetInThisColumn(@BeanProperty var widgetType: String,
 class ColumnDefinition(
   @BeanProperty var columnName: String,
   @BeanProperty var sort: String,
-  @BeanProperty var width: String, 
+  @BeanProperty var width: String,
   @BeanProperty var bootstrapWidth: String,
   @BeanProperty var alignment: String,
   @BeanProperty var widgetList: java.util.ArrayList[WidgetInThisColumn],
@@ -82,7 +82,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
     var largeurTotaleinDouzieme = 0
     // si la largeur des colonnes n'est pas spécifiée => message erreur
 
-    if (CommonObjectForMockupProcess.globalContext != null && tableauDesLargeursDesColonnes.isEmpty ) {
+    if (CommonObjectForMockupProcess.globalContext != null && tableauDesLargeursDesColonnes.isEmpty) {
       val mes = utilitaire.getContenuMessage("mes71", this.customId)
       CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstWarning)
     }
@@ -108,6 +108,7 @@ class Datagrid(id_interne: Int, groupe_en_cours: WidgetDeBase, elementXML: Eleme
         sort = cstAsc
         columnName = column.substring(0, column.length() - 1)
       } else columnName = column.substring(0, column.length())
+      columnName = utilitaire.textFormatting(columnName) // ajout le 1 mars 2016
 
       // on récupère la largeur de la colonne (en %)
       // le dernier caractere peut inidquer l'alignement dans la cellule
