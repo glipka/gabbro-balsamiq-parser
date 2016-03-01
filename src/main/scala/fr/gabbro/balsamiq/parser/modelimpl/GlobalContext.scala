@@ -60,7 +60,7 @@ class GlobalContext() {
   @BeanProperty var paths = new java.util.ArrayList[Location]() // contient la localisation des fichiers JSP générés.
   @BeanProperty var mapSourcesJavascript = scala.collection.mutable.Map[(String, String, String), String]() // clef = (usecase,filename,section) value = code javascript
   val logBack = LoggerFactory.getLogger(this.getClass());
-  val gblTableTrace = ArrayBuffer[(String, String, String, String, String, String)]() // (bmml,templateID,componant,mes1,description,gravity)
+  val gblTableTrace = ArrayBuffer[(String, String, String, String, String, String,String)]() // (bmml,templateID,componant,mes1,description,gravity,usecase)
 
   /**
    * @param bmml
@@ -72,7 +72,7 @@ class GlobalContext() {
    */
   def addTraceToReport(bmml: String, templateID: String, componant: String, mes1: String, description: String, gravity: String): Unit = {
     var mes = s"bmml ${bmml} composant ${componant} templateId ${templateID} ${mes1}  ${description} "
-    val trace = (bmml, templateID, componant, mes1, description, gravity)
+    val trace = (bmml, templateID, componant, mes1, description, gravity,CommonObjectForMockupProcess.nomDuUseCaseEnCoursDeTraitement)
     gblTableTrace += trace
    // gravity match {
    //   case "error" => logBack.error(mes)
