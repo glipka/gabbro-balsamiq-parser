@@ -99,8 +99,8 @@ class Utilitaire {
    */
   def textFormatting(text: String): String = {
     var outputString = remplaceHexa(text)
-    outputString = outputString.replace("\\r", "<br>")
-    outputString = outputString.replace("\n", "<br>")
+    outputString = outputString.replace("\\r", "")
+    outputString = outputString.replace("\\n", "")
 
     val l = extractColorList(outputString)
     l.foreach {
