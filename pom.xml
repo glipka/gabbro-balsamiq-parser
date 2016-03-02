@@ -73,12 +73,6 @@
 		<!-- remove the real commons-logging from classpath -->
 		<!-- declare as provided or exclude from spring jars -->
 		<dependency>
-			<artifactId>commons-logging</artifactId>
-			<groupId>commons-logging</groupId>
-			<version>${commonsLogging}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>
 			<version>${jericho}</version>
