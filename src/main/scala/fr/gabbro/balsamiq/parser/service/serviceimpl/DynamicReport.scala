@@ -33,24 +33,30 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
 import java.io.File
+import org.slf4j.LoggerFactory
 
 //import net.sf.dynamicreports.report.builder.DynamicReports.{ `type` => type1 }
 
 class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
-
+  val logBack = LoggerFactory.getLogger(this.getClass());
   val format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-  // si le repertoire de generation des rapports est renseigné  => 
-  val directory = if (CommonObjectForMockupProcess.generationProperties.reportGenerationDir != "") {
-    CommonObjectForMockupProcess.generationProperties.reportGenerationDir
-  } else {
-    CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir + "/" + cstReporting
+  def process(): Unit = {
+    logBack.info(utilitaire.getContenuMessage("mes72"))
 
+    // si le repertoire de generation des rapports est renseigné  => 
+    val directory = if (CommonObjectForMockupProcess.generationProperties.reportGenerationDir != "") {
+      CommonObjectForMockupProcess.generationProperties.reportGenerationDir
+    } else {
+      CommonObjectForMockupProcess.generationProperties.balsamiqMockupsDir + "/" + cstReporting
+
+    }
+
+    utilitaire.createRepostoriesIfNecessary(directory)
+    val fileName = directory + "/" +   CommonObjectForMockupProcess.generationProperties.projectName + "-" + format.format(new Date()) + cstSuffixPdf
+    val f1 = new FileOutputStream(fileName)
+    val rep1 = createReport()
+    val pdf1 = rep1.toPdf(f1)
   }
-  utilitaire.createRepostoriesIfNecessary(directory)
-  val fileName = directory + "/" + cstReporting + "-" + format.format(new Date()) + cstSuffixPdf
-  val f1 = new FileOutputStream(fileName)
-  val rep1 = createReport()
-  val pdf1 = rep1.toPdf(f1)
   // création d'un rapport 
   def createReport(): JasperReportBuilder = {
 
@@ -79,10 +85,10 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
       grpGravity.setStyle(groupStyle)
 
       val titleStyle = stl.style(boldCenteredStyle).setVerticalAlignment(VerticalAlignment.MIDDLE).setFontSize(15);
-     //val fichierImage= new File("c:/temp/bouvier.png")
-      val fichierImage= new File("./bouvier.png")
-     val img = if (fichierImage.exists) {ImageIO.read(fichierImage)} else {null}
-       
+      //val fichierImage= new File("c:/temp/bouvier.png")
+      val fichierImage = new File("./bouvier.png")
+      val img = if (fichierImage.exists) { ImageIO.read(fichierImage) } else { null }
+
       val rep1 =
         report()
           .setColumnTitleStyle(columnTitleStyle)
@@ -103,8 +109,6 @@ class DynamicReport(globalContext: GlobalContext, utilitaire: Utilitaire) {
           .groupBy(grpGravity)
           .setDataSource(createDataSource()) //set datasource
           .setPageFormat(1000, 400, PageOrientation.PORTRAIT)
-
-  
 
       return rep1
     } catch {
