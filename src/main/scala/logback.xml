@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="10 seconds">
 <property name="app-name" value="balsamiqFreeMarkerConverter" />
-<property name="file-default-path" value="c:/temp/balsamiq/logs" />
+<property name="file-default-path" value="${gencodefrombalsamiq.logs.dir}" />
 <property name="pattern-console-message" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg \\(%file:%line\\)%n" />
 <property name="pattern-file-message" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg \\(%file:%line\\)%n" />
 <property name="file-default-maxsize" value="5MB" />
 <property name="file-default-maxhistory" value="30" />
+ 
 
 
 <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
