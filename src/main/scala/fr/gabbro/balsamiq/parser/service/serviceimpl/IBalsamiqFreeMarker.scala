@@ -19,7 +19,7 @@ package fr.gabbro.balsamiq.parser.service.serviceimpl
 import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
-import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.asScalaBuffer 
 import scala.collection.JavaConversions.propertiesAsScalaMap
 import scala.collection.mutable.StringBuilder
 import java.io.InputStreamReader
@@ -136,7 +136,7 @@ object IBalsamiqFreeMarker extends App with TIBalsamiqFreeMarker {
       } 
        
       val dynamicReport = new DynamicReport(globalContext,utilitaire).process
-      return true
+      return {true}
     } else { false }
 
   }
