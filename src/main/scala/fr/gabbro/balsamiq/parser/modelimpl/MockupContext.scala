@@ -23,6 +23,7 @@ import fr.gabbro.balsamiq.parser.model.composantsetendus.WidgetDeBase
 import fr.gabbro.balsamiq.parser.model.composantsetendus.DirectoryFile
 import fr.gabbro.balsamiq.parser.service.serviceimpl.TraitementPreserveSection
 import fr.gabbro.balsamiq.parser.service.serviceimpl.CommonObjectForMockupProcess.constants._
+import scala.collection.mutable.ArrayBuffer
 // -----------------------------------------------
 // fragmentName : nom du fragment 
 // ficName : Nom du fichier 
@@ -75,6 +76,8 @@ class MockupContext() {
   @BeanProperty var bindedForms = new java.util.ArrayList[FormulaireCode]() // contient les sources pour instancier les formulaires
   @BeanProperty var fragments = new java.util.ArrayList[Fragment]() // table des fragments
   @BeanProperty var tableDesCodesDesClassesJavaouScala = Map[(String, String), String]() // table des classes : nom de la classe, nom du sous package,code de la classe
+  var tableauDesIdsDesWidgets = new ArrayBuffer[String] // utilisé pour stocker les ids des widgets du mockup
+
   val utilitaire = new Utilitaire
   /**
    * <p>methode appelée par freeMarker pour mettre en table le code source des classes java.</p>

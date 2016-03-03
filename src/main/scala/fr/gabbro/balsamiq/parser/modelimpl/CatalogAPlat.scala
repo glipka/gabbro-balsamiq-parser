@@ -69,8 +69,8 @@ class CatalogAPlat(fichierBalsamiq: File, moteurTemplateFreeMarker: MoteurTempla
           (catalog(i).yAbsolute == catalog(j).yAbsolute) &&
           (catalog(i).w == catalog(j).w) &&
           (catalog(i).h == catalog(j).h)) {
-          logBack.error(utilitaire.getContenuMessage("mes26"), catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(j).xAbsolute.toString(), catalog(j).yAbsolute.toString())
-          val mes = utilitaire.getContenuMessage("mes26", catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(j).controlTypeID, catalog(j).xAbsolute.toString(), catalog(j).yAbsolute.toString())
+          val mes = utilitaire.getContenuMessage("mes26", catalog(i).controlTypeID, catalog(i).xAbsolute.toString, catalog(i).yAbsolute.toString, catalog(i).customId, catalog(j).controlTypeID, catalog(j).xAbsolute.toString(), catalog(j).yAbsolute.toString(), catalog(j).customId)
+          logBack.error(mes)
           CommonObjectForMockupProcess.globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
 
           return false

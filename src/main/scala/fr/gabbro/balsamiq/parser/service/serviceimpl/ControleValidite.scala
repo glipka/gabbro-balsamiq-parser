@@ -122,7 +122,7 @@ class ControleValidite(catalog: ArrayBuffer[WidgetDeBase], traitementBinding: Tr
           logBack.error(utilitaire.getContenuMessage("mes29"), controle.controlTypeID.split("::").last)
 
         } // plus de 1 formulaire avec le même Nom ? 
-        else if (CommonObjectForMockupProcess.tableauDesIdsDesWidgets.filter(_ == controle.customId).size > 1) {
+        else if (CommonObjectForMockupProcess.mockupContext.tableauDesIdsDesWidgets.filter(_ == controle.customId).size > 1) {
           val mes = utilitaire.getContenuMessage("mes30", controle.controlTypeID.split("::").last, controle.customId)
           globalContext.addTraceToReport(CommonObjectForMockupProcess.nomDuFichierEnCoursDeTraitement, "", this.getClass.toString().split("\\.").last, mes, "", cstError)
           logBack.error(utilitaire.getContenuMessage("mes30"), controle.controlTypeID.split("::").last, controle.customId, "xx")

@@ -350,7 +350,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
           else if (elementName == cstCustomID) { // customId=wwwww   sert essentiellement pour identifier les formulaires 
             val id = if (elementValue != "") { elementValue.trim } else { "" }
             this.customId = id
-            if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
+            if (id != "" && CommonObjectForMockupProcess.mockupContext != null) { CommonObjectForMockupProcess.mockupContext.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
 
           } else if (elementName == cstCustomData) {
             val tableValue = elementValue.split(";").map(_.trim)
@@ -481,7 +481,7 @@ abstract class WidgetDeBase(@BeanProperty val id_interne: Int, groupe_en_cours: 
                 }
                 this.customId = id // custom ID
 
-                if (id != "") { CommonObjectForMockupProcess.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
+                if (id != ""  && CommonObjectForMockupProcess.mockupContext != null) { CommonObjectForMockupProcess.mockupContext.tableauDesIdsDesWidgets += this.customId } // on met en table le nom des formulaires
 
                 mapExtendedAttributDuComposant += (cstCustomID -> id)
               } else if (paramName == cstCustomData) {
