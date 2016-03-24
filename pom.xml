@@ -229,7 +229,7 @@
 						<argument>-Dgencodefrombalsamiq.messagesFile=${fr.gencodefrombalsamiq.messagesFile}</argument>
 						<argument>-Dgencodefrombalsamiq.projectName=${fr.gencodefrombalsamiq.projectName}</argument>
 						<argument>-Dgencodefrombalsamiq.reportGenerationDir=${fr.gencodefrombalsamiq.reportGenerationDir}</argument>
-					    <argument>-Dgencodefrombalsamiq.logs.dirr=${fr.gencodefrombalsamiq.logs.dir}</argument>
+					    <argument>-Dgencodefrombalsamiq.logs.dir=${fr.gencodefrombalsamiq.logs.dir}</argument>
 					
 						
 						<argument>-Dfile.encoding=UTF-8</argument>
